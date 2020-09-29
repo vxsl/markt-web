@@ -1,0 +1,3 @@
+[submodule "bnnbloomberg-markets-scraper"]
+	path = bnnbloomberg-markets-scraper
+	url = https://github.com/vxsl/bnnbloomberg-markets-scraper
