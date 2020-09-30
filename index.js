@@ -1,32 +1,65 @@
 const scraper = require("./bnnbloomberg-markets-scraper")
 
+const NUM_POSITIONS = 4
 
-var market = []
+var positions = []
+let market = []
 var timestamp
 
-const getStockBySymbol = (symbol) => {
-
-	for (var i = 0; i < market.length; i++) {
-
-		if (market[i].symbol = symbol) return market[i]
+const main = async () => {
+	
+	console.log("\nInitializing...")
+	await init()	
+	console.log("Market model initialized with " + market.length + " stocks.\n")
+	displayPositions()
+	
+	while (true) {
+		//console.log('here')
+		await poll(updateMarket)
 	}
-}
-
-const display = () => {
-
-	for (var i = 0; i < 10; i++) {
-		console.log(market[i].symbol)
-	}		
-	//console.log(timestamp)
 }
 
 const init = async () => {
 
+	// initialize market model:
 	var tmp = await scraper.gainers()
 	market = [...tmp.data.stocks]
 	sortStocks(market)
 	timestamp = tmp.generatedTimestamp
+
+	// initialize positions:
+	for (var i = 0; i < NUM_POSITIONS ; i++) {
+		positions.push(market[i])
+	}
 }
+
+
+/*=========================================
+=            POLLING FUNCTIONS            =
+=========================================*/
+
+const poll = async (updateMarket) => {
+
+	var cur = await scraper.gainers()
+	updateMarket(cur)	
+	await new Promise(r => setTimeout(r, 1000));	// sleep
+}
+
+const updateMarket = (cur) => {
+
+	timestamp = cur.generatedTimestamp
+	if (marketDiff(sortStocks(cur.data.stocks))) {
+
+		// evaluatePositions()
+
+		market = cur.data.stocks
+		console.log("*********************************************************")
+		console.log("Market updated at " + timestamp.substring(11) + ": ")
+		displayMarket()
+	}
+}
+
+/*----------  Polling helpers  ----------*/
 
 const marketDiff = (stockArr) => {
 
@@ -60,41 +93,46 @@ const stockDiff	= (stock, newIndex) => {
 	}	                
 }*/
 
+/*=============================	============
+=            DISPLAY FUNCTIONS            =
+=========================================*/
+
+const displayMarket = (n=10) => {
+
+	for (var i = 0; i < n; i++) {
+		console.log(market[i].symbol)
+	}		
+	//console.log(timestamp)
+}
+
+const displayPositions = () => {
+
+	console.log("Positions: ")
+	for (var i = 0; i < positions.length; i++) {
+		console.log(positions[i].symbol + "  \t@ $" + positions[i].price)
+	}
+}
+
+/*=====================================
+=            MISC. HELPERS            =
+=====================================*/
+
+const getStockBySymbol = (symbol) => {
+
+	for (var i = 0; i < market.length; i++) {
+
+		if (market[i].symbol = symbol) return market[i]
+	}
+}
+
 const sortStocks = (stockArr) => {
 
 	stockArr.sort((a, b) => b.pctChng - a.pctChng);
 	return stockArr
 }
 
-const updateMarket = (cur) => {
-
-	timestamp = cur.generatedTimestamp
-	if (marketDiff(sortStocks(cur.data.stocks))) {
-		market = cur.data.stocks
-		console.log("*********************************************************")
-		console.log("Market updated at " + timestamp.substring(11) + ": ")
-		display()
-	}
-}
-
-const poll = async (updateMarket) => {
-
-	cur = await scraper.gainers()
-	updateMarket(cur)		
-	await new Promise(r => setTimeout(r, 1000));	// sleep
-}
-
-
-const main = async () => {
-	
-	console.log("Initializing...")
-	await init()	
-	console.log("Market model initialized with " + market.length + " stocks.\n")
-	
-	while (true) {
-		//console.log('here')
-		await poll(updateMarket)
-	}
-}
+/*===============================
+=            Program            =
+===============================*/
 
 main()
