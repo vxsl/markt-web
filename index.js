@@ -11,11 +11,11 @@ const main = async () => {
 	
 	let failCount = 0
 	
-	scraper.select(0)
+	scraper.initialize(0)
 
 	for (let i = 0; i < TESTS; i++) {
 		let result = await scraper.poll()
-		if (result == 'fail') {
+		if (result != 0) {
 			//console.log("fail...")
 			failCount++
 		}
