@@ -1,13 +1,14 @@
 const scraper = require("./bnnbloomberg-markets-scraper")
 const fs = require('fs')
 
-const NUM_POSITIONS = 4
+const NUM_POSITIONS = 6
 
 var positions = []
 var market = []
 var currentTimestamp, lastTimestamp
 
 process.chdir('/var/www/html/kylegrimsrudma.nz/scalping-agent/')
+const jsonDir = '../public_html/tsx-project/scalping-agent-web/js'
 
 const main = async () => {
 	
@@ -40,8 +41,13 @@ const init = async () => {
 	for (let i = 0; i < NUM_POSITIONS ; i++) {
 		positions.push({
 			stock:market[i],
-			purchasePrice:market[i].price,
-			history: [market[i].price]
+			price:{
+				current:market[i].price,
+				history:[market[i].price],				
+				min:market[i].price,
+				max: market[i].price,
+				average:market[i].price 
+			}
 		})
 	}
 }
@@ -52,26 +58,37 @@ const evaluatePositions = () => {
 	let changeCount = 0
 	for (let i = 0; i < positions.length; i++) {
 		p = positions[i]
-		currentPrice = p.history[0]
+		currentPrice = p.price.current
 		newPrice = getStockBySymbol(p.stock.symbol).price
+		p.price.history.unshift(newPrice)
 		if (currentPrice != newPrice) {
-			p.history.push(newPrice)
+			p.price.current = newPrice
+			if (newPrice < p.price.min) {
+				p.price.min = newPrice
+			}
+			else if (newPrice > p.price.max) {
+				p.price.max = newPrice
+			}
+			//p.history.push(newPrice)
 			let s = (p.stock.symbol + " ")
 			s += (newPrice - currentPrice > 0) ? "jumped" : "fell"
 			s += (" from " + currentPrice + " to " + newPrice + "...")
-			console.log(s + p.history)
+			console.log(s + p.price.history)
 			changeCount++
 		}
 	}
-	if (changeCount <= 0) {
+	/*if (changeCount <= 0) {
 		console.log("None of your positions have changed in value. Something went wrong.")
 		//exit()
 	}
-	else {
+	else {*/
+	if (changeCount > 0) {
 		console.log(changeCount + " OF YOUR POSITIONS HAVE CHANGED IN VALUE:")
 		console.log("-------------------------------------------")
 		displayPositions()
 	}
+
+	writeJSON(positions)
 }
 
 
@@ -91,6 +108,8 @@ const getNewQuote = async () => {
 
 const updateMarket = (cur) => {
 
+	fakeMarket(cur)
+
 	lastTimestamp = currentTimestamp
 	currentTimestamp = cur.generatedTimestamp
 
@@ -99,31 +118,38 @@ const updateMarket = (cur) => {
 		return
 	}
 	if (marketDiff(sortStocks(cur.data.stocks, 'pctChng'))) {
-		market = cur.data.stocks	
-
-		evaluatePositions()	
+		market = [...cur.data.stocks]	
 		displayMarket()
 	}
 	else if (lastTimestamp != currentTimestamp) {
+		
 		console.log(currentTimestamp.substring(11) + ": Nothing to report...")
+	}
+
+	evaluatePositions()	
+}
+
+const fakeMarket = (cur) => {
+	for (let i = 0; i < cur.data.stocks.length; i++) {
+		//console.log(cur.data.stocks[i])
+		if (Math.random() > 0.3) {
+			if (Math.random() > 0.5) {
+				cur.data.stocks[i].price = getStockBySymbol(cur.data.stocks[i].symbol).price + Math.random()
+			} else {
+				cur.data.stocks[i].price = getStockBySymbol(cur.data.stocks[i].symbol).price - Math.random()
+			}
+		}
+		
 	}
 }
 
 /*----------  Polling helpers  ----------*/
 
-const marketDiff = (stockArr, n=10) => {
+const marketDiff = (stockArr, n=NUM_POSITIONS*2) => {
 
-	//stockArr.map((stock, newIndex) => stockDiff(stock, newIndex))
-
-	let oldIndex
-	for (let newIndex = 0; newIndex < n; newIndex++) {
-		oldIndex = market.findIndex(s  => s.symbol == stockArr[newIndex].symbol); 
-		//console.log(oldIndex + " " + newIndex)
-		if (newIndex != oldIndex) {			
+	for (let i = 0; i < n; i++) {
+		if (stockArr[i].price != getStockBySymbol(stockArr[i].symbol).price) {			
 			return true
-			/*process.stdout.write(stock.symbol)
-			let a = (newIndex - oldIndex > 0) ? "jumped" : "fell"
-			process.stdout.write(a +" from " + oldIndex + " to " + newIndex + "...\n")*/			
 		}
 	}
 	return false
@@ -148,10 +174,6 @@ const stockDiff	= (stock, newIndex) => {
 
 const displayMarket = async (n=10) => {
 
-	/*fs.writeFile('../public_html/tsx-project/scalping-agent-web/js/market.json', JSON.stringify(market), () => {
-		console.log("wrote market to JSON")
-	})*/
-	//console.log("*********************************************************")
 	console.log("New market snapshot at " + currentTimestamp.substring(11) + ": ")
 
 	for (let i = 0; i < n; i++) {
@@ -164,19 +186,12 @@ const displayMarket = async (n=10) => {
 
 const displayPositions = async () => {
 
-	fs.writeFile('../public_html/tsx-project/scalping-agent-web/js/positions.json', JSON.stringify(positions), (err) => {
-		console.log("wrote positions to JSON")
-		if (err != null) {
-			console.log(err)
-		}
-	})
-
 	//console.log("Positions: ")
 	let p, priceDiff
 	for (let i = 0; i < positions.length; i++) {
 		p = positions[i]
-		priceDiff = p.history[0] - p.purchasePrice
-		console.log(p.stock.symbol + "  \t@ " + p.history[0].toFixed(2) + "  \t" + priceDiff.toFixed(2))
+		priceDiff = p.price.history[0] - p.price.average
+		console.log(p.stock.symbol + "  \t@ " + p.price.history[0].toFixed(2) + "  \t" + priceDiff.toFixed(2))
 	}
 	console.log("\n")
 }
@@ -184,6 +199,15 @@ const displayPositions = async () => {
 /*=====================================
 =            MISC. HELPERS            =
 =====================================*/
+
+const writeJSON = async (data) => {
+	fs.writeFile(jsonDir+'/positions.json', JSON.stringify(data), (err) => {
+		//console.log("wrote positions to JSON")
+		if (err != null) {
+			console.log(err)
+		}
+	})
+}
 
 const getStockBySymbol = (symbol) => {
 
