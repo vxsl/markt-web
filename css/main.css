@@ -1,0 +1,39 @@
+body {
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", sans-serif !important;
+    background-color:#f0f0f0 !important;
+}
+
+canvas {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+.chart-container {
+    width:30%;
+    padding:1%
+    /*
+    width: 500px;
+    margin-left: 40px;
+    margin-right: 40px;
+    margin-bottom: 40px;*/
+}
+.chartTable {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+div#main-title {
+    padding:2%
+}
+div#main-title > * {
+    text-align:center;
+}
+div#main-title > h1 {
+    font-weight:lighter;
+    color:rgb(255, 99, 132);
+}
+div#main-title > p {
+    color:rgb(189, 189, 189)
+}
