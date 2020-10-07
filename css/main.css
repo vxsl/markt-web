@@ -1,21 +1,41 @@
+@import 'util/column-grid.css';
+
+:root {
+    --main-color: rgb(5, 205, 255);
+    --secondary-color: rgb(236, 236, 236);
+}
+
 body {
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", sans-serif !important;
-    background-color:#f0f0f0 !important;
+    font-family: "Helvetica", sans-serif !important;
+    background-color:#dddddd !important;
 }
 
 canvas {
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
+    width:100%;
+    height:100%;
 }
-.chart-container {
+.chart-container-container {
     width:30%;
-    padding:1%
+    /*height:25vh;*/
+    padding:2%;
+}
+.chart-container{
+    
+    padding:5%;
     /*
     width: 500px;
     margin-left: 40px;
     margin-right: 40px;
     margin-bottom: 40px;*/
+    box-sizing:border-box;
+    border:solid;
+    border-color:var(--secondary-color);
+    
+    border-radius: 5%;
+
 }
 .chartTable {
     display: flex;
@@ -24,15 +44,49 @@ canvas {
     justify-content: center;
 }
 
+.chart-extlabel {
+    width:100%;
+    color:rgb(165, 165, 165);
+    padding:3%;
+    background-color:rgb(236, 236, 236);
+    margin-bottom:10%;
+    border-radius:10px;
+    display:table
+
+}
+.chart-extlabel > h2 {
+    font-size:1vw;
+    display:table-cell;
+    vertical-align:middle;
+    padding-left:5%;
+}
+
+.chartTable-sidebar {
+
+    width:100%;
+}
+
+.chartTable-sidebar > table {
+    
+    width:100%
+}
+
+
+div#titlebar {
+    background-color:rgb(236, 236, 236);
+    margin:0;
+    margin-bottom:2%
+}
 div#main-title {
-    padding:2%
+    width:100%;
+    padding:2%;
 }
 div#main-title > * {
-    text-align:center;
+    text-align:right;
 }
 div#main-title > h1 {
     font-weight:lighter;
-    color:rgb(255, 99, 132);
+    color:var(--main-color)
 }
 div#main-title > p {
     color:rgb(189, 189, 189)
