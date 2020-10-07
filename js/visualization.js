@@ -22,29 +22,12 @@ const fetchPositions = async () => {
 
 const init = async () => {
 
-    let data = await fetchPositions()
+    let data = await fetchPositions()  
+    createTable()
+    
+    for (let i = 0; i < NUM_TABLES; i++) {      
 
-    for (let i = 0; i < NUM_TABLES; i++) {
-
-        let container = document.querySelector('.chartTable-sidebar')
-        let sidebarTable = document.createElement('table')
-        sidebarTable.setAttribute("border", "1")
-        sidebarTable.setAttribute("cellpadding", "10")
-        for (let j=0; j<3; j++){
-            var tr = document.createElement('tr');
-            sidebarTable.appendChild(tr);
-            
-            for (var k=0; k<4; k++){
-                var td = document.createElement('td');
-                //td.width='75';
-                td.appendChild(document.createTextNode("Cell " + i + "," + j));
-                tr.appendChild(td);
-            }
-         }  
-        container.appendChild(sidebarTable)
-
-         
-        container = document.querySelector('.chartTable');
+        let container = document.querySelector('.chartTable');
         let outerCountainer = document.createElement('div')
         outerCountainer.classList.add('chart-container-container')
 
@@ -74,17 +57,19 @@ const init = async () => {
                     label: data[i].stock.symbol,
                     backgroundColor: MAINCOLOR,
                     borderColor: MAINCOLOR,
-                    data: data[i].price.history
+                    lineTension:0,
+                    data: []
                 }]
             },
             plugins: [{
                 /* Adjust label font size according to chart size */
                 beforeDraw: function(c) {
                     c.options.legend.labels.fontSize = c.chart.height * 0.07;
-                }
+                },
+                streaming: 30
             }],            
             options: {
-                //responsive:true,
+                //responsive:true,                
                 elements: {
                     point: {
                         radius:0
@@ -102,7 +87,7 @@ const init = async () => {
                         //fontStyle:'bold',
                         fontFamily:'Helvetica',
                         boxWidth:0,
-                    }
+                    },
                 },
                 scales: {
                     xAxes: [{                    
@@ -113,6 +98,21 @@ const init = async () => {
                         type: 'realtime',
                         realtime: {
                             onRefresh: async function(chart) {
+                                //console.log('refresh ' + i)
+                                let position = await fetchPositions()
+                                //Array.prototype.push.apply(chart.data.datasets[0].data, position[i].price.current);
+                                chart.data.datasets[0].data.push({
+                                    //x:position[i].price.history[0].timestamp,
+                                    x:Date.now(),
+                                    y:position[i].price.current
+                                })
+                                console.log(i + ": " + position[i].price.current)
+                                //console.log(chart.data.datasets[0].data)
+                                //chart.update()
+                                chart.options.scales.yAxes[0].ticks.min = Math.max(0, 0.995*position[i].price.min);
+                                chart.options.scales.yAxes[0].ticks.max = 1.025*position[i].price.max;
+                            },
+                            /*onRefresh: async function(chart) {
                                 let position = await fetchPositions().then(function(json) {
                                     return json[i]    // TODO stop this from executing fetchPositions() 6 times....
                                 })
@@ -126,7 +126,7 @@ const init = async () => {
                                     //console.log(dataset.data[0])
                                 });
                                 chart.options.scales.yAxes[0].ticks.max = 1.3*position.price.max;
-                            },
+                            },*/
                             delay:2000
                         }                
                       }],
@@ -136,7 +136,7 @@ const init = async () => {
                             color:SECONDARYCOLOR
                         },
                         ticks: {
-                            suggestedMin: 0,
+                            //suggestedMin: 0,
                             maxTicksLimit: 4
                         }
                     }]
@@ -144,6 +144,27 @@ const init = async () => {
             }
         }); 
     };
+}
+
+const createTable = () => {
+    var sidebarContainer = document.querySelector('.chartTable-sidebar')
+    var sidebarTable = document.createElement('table')
+    sidebarTable.setAttribute("border", "1")
+    sidebarTable.setAttribute("cellpadding", "10")
+
+    container = document.querySelector('.chartTable-sidebar')
+        for (let j=0; j<6; j++){
+            var tr = document.createElement('tr');
+            sidebarTable.appendChild(tr);
+            
+            for (var k=0; k<5; k++){
+                var td = document.createElement('td');
+                //td.width='75';
+                td.appendChild(document.createTextNode("Cell " +  j));
+                tr.appendChild(td);
+            }
+         }  
+        sidebarContainer.appendChild(sidebarTable)
 }
 
 init()

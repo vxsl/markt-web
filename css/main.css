@@ -1,4 +1,4 @@
-@import 'util/column-grid.css';
+@import "util/column-grid.css";
 
 :root {
     --main-color: rgb(5, 205, 255);
@@ -8,6 +8,8 @@
 body {
     font-family: "Helvetica", sans-serif !important;
     background-color:#dddddd !important;
+    margin:0;
+    padding:0
 }
 
 canvas {
@@ -18,7 +20,7 @@ canvas {
     height:100%;
 }
 .chart-container-container {
-    width:30%;
+    width:20%;
     /*height:25vh;*/
     padding:2%;
 }
@@ -41,7 +43,8 @@ canvas {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: right;
+    
 }
 
 .chart-extlabel {
@@ -62,24 +65,35 @@ canvas {
 }
 
 .chartTable-sidebar {
+    width:80%;
+}
 
+.chartTable-sidebar > table {   
+    color:var(--main-color);
+    border:1px solid;
+    border-color:var(--main-color);
     width:100%;
+    border-collapse: collapse;
+}
+.chartTable-sidebar > table > tr, td {
+    text-align:left;
+    vertical-align:middle
+}
+.chartTable-sidebar > pre {
+    margin-left:5%;
+    font-size:.8vw;
 }
 
-.chartTable-sidebar > table {
-    
-    width:100%
-}
 
 
 div#titlebar {
     background-color:rgb(236, 236, 236);
-    margin:0;
     margin-bottom:2%
 }
 div#main-title {
-    width:100%;
-    padding:2%;
+    float:right;
+    width:20%;
+    padding-right:2%
 }
 div#main-title > * {
     text-align:right;

@@ -7,23 +7,28 @@
         <!--<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>-->
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
         <script type="text/javascript" src="js/node_modules/chartjs-plugin-streaming/dist/chartjs-plugin-streaming.min.js"></script>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">-->
     </head>
 
     <body>
 
         <div class="row" id ="titlebar">
             <div id="main-title">            
-                <h1>SCALPING AGENT</h1>
+                <h1>SCALPING<br>AGENT</h1>
                 <p>kylegrimsrudma.nz</p>
             </div>
         </div>
 
-        <div class="row"> 
-            <div class="chartTable-sidebar col-4"></div>
-            <div class="chartTable col-8" id="positionsTable"> </div>
+        <div class="row">             
+            <div class="col-4">
+                <div class="chartTable-sidebar">
+                    <pre id="log"></pre>
+                </div>
+            </div>
+            <div class="col-8 chartTable" id="positionsTable"> </div>
         </div>
         <script src="js/visualization.js"></script>
+        <script src="js/information.js"></script>
 
     </body>
 </html>
