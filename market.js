@@ -62,12 +62,13 @@ const evaluatePositions = () => {
 
 	let p, currentPrice, newPrice
 	let changeCount = 0
+	let s = ''
 	for (let i = 0; i < positions.length; i++) {
 		p = positions[i]
 		currentPrice = p.price.current
 		newPrice = getStockBySymbol(p.stock.symbol).price
 		
-		if (currentPrice > newPrice) buySellEmitter.emit("sell", i)
+		if (currentPrice > newPrice) buySellEmitter.emit	 ("sell", i)
 		if (currentPrice != newPrice) {
 			p.price.current = newPrice
 			p.price.history.unshift({value:newPrice, timestamp: currentTimestamp})
@@ -79,18 +80,18 @@ const evaluatePositions = () => {
 			else if (newPrice > p.price.max) {
 				p.price.max = newPrice
 			}			
-			let s = (p.stock.symbol + " ")
+			s += (p.stock.symbol + " ")
 			s += (newPrice - currentPrice > 0) ? "jumped" : "fell"
-			s += (" from " + currentPrice + " to " + newPrice + "...")			
-			log(s)
+			s += (" from " + currentPrice + " to " + newPrice + "...\n")	
 			changeCount++
 		}
-	}
-	if (changeCount > 0) {
+	}			
+	if (s) log(s)
+	/* if (changeCount > 0) {
 		log(changeCount + " OF YOUR POSITIONS HAVE CHANGED IN VALUE:")
 		log("-------------------------------------------")
 		displayPositions()
-	}
+	} */
 
 	writeJSON(positions)
 }
@@ -127,8 +128,7 @@ const updateMarket = (cur) => {
 	}
 	else if (lastTimestamp != currentTimestamp) {
 		
-		let d = new Date(currentTimestamp)
-		nothingLog(d.toLocaleTimeString().replace(" PM", ":" + d.getMilliseconds() +" PM") + " -> Nothing to report...")
+		nothingLog("\n" + epochToTimeString(currentTimestamp) + " -> Nothing to report...\n")
 	}
 
 	evaluatePositions()	
@@ -179,7 +179,8 @@ const stockDiff	= (stock, newIndex) => {
 
 const displayMarket = async (n=10) => {
 
-	log("New market snapshot at " + currentTimestamp + ": ")
+	log("Update stamped " + epochToTimeString(currentTimestamp) + ". (" + ((Date.now() - currentTimestamp) / 1000) + " seconds late)" )
+	//log("New market snapshot at " + currentTimestamp + ": ")
 
 	/*for (let i = 0; i < n; i++) {
 		log(market[i].symbol + "  \t" + market[i].price.toFixed(2) + "\t\t+" + market[i].pctChng.toFixed(2) + "%")
@@ -197,6 +198,11 @@ const displayPositions = async () => {
 		log(p.stock.symbol + "  \t@ " + p.price.history[0].value.toFixed(2) + "  \t" + priceDiff.toFixed(2))
 	}
 	log("\n")
+}
+
+const epochToTimeString = (epochString) => {
+	let d = new Date(epochString)
+	return d.toLocaleTimeString().replace(" PM", ":" + d.getMilliseconds() +" PM").replace(" AM", ":" + d.getMilliseconds().toString().slice(-3) +" AM")
 }
 
 /*=====================================
@@ -246,7 +252,7 @@ const nothingLog = async (message) => {
 	fs.openSync(filename, 'r+')
 
 	// remove redundant line from end of log
-	let stdout = child_process.execSync('tail -n 1 '+filename)
+	let stdout = child_process.execSync('tail -n 3 '+filename)
 	let stat = fs.statSync(filename)
 	if (stdout.includes("Nothing to report")) {
 		fs.truncateSync(filename, stat.size - stdout.length)
@@ -254,8 +260,7 @@ const nothingLog = async (message) => {
 	
 	// replace with new line
 	fs.appendFileSync(filename, message+"\n")
-	if (debug) console.log(message)
-	
+	if (debug) console.log(message)	
 }
 
 /*===============================
