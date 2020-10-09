@@ -1,5 +1,3 @@
-const NUM_TABLES = 6
-
 var positions
 var update = true
 
@@ -11,22 +9,33 @@ const SECONDARYCOLOR = 'rgb(236, 236, 236)'
 
 var updating = false
 
-const fetchPositions = async () => {    
-    
-    var xhr = new XMLHttpRequest();    
-    xhr.open('GET', 'js/data/stocks.json');    
-    xhr.send();
-    return new Promise((resolve, reject) => {
-        xhr.onload = () => resolve(JSON.parse(xhr.responseText))        
-        xhr.onerror = reject
-    })    
+const fetchPositions = async () => {
+    let xhr, r    
+    while (true) {
+        xhr = new XMLHttpRequest();    
+        xhr.open('GET', 'js/data/stocks.json');    
+        xhr.send();
+        return new Promise((resolve, reject) => {
+            xhr.onload = () => resolve(JSON.parse(xhr.responseText))        
+            xhr.onerror = reject
+        })     
+        /* r = await new Promise(async (resolve, reject) => {    
+            xhr.onload = async () => {
+                try {resolve(JSON.parse(xhr.responseText))}
+                catch (error) {return 1}
+            }             
+            xhr.onerror = reject
+        }) 
+        if (r != 1) return r */   
+    }
 }
 
 const init = async () => {
 
-    positions = await fetchPositions()  
-    
-    for (let i = 0; i < NUM_TABLES; i++) {      
+    positions = await fetchPositions()  // first call
+    console.log(positions)
+
+    for (let i = 0; i < positions.length; i++) {      
 
         let container = document.querySelector('.chartTable');
         let outerCountainer = document.createElement('div')
@@ -124,7 +133,7 @@ const init = async () => {
                                 chart.options.scales.yAxes[0].ticks.min = Math.max(0, 0.995*p.price.min);
                                 chart.options.scales.yAxes[0].ticks.max = 1.025*p.price.max;      
                                 
-                                if (i+1 === NUM_TABLES) {
+                                if (i+1 === positions.length) {
                                     updating = false
                                 }
                             },

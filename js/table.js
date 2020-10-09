@@ -36,8 +36,10 @@ let createTable = async() => {
     positionsTable.appendChild(tr)
     for (let key in positions[0]) {
         let th = document.createElement('th')
-        tr.appendChild(th)    
-        th.innerHTML = key
+        tr.appendChild(th)                 
+        if (key == "average") th.innerHTML = "AVG"   
+        else if (key == "quantity") th.innerHTML = "QTY"   
+        else th.innerHTML = key.toUpperCase()        
     }
     for (let i=0; i<positions.length; i++){
         let tr = document.createElement('tr')
@@ -70,6 +72,7 @@ let tableRefresh = async() => {
         let netTotal = 0
         for (let i=1; i<=positions.length; i++){
             let tr = positionsTable.rows[i]
+            if (positions[i-1].sold) tr.style.fontWeight = "bold"
             j = 0
             for (let key in positions[i-1]) {
                 if (key == "net") break  
@@ -88,17 +91,18 @@ let tableRefresh = async() => {
             else net = null
             td.innerHTML = net
         }
-        let tr = positionsTable.rows[7]
+        let tr = positionsTable.rows[positions.length+1]
         let td = tr.cells[--j]
-            if (netTotal > 0) {
-                netTotal = "+" + netTotal
-                td.style.color = 'green'
-            }
-            else if (netTotal < 0) {
-                td.style.color = "red"
-            }
-            else netTotal = null
-        td.innerHTML = "<b>" + netTotal.toFixed(2) + "</b>"
+        if (netTotal > 0) {
+            netTotal = "+" + netTotal.toFixed(2)
+            td.style.color = 'green'
+        }
+        else if (netTotal < 0) {
+            netTotal = netTotal.toFixed(2)
+            td.style.color = "red"
+        }
+        else netTotal = 0
+        td.innerHTML = "<b>" + netTotal + "</b>"
         
         await new Promise(r=> setTimeout(r,500))
     }
