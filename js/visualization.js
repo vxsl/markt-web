@@ -9,10 +9,12 @@ var charts = []
 const MAINCOLOR = 'rgb(5, 205, 255)'
 const SECONDARYCOLOR = 'rgb(236, 236, 236)'
 
+var updating = false
+
 const fetchPositions = async () => {    
     
     var xhr = new XMLHttpRequest();    
-    xhr.open('GET', 'js/positions.json');    
+    xhr.open('GET', 'js/data/stocks.json');    
     xhr.send();
     return new Promise((resolve, reject) => {
         xhr.onload = () => resolve(JSON.parse(xhr.responseText))        
@@ -22,8 +24,7 @@ const fetchPositions = async () => {
 
 const init = async () => {
 
-    let data = await fetchPositions()  
-    createTable()
+    positions = await fetchPositions()  
     
     for (let i = 0; i < NUM_TABLES; i++) {      
 
@@ -38,7 +39,7 @@ const init = async () => {
         let extLabel = document.createElement('div')
         extLabel.classList.add('chart-extlabel');
         let extLabelHeader = document.createElement('h2')
-        extLabelHeader.innerHTML = data[i].stock.symbol
+        extLabelHeader.innerHTML = positions[i].stock.symbol
         extLabel.appendChild(extLabelHeader)
         
 
@@ -54,7 +55,7 @@ const init = async () => {
             data: {
                 datasets: [{
                     fill:false,
-                    label: data[i].stock.symbol,
+                    label: positions[i].stock.symbol,
                     backgroundColor: MAINCOLOR,
                     borderColor: MAINCOLOR,
                     lineTension:0,
@@ -66,10 +67,11 @@ const init = async () => {
                 beforeDraw: function(c) {
                     c.options.legend.labels.fontSize = c.chart.height * 0.07;
                 },
-                streaming: 30
+                //streaming: 30
             }],            
             options: {
-                //responsive:true,                
+                //responsive:true, 
+                events: [],        
                 elements: {
                     point: {
                         radius:0
@@ -98,19 +100,33 @@ const init = async () => {
                         type: 'realtime',
                         realtime: {
                             onRefresh: async function(chart) {
-                                //console.log('refresh ' + i)
-                                let position = await fetchPositions()
+                                
+                                if (!updating) {
+                                    updating = true
+                                    positions = await fetchPositions()
+                                }
                                 //Array.prototype.push.apply(chart.data.datasets[0].data, position[i].price.current);
+
+                                let p = positions[i]
                                 chart.data.datasets[0].data.push({
                                     //x:position[i].price.history[0].timestamp,
                                     x:Date.now(),
-                                    y:position[i].price.current
+                                    y:p.price.current
                                 })
-                                console.log(i + ": " + position[i].price.current)
+
+                                chart.data.datasets[0].data = chart.data.datasets[0].data.slice(-10)
+                                
+                                //console.log(i + ": " + position[i].price.current)
                                 //console.log(chart.data.datasets[0].data)
                                 //chart.update()
-                                chart.options.scales.yAxes[0].ticks.min = Math.max(0, 0.995*position[i].price.min);
-                                chart.options.scales.yAxes[0].ticks.max = 1.025*position[i].price.max;
+
+                                // adjust min/max of the chart if necessary
+                                chart.options.scales.yAxes[0].ticks.min = Math.max(0, 0.995*p.price.min);
+                                chart.options.scales.yAxes[0].ticks.max = 1.025*p.price.max;      
+                                
+                                if (i+1 === NUM_TABLES) {
+                                    updating = false
+                                }
                             },
                             /*onRefresh: async function(chart) {
                                 let position = await fetchPositions().then(function(json) {
@@ -127,7 +143,7 @@ const init = async () => {
                                 });
                                 chart.options.scales.yAxes[0].ticks.max = 1.3*position.price.max;
                             },*/
-                            delay:2000
+                            //delay:2000
                         }                
                       }],
                     yAxes: [{
@@ -144,27 +160,6 @@ const init = async () => {
             }
         }); 
     };
-}
-
-const createTable = () => {
-    var sidebarContainer = document.querySelector('.chartTable-sidebar')
-    var sidebarTable = document.createElement('table')
-    sidebarTable.setAttribute("border", "1")
-    sidebarTable.setAttribute("cellpadding", "10")
-
-    container = document.querySelector('.chartTable-sidebar')
-        for (let j=0; j<6; j++){
-            var tr = document.createElement('tr');
-            sidebarTable.appendChild(tr);
-            
-            for (var k=0; k<5; k++){
-                var td = document.createElement('td');
-                //td.width='75';
-                td.appendChild(document.createTextNode("Cell " +  j));
-                tr.appendChild(td);
-            }
-         }  
-        sidebarContainer.appendChild(sidebarTable)
 }
 
 init()

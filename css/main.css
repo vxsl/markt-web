@@ -2,7 +2,8 @@
 
 :root {
     --main-color: rgb(5, 205, 255);
-    --secondary-color: rgb(236, 236, 236);
+    --light-grey: rgb(236, 236, 236);
+    --dark-grey: rgb(117, 117, 117)
 }
 
 body {
@@ -34,9 +35,9 @@ canvas {
     margin-bottom: 40px;*/
     box-sizing:border-box;
     border:solid;
-    border-color:var(--secondary-color);
+    border-color:var(--light-grey);
     
-    border-radius: 5%;
+    border-radius: 1em;
 
 }
 .chartTable {
@@ -53,7 +54,8 @@ canvas {
     padding:3%;
     background-color:rgb(236, 236, 236);
     margin-bottom:10%;
-    border-radius:10px;
+    border-top-left-radius:0.6em;
+    border-bottom-left-radius:0.6em;
     display:table
 
 }
@@ -65,24 +67,49 @@ canvas {
 }
 
 .chartTable-sidebar {
-    width:80%;
+    width:90%;
+    padding-top:5%
 }
 
 .chartTable-sidebar > table {   
-    color:var(--main-color);
+    color:var(--dark-grey);
     border:1px solid;
-    border-color:var(--main-color);
+    border-color:var(--dark-grey);
     width:100%;
     border-collapse: collapse;
+    margin-top:5%;
 }
 .chartTable-sidebar > table > tr, td {
     text-align:left;
     vertical-align:middle
 }
-.chartTable-sidebar > pre {
-    margin-left:5%;
+
+#logContainer {
+   overflow:hidden;
+   padding:4%
+}
+
+#logContainer > pre {
+    white-space:pre-wrap;
     font-size:.8vw;
 }
+
+#clock{
+    float:right;
+    padding-right:4%;
+}
+
+.chartTable-sidebar > #logContainer {
+    color:var(--dark-grey);
+    padding-left:4%;
+    border:solid;
+    border-left:none;
+    border-top-right-radius:1em;
+    border-bottom-right-radius:1em;
+    border-color:var(--dark-grey);
+    border-width: 1px;
+}
+
 
 
 
