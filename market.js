@@ -14,7 +14,6 @@ var market = []
 var currentTimestamp, lastTimestamp
 
 process.chdir('/var/www/html/kylegrimsrudma.nz/scalping-agent/')
-const fileDir = '../public_html/tsx-project/scalping-agent-web/js'
 
 const main = async () => {
 	
@@ -26,7 +25,7 @@ const main = async () => {
 	displayMarket()
 	displayPositions()
 	
-	while (true) {
+	while (true) {	
 		updateMarket(await getNewQuote())
 	}
 }
@@ -68,7 +67,6 @@ const evaluatePositions = () => {
 		currentPrice = p.price.current
 		newPrice = getStockBySymbol(p.stock.symbol).price
 		
-		if (currentPrice > newPrice) buySellEmitter.emit	 ("sell", i)
 		if (currentPrice != newPrice) {
 			p.price.current = newPrice
 			p.price.history.unshift({value:newPrice, timestamp: currentTimestamp})
@@ -82,9 +80,12 @@ const evaluatePositions = () => {
 			}			
 			s += (p.stock.symbol + " ")
 			s += (newPrice - currentPrice > 0) ? "jumped" : "fell"
-			s += (" from " + currentPrice + " to " + newPrice + "...\n")	
+			s += (" from " + currentPrice.toFixed(2) + " to " + newPrice.toFixed(2) + "...\n")	
 			changeCount++
 		}
+
+		
+		if (currentPrice > newPrice) buySellEmitter.emit("sell", p.stock.symbol, newPrice)
 	}			
 	if (s) log(s)
 	/* if (changeCount > 0) {
@@ -93,7 +94,7 @@ const evaluatePositions = () => {
 		displayPositions()
 	} */
 
-	writeJSON(positions)
+	writeJSON(positions, "stocks.json")
 }
 
 
@@ -113,7 +114,7 @@ const getNewQuote = async () => {
 
 const updateMarket = (cur) => {
 
-	//fakeMarket(cur)
+	fakeMarket(cur)
 
 	lastTimestamp = currentTimestamp
 	currentTimestamp = Date.parse(cur.generatedTimestamp)
@@ -209,19 +210,27 @@ const epochToTimeString = (epochString) => {
 =            MISC. HELPERS            =
 =====================================*/
 
-const writeJSON = async (data) => {
-	fs.writeFile(fileDir+'/positions.json', JSON.stringify(data), (err) => {
-		//log("wrote positions to JSON")
-		if (err != null) {
-			log(err)
-		}
-	})
+const writeJSON = async (data, filename, append=false) => {
+	if (!append) {
+		fs.writeFile(config.fileDir+filename, JSON.stringify(data), (err) => {
+			//log("wrote positions to JSON")
+			if (err != null) {
+				log(err)
+			}
+		})
+	}
+	else {
+		fs.appendFile(config.fileDir+filename, JSON.stringify(data), (err) => {
+			log("wrote positions to JSON")
+			if (err != null) {
+				log(err)
+			}
+		})
+	}
 }
 
 const getStockBySymbol = (symbol) => {
-
 	for (let i = 0; i < market.length; i++) {
-
 		if (market[i].symbol == symbol) return market[i]
 	}
 }
@@ -239,7 +248,7 @@ const sortStocks = (stockArr, sortBy) => {
 
 const log = async(message) => {
 	
-	fs.appendFile(fileDir+'/information/log', message+"\n", function (err) {
+	fs.appendFile(config.fileDir+'log', message+"\n", function (err) {
 		if (err) throw err;
 	});
 	if (debug) console.log(message)
@@ -248,7 +257,7 @@ const log = async(message) => {
 // special fn to avoid writing "Nothing to report..." over and over again
 const nothingLog = async (message) => {
 
-	let filename = fileDir+'/information/log'	
+	let filename = config.fileDir+'log'	
 	fs.openSync(filename, 'r+')
 
 	// remove redundant line from end of log
@@ -267,9 +276,10 @@ const nothingLog = async (message) => {
 =            Program            =
 ===============================*/
 
-main()
 
 module.exports = {
 	positions,
-	buySellEmitter
+	buySellEmitter,
+	main,
+	writeJSON
 }
