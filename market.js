@@ -9,7 +9,7 @@ const buySellEmitter = new EventEmitter()
 
 const debug = true
 
-var positions = []
+var positionModel = []
 var market = []
 var currentTimestamp, lastTimestamp
 
@@ -17,13 +17,10 @@ process.chdir('/var/www/html/kylegrimsrudma.nz/scalping-agent/')
 
 const main = async () => {
 	
-	log("\nInitializing...")
-	await init()	
-	log("Market model initialized with " + market.length + " stocks.\n")
-	
-	// show initial state of market:
-	displayMarket()
-	displayPositions()
+	let tmp = await getNewQuote()
+	market = [...tmp.data.stocks]
+	sortStocks(market, 'pctChng')
+	currentTimestamp = Date.parse(tmp.generatedTimestamp)
 	
 	while (true) {	
 		updateMarket(await getNewQuote())
@@ -31,7 +28,24 @@ const main = async () => {
 }
 
 const init = async () => {
+	log("\nInitializing...")
+	log("Going to recommend " + config.NUM_POSITIONS + " positions.")
+	let recommendedPositions = await recommendPositions()	
+	log("Market model initialized with " + market.length + " stocks.\n")
 	
+	// show initial state of market:
+	displayMarket()
+	displayPositionModel()
+
+	positionModel = recommendedPositions	// TODO remove this
+
+	return recommendedPositions
+}
+
+const recommendPositions = async () => {
+	
+	let tentativePositionModel = []
+
 	// initialize bnnbloomberg-markets-scraper
 	await scraper.initialize(0)
 
@@ -41,10 +55,10 @@ const init = async () => {
 	sortStocks(market, 'pctChng')
 	currentTimestamp = Date.parse(tmp.generatedTimestamp)
 
-	// initialize positions:
-	for (let i = 0; i < config.NUM_POSITIONS ; i++) {
-		buySellEmitter.emit("buy", market[i].symbol, market[i].price)
-		positions.push({
+	// initialize model for recommended positions:
+	for (let i = 0; i < config.NUM_POSITIONS; i++) {
+		//buySellEmitter.emit("buy", market[i].symbol, market[i].price)
+		tentativePositionModel.push({
 			stock:market[i],
 			price:{
 				current:market[i].price,
@@ -53,17 +67,19 @@ const init = async () => {
 				max: market[i].price,
 				average:market[i].price 
 			}
-		})
+		})		
 	}
+
+	return tentativePositionModel
 }
 
-const evaluatePositions = () => {
+const evaluatePositionModel = () => {
 
 	let p, currentPrice, newPrice
 	let changeCount = 0
 	let s = ''
-	for (let i = 0; i < positions.length; i++) {
-		p = positions[i]
+	for (let i = 0; i < positionModel.length; i++) {
+		p = positionModel[i]
 		currentPrice = p.price.current
 		newPrice = getStockBySymbol(p.stock.symbol).price
 		
@@ -94,7 +110,7 @@ const evaluatePositions = () => {
 		displayPositions()
 	} */
 
-	writeJSON(positions, "stocks.json")
+	writeJSON(positionModel, "stocks.json")
 }
 
 
@@ -114,7 +130,7 @@ const getNewQuote = async () => {
 
 const updateMarket = (cur) => {
 
-	fakeMarket(cur)
+	//fakeMarket(cur)
 
 	lastTimestamp = currentTimestamp
 	currentTimestamp = Date.parse(cur.generatedTimestamp)
@@ -132,7 +148,7 @@ const updateMarket = (cur) => {
 		nothingLog("\n" + epochToTimeString(currentTimestamp) + " -> Nothing to report...\n")
 	}
 
-	evaluatePositions()	
+	evaluatePositionModel()	
 }
 
 const fakeMarket = (cur) => {
@@ -151,7 +167,15 @@ const fakeMarket = (cur) => {
 
 /*----------  Polling helpers  ----------*/
 
-const marketDiff = (stockArr, n=config.NUM_POSITIONS*2) => {
+/**
+ * Returns true iff there is a difference in price found in the entire market
+ * 
+ * // TODO make this happen only for stocks that we care about (i.e. positions)
+ * 
+ * @param {*} stockArr 
+ * @param {*} n 
+ */
+const marketDiff = (stockArr, n=market.length) => {
 
 	for (let i = 0; i < n; i++) {
 		if (stockArr[i].price != getStockBySymbol(stockArr[i].symbol).price) {			
@@ -180,21 +204,21 @@ const stockDiff	= (stock, newIndex) => {
 
 const displayMarket = async (n=10) => {
 
-	log("Update stamped " + epochToTimeString(currentTimestamp) + ". (" + ((Date.now() - currentTimestamp) / 1000) + " seconds late)" )
-	//log("New market snapshot at " + currentTimestamp + ": ")
+	// TODO only log if there is a difference in price in the stocks we care about
 
+	log("Update stamped " + epochToTimeString(currentTimestamp) + ". (" + ((Date.now() - currentTimestamp) / 1000) + " seconds late)" )
 	/*for (let i = 0; i < n; i++) {
 		log(market[i].symbol + "  \t" + market[i].price.toFixed(2) + "\t\t+" + market[i].pctChng.toFixed(2) + "%")
 	}
 	log("\n")*/
 }
 
-const displayPositions = async () => {
+const displayPositionModel = async () => {
 
-	//log("Positions: ")
+	//log("Position model: ")
 	let p, priceDiff
-	for (let i = 0; i < positions.length; i++) {
-		p = positions[i]
+	for (let i = 0; i < positionModel.length; i++) {
+		p = positionModel[i]
 		priceDiff = p.price.history[0].value - p.price.average
 		log(p.stock.symbol + "  \t@ " + p.price.history[0].value.toFixed(2) + "  \t" + priceDiff.toFixed(2))
 	}
@@ -210,23 +234,12 @@ const epochToTimeString = (epochString) => {
 =            MISC. HELPERS            =
 =====================================*/
 
-const writeJSON = async (data, filename, append=false) => {
-	if (!append) {
-		fs.writeFile(config.fileDir+filename, JSON.stringify(data), (err) => {
-			//log("wrote positions to JSON")
-			if (err != null) {
-				log(err)
-			}
-		})
-	}
-	else {
-		fs.appendFile(config.fileDir+filename, JSON.stringify(data), (err) => {
-			log("wrote positions to JSON")
-			if (err != null) {
-				log(err)
-			}
-		})
-	}
+const writeJSON = async (data, filename) => {
+	fs.writeFile(config.fileDir+filename, JSON.stringify(data), (err) => {
+		if (err != null) {
+			log(err)
+		}
+	})
 }
 
 const getStockBySymbol = (symbol) => {
@@ -246,12 +259,13 @@ const sortStocks = (stockArr, sortBy) => {
 	return stockArr
 }
 
-const log = async(message) => {
+const log = (message) => {
 	
-	fs.appendFile(config.fileDir+'log', message+"\n", function (err) {
+	fs.appendFileSync(config.fileDir+'log', message+"\n")
+	/* fs.appendFile(config.fileDir+'log', message+"\n", function (err) {
 		if (err) throw err;
 	});
-	if (debug) console.log(message)
+	if (debug) console.log(message) */
 }
 
 // special fn to avoid writing "Nothing to report..." over and over again
@@ -278,7 +292,8 @@ const nothingLog = async (message) => {
 
 
 module.exports = {
-	positions,
+	positionModel,
+	init,
 	buySellEmitter,
 	main,
 	writeJSON
