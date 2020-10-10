@@ -1,19 +1,14 @@
-const 	config = require("./config.js"),
-		scraper = require("./bnnbloomberg-markets-scraper")
+const 	config = require('../config.js'),
+		tools = require('../tools/tools.js'),
+		scraper = require("./bnnbloomberg-markets-scraper"),
+		{ EventEmitter } = require("events")
 
-const 	fs = require('fs'),
-    	child_process = require('child_process');
-
-const { EventEmitter } = require("events");
 const buySellEmitter = new EventEmitter()
-
-const debug = true
 
 var positionModel = []
 var market = []
 var currentTimestamp, lastTimestamp
 
-process.chdir(config.workDir)
 
 const main = async () => {
 	
@@ -28,11 +23,14 @@ const main = async () => {
 }
 
 const init = async () => {
-	log("\nInitializing...")	
+
+	process.chdir(config.workDir)
+
+	tools.log("\nInitializing...")	
 	await scraper.initialize("ca")
-	log("bnnbloomberg-markets-scraper initialized succesfully.")
+	tools.log("bnnbloomberg-markets-scraper initialized succesfully.")
 	
-	log("Going to recommend " + config.NUM_POSITIONS + " positions.")
+	tools.log("Going to recommend " + config.NUM_POSITIONS + " positions.")
 	let recommendedPositions = await recommendPositions()	
 
 	// show initial state of market:
@@ -54,7 +52,7 @@ const recommendPositions = async () => {
 	sortStocks(market, 'pctChng')
 	currentTimestamp = Date.parse(tmp.generatedTimestamp)
 	
-	log("Market model initialized with " + market.length + " stocks.\n")	
+	tools.log("Market model initialized with " + market.length + " stocks.\n")	
 
 	// initialize model for recommended positions:
 	for (let i = 0; i < config.NUM_POSITIONS; i++) {
@@ -104,16 +102,15 @@ const evaluatePositionModel = () => {
 		
 		if (currentPrice > newPrice) buySellEmitter.emit("sell", p.stock.symbol, newPrice)
 	}			
-	if (s) log(s)
+	//if (s) tools.log(s)
 	/* if (changeCount > 0) {
 		log(changeCount + " OF YOUR POSITIONS HAVE CHANGED IN VALUE:")
 		log("-------------------------------------------")
 		displayPositions()
 	} */
 
-	writeJSON(positionModel, "stocks.json")
+	tools.writeJSON(positionModel, "stocks.json")
 }
-
 
 /*=========================================
 =            POLLING FUNCTIONS            =
@@ -121,13 +118,13 @@ const evaluatePositionModel = () => {
 
 const updateMarket = (quote) => {
 
-	//simulateMarketAction(cur)
+	simulateMarketAction(quote)
 
 	lastTimestamp = currentTimestamp
 	currentTimestamp = Date.parse(quote.generatedTimestamp)
 
 	if (currentTimestamp < lastTimestamp) {
-		log("BNNBloomberg's API blew it this time...")
+		tools.log("BNNBloomberg's API blew it this time...")
 		return
 	}
 	if (marketDiff(sortStocks(quote.data.stocks, 'pctChng'))) {
@@ -136,22 +133,24 @@ const updateMarket = (quote) => {
 	}
 	else if (lastTimestamp != currentTimestamp) {
 		
-		nothingLog("\n" + epochToTimeString(currentTimestamp) + " -> Nothing to report...\n")
+	tools.refreshLog(currentTimestamp,"Nothing to report...")
 	}
 
 	evaluatePositionModel()	
 }
 
 const simulateMarketAction = (quote) => {
-	for (let i = 0; i < quote.data.stocks.length; i++) {
-		//log(cur.data.stocks[i])
-		if (Math.random() > 0.3) {
-			if (Math.random() > 0.5) {
-				quote.data.stocks[i].price = getStockBySymbol(quote.data.stocks[i].symbol).price + Math.random()
-			} else {
-				quote.data.stocks[i].price = getStockBySymbol(quote.data.stocks[i].symbol).price - Math.random()
-			}
-		}		
+	if (Math.random() > 0.5) {
+		for (let i = 0; i < quote.data.stocks.length; i++) {
+			//log(cur.data.stocks[i])
+			if (Math.random() > 0.3) {
+				if (Math.random() > 0.5) {
+					quote.data.stocks[i].price = getStockBySymbol(quote.data.stocks[i].symbol).price + Math.random()
+				} else {
+					quote.data.stocks[i].price = getStockBySymbol(quote.data.stocks[i].symbol).price - Math.random()
+				}
+			}		
+		}
 	}
 }
 
@@ -188,15 +187,10 @@ const stockDiff	= (stock, newIndex) => {
 	}	                
 }*/
 
-/*=============================	============
-=            DISPLAY FUNCTIONS            =
-=========================================*/
-
 const displayMarket = async (n=10) => {
 
 	// TODO only log if there is a difference in price in the stocks we care about
-
-	log("Update stamped " + epochToTimeString(currentTimestamp) + ". (" + ((Date.now() - currentTimestamp) / 1000) + " seconds late)" )
+	tools.refreshLog(currentTimestamp, "New update.", " [" + ((Date.now() - currentTimestamp) / 1000) + " seconds late]")
 	/*for (let i = 0; i < n; i++) {
 		log(market[i].symbol + "  \t" + market[i].price.toFixed(2) + "\t\t+" + market[i].pctChng.toFixed(2) + "%")
 	}
@@ -210,26 +204,8 @@ const displayPositionModel = async () => {
 	for (let i = 0; i < positionModel.length; i++) {
 		p = positionModel[i]
 		priceDiff = p.price.history[0].value - p.price.average
-		log(p.stock.symbol + "  \t@ " + p.price.history[0].value.toFixed(2) + "  \t" + priceDiff.toFixed(2))
+		tools.log(p.stock.symbol + "  \t@ " + p.price.history[0].value.toFixed(2) + "  \t" + priceDiff.toFixed(2))
 	}
-	log("\n")
-}
-
-const epochToTimeString = (epochString) => {
-	let d = new Date(epochString)
-	return d.toLocaleTimeString().replace(" PM", ":" + d.getMilliseconds() +" PM").replace(" AM", ":" + d.getMilliseconds().toString().slice(-3) +" AM")
-}
-
-/*=====================================
-=            MISC. HELPERS            =
-=====================================*/
-
-const writeJSON = async (data, filename) => {
-	fs.writeFile(config.fileDir+filename, JSON.stringify(data), (err) => {
-		if (err != null) {
-			log(err)
-		}
-	})
 }
 
 const getStockBySymbol = (symbol) => {
@@ -249,29 +225,7 @@ const sortStocks = (stockArr, sortBy) => {
 	return stockArr
 }
 
-const log = (message) => {
-	
-	fs.appendFileSync(config.fileDir+'log', message+"\n")
-	if (debug) console.log(message) 
-}
 
-// special fn to avoid writing "Nothing to report..." over and over again
-const nothingLog = async (message) => {
-
-	let filename = config.fileDir+'log'	
-	fs.openSync(filename, 'r+')
-
-	// remove redundant line from end of log
-	let stdout = child_process.execSync('tail -n 3 '+filename)
-	let stat = fs.statSync(filename)
-	if (stdout.includes("Nothing to report")) {
-		fs.truncateSync(filename, stat.size - stdout.length)
-	}
-	
-	// replace with new line
-	fs.appendFileSync(filename, message+"\n")
-	if (debug) console.log(message)	
-}
 
 /*===============================
 =            Program            =
@@ -283,5 +237,4 @@ module.exports = {
 	init,
 	buySellEmitter,
 	main,
-	writeJSON
 }

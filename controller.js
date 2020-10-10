@@ -1,7 +1,8 @@
-const market = require("./market.js")
-const agent = require("./agent/agent.js")
-const config = require("./config.js")
-const fs = require("fs")
+const   market = require("./market/market.js"),
+        agent = require("./agent/agent.js"),
+        config = require("./config.js"),
+        tools = require("./tools/tools.js"),
+        fs = require("fs")
 
 /**
  * delays execution of function fn until time "XX:XX". 
@@ -16,7 +17,7 @@ const waitUntil = (fn, time, async=false) => {
     console.log("\nIt is " + now.toLocaleTimeString() + ". Waiting until " + then.toLocaleTimeString() + " to execute " + fn.name + ".")
 
     if (!async) {        
-        setTimeout( fn, 1);
+        setTimeout(fn, 1);
     }
     else {
         return new Promise(function(resolve, reject) {
@@ -43,7 +44,8 @@ const writePositionsToJSON = () => {
 }
 
 const main = async() => {
-        
+    
+
     await agent.init()      
     let getRecommendedPositions = await waitUntil(market.init, "08:58", true) 
     let recommendedPositions = await getRecommendedPositions()  
