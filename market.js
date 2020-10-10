@@ -13,26 +13,28 @@ var positionModel = []
 var market = []
 var currentTimestamp, lastTimestamp
 
-process.chdir('/var/www/html/kylegrimsrudma.nz/scalping-agent/')
+process.chdir(config.workDir)
 
 const main = async () => {
 	
-	let tmp = await getNewQuote()
+	let tmp = await scraper.quote()
 	market = [...tmp.data.stocks]
 	sortStocks(market, 'pctChng')
 	currentTimestamp = Date.parse(tmp.generatedTimestamp)
 	
 	while (true) {	
-		updateMarket(await getNewQuote())
+		updateMarket(await scraper.quote())
 	}
 }
 
 const init = async () => {
-	log("\nInitializing...")
+	log("\nInitializing...")	
+	await scraper.initialize("ca")
+	log("bnnbloomberg-markets-scraper initialized succesfully.")
+	
 	log("Going to recommend " + config.NUM_POSITIONS + " positions.")
 	let recommendedPositions = await recommendPositions()	
-	log("Market model initialized with " + market.length + " stocks.\n")
-	
+
 	// show initial state of market:
 	displayMarket()
 	displayPositionModel()
@@ -46,14 +48,13 @@ const recommendPositions = async () => {
 	
 	let tentativePositionModel = []
 
-	// initialize bnnbloomberg-markets-scraper
-	await scraper.initialize(0)
-
 	// initialize market model:
-	let tmp = await getNewQuote()
+	let tmp = await scraper.quote()
 	market = [...tmp.data.stocks]
 	sortStocks(market, 'pctChng')
 	currentTimestamp = Date.parse(tmp.generatedTimestamp)
+	
+	log("Market model initialized with " + market.length + " stocks.\n")	
 
 	// initialize model for recommended positions:
 	for (let i = 0; i < config.NUM_POSITIONS; i++) {
@@ -69,7 +70,7 @@ const recommendPositions = async () => {
 			}
 		})		
 	}
-
+	
 	return tentativePositionModel
 }
 
@@ -118,29 +119,19 @@ const evaluatePositionModel = () => {
 =            POLLING FUNCTIONS            =
 =========================================*/
 
-const getNewQuote = async () => {
+const updateMarket = (quote) => {
 
-	let newQuote = await scraper.poll()
-	while (true) {
-		if (newQuote != 1) break
-		newQuote = await scraper.poll()
-	}
-	return newQuote
-}
-
-const updateMarket = (cur) => {
-
-	//fakeMarket(cur)
+	//simulateMarketAction(cur)
 
 	lastTimestamp = currentTimestamp
-	currentTimestamp = Date.parse(cur.generatedTimestamp)
+	currentTimestamp = Date.parse(quote.generatedTimestamp)
 
 	if (currentTimestamp < lastTimestamp) {
 		log("BNNBloomberg's API blew it this time...")
 		return
 	}
-	if (marketDiff(sortStocks(cur.data.stocks, 'pctChng'))) {
-		market = [...cur.data.stocks]	
+	if (marketDiff(sortStocks(quote.data.stocks, 'pctChng'))) {
+		market = [...quote.data.stocks]	
 		displayMarket()
 	}
 	else if (lastTimestamp != currentTimestamp) {
@@ -151,17 +142,16 @@ const updateMarket = (cur) => {
 	evaluatePositionModel()	
 }
 
-const fakeMarket = (cur) => {
-	for (let i = 0; i < cur.data.stocks.length; i++) {
+const simulateMarketAction = (quote) => {
+	for (let i = 0; i < quote.data.stocks.length; i++) {
 		//log(cur.data.stocks[i])
 		if (Math.random() > 0.3) {
 			if (Math.random() > 0.5) {
-				cur.data.stocks[i].price = getStockBySymbol(cur.data.stocks[i].symbol).price + Math.random()
+				quote.data.stocks[i].price = getStockBySymbol(quote.data.stocks[i].symbol).price + Math.random()
 			} else {
-				cur.data.stocks[i].price = getStockBySymbol(cur.data.stocks[i].symbol).price - Math.random()
+				quote.data.stocks[i].price = getStockBySymbol(quote.data.stocks[i].symbol).price - Math.random()
 			}
-		}
-		
+		}		
 	}
 }
 
@@ -262,10 +252,7 @@ const sortStocks = (stockArr, sortBy) => {
 const log = (message) => {
 	
 	fs.appendFileSync(config.fileDir+'log', message+"\n")
-	/* fs.appendFile(config.fileDir+'log', message+"\n", function (err) {
-		if (err) throw err;
-	});
-	if (debug) console.log(message) */
+	if (debug) console.log(message) 
 }
 
 // special fn to avoid writing "Nothing to report..." over and over again
