@@ -4,59 +4,63 @@ const   market = require("./market/market.js"),
         tools = require("./tools/tools.js"),
         fs = require("fs")
 
-/**
- * delays execution of function fn until time "XX:XX". 
- * If async, return a promise.
- */
-const waitUntil = (fn, time, async=false) => {
-
-    let now = new Date();
-    let then = new Date(now.getFullYear(), now.getMonth(), now.getDate(), time.split(":")[0], time.split(":")[1], 0, 0)
-    let msUntil = then - now;
-    
-    console.log("\nIt is " + now.toLocaleTimeString() + ". Waiting until " + then.toLocaleTimeString() + " to execute " + fn.name + ".")
-
-    if (!async) {        
-        setTimeout(fn, 1);
+// tries to cancel, but will resort to selling if the order has already gone through
+market.buySellEmitter.on("cancel", async (ticker, price) => {
+    let p = await agent.getPositionByTicker(ticker)
+    if (p.sellable_quantity == 0) { // TODO check if this condition makes sense   
+        await agent.cancel(ticker).catch(market.buySellEmitter.emit("sell", ticker))   
     }
-    else {
-        return new Promise(function(resolve, reject) {
-            setTimeout(() => {
-                resolve(async () => {
-                    return await fn()
-                })
-            }, msUntil);
-        });
-    }
-}
+    else market.buySellEmitter.emit("sell", ticker)
 
+    writePositionsToJSON()
+})  
+
+// TODO add pause condition if there is going to be an overly significant net loss? 
 market.buySellEmitter.on("sell", async (ticker, price) => {
-    if (agent.getFakePositionByTicker(ticker).sold === false) {
+    let p = await agent.getPositionByTicker(ticker)
+    if (p.sellable_quantity > 0) {
         await agent.sell(ticker, price)    
     }
     writePositionsToJSON()
 })  
 
 const writePositionsToJSON = () => {
-    let data = agent.fakePositions
+    let data = agent.fake.fakePositions
     let filename = "positions.json"
     fs.writeFileSync(config.fileDir+filename, JSON.stringify(data))
 }
 
 const main = async() => {
     
-
+    tools.log("\nInitializing Wealthsimple connection...")			
     await agent.init()      
-    let getRecommendedPositions = await waitUntil(market.init, "08:58", true) 
-    let recommendedPositions = await getRecommendedPositions()  
-    let buyErrors = await agent.placeInitialOrders(recommendedPositions)
-    buyErrors > 0? console.log("\nOnly " + (recommendedPositions.length - buyErrors) + " orders were successful.") : console.log("\nAll orders were successful.")
+
+    tools.log("\nInitializing BNN Bloomberg API connections...")
+    // TODO use https://ca.finance.yahoo.com/gainers/ instead to recommend gainers? Investigate API
+    // Yahoo doesn't seem to reset their stats at 9:00am like BNN and Tradingview.
+    // Would have to filter, because the Yahoo list includes a lot of stocks that are not on BNN list.
+    let recommendedPositions = await (await tools.delayFunctionCall(market.recommendPositions, "05:00", true))()
+    
+    tools.log("\nPlacing Wealthsimple orders based on recommended positions...")
+
+
+   /*  let initialOrders = await agent.placeInitialOrders(recommendedPositions)
+    initialOrders.errors > 0? console.log("\nOnly " + (recommendedPositions.length - initialOrders.errors) + " orders were successful.") : console.log("\nAll orders were successful.")
     writePositionsToJSON()
+
+    tools.log("\nDouble-checking that the position model and actual positions are identical...")
+    // get price diffs
+    await market.confirmPositions(initialOrders.positions.results) */
+
+
+
 
     // TODO what happens when a marketBuy is placed before the market opens?
 
-    waitUntil(market.main, "09:28", false)
+    tools.delayFunctionCall(market.main, "05:00", false)  // TODO change to "09:28"
 }
+
+
 
 
 main()

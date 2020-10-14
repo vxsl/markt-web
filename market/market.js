@@ -1,7 +1,8 @@
 const 	config = require('../config.js'),
 		tools = require('../tools/tools.js'),
-		scraper = require("./bnnbloomberg-markets-scraper"),
-		{ EventEmitter } = require("events")
+		{ QuoteHarvester } = require("./bnnbloomberg-markets-scraper"),
+		{ EventEmitter } = require("events"),
+		{ Position } = require ("./Position.js")
 
 const buySellEmitter = new EventEmitter()
 
@@ -9,67 +10,142 @@ var positionModel = []
 var market = []
 var currentTimestamp, lastTimestamp
 
+var positions = []
+var recommendedPositions = []
 
 const main = async () => {
 	
-	let tmp = await scraper.quote()
+	let tmp = await quoters[0].quote()
 	market = [...tmp.data.stocks]
 	sortStocks(market, 'pctChng')
 	currentTimestamp = Date.parse(tmp.generatedTimestamp)
 	
 	while (true) {	
-		updateMarket(await scraper.quote())
+		updateMarket(await quoters[0].quote())
 	}
 }
 
-const init = async () => {
+const alterPicks = (gainers) => {
 
-	process.chdir(config.workDir)
-
-	tools.log("\nInitializing...")	
-	await scraper.initialize("ca")
-	tools.log("bnnbloomberg-markets-scraper initialized succesfully.")
-	
-	tools.log("Going to recommend " + config.NUM_POSITIONS + " positions.")
-	let recommendedPositions = await recommendPositions()	
-
-	// show initial state of market:
-	displayMarket()
-	displayPositionModel()
-
-	positionModel = recommendedPositions	// TODO remove this
-
-	return recommendedPositions
+	// get only cheap gainers < $2.00
+	let result = []
+	for (i in gainers) {
+		if (gainers[i].price < 2) result.push(gainers[i])
+		//if (gainers[i].symbol == "DIV:CT") result.push(gainers[i])
+	}
+	return result.slice(0, config.NUM_POSITIONS)
 }
 
 const recommendPositions = async () => {
 	
-	let tentativePositionModel = []
-
+	tools.log("Going to recommend " + config.NUM_POSITIONS + " positions.")
 	// initialize market model:
-	let tmp = await scraper.quote()
-	market = [...tmp.data.stocks]
-	sortStocks(market, 'pctChng')
-	currentTimestamp = Date.parse(tmp.generatedTimestamp)
-	
-	tools.log("Market model initialized with " + market.length + " stocks.\n")	
+	let market = await (await QuoteHarvester.build("ca")).quote()	
 
-	// initialize model for recommended positions:
-	for (let i = 0; i < config.NUM_POSITIONS; i++) {
-		//buySellEmitter.emit("buy", market[i].symbol, market[i].price)
-		tentativePositionModel.push({
-			stock:market[i],
-			price:{
-				current:market[i].price,
-				history:[{value: market[i].price, timestamp: currentTimestamp}],				
-				min:market[i].price,
-				max: market[i].price,
-				average:market[i].price 
+	tools.log("TSX market model retrieved (" + market.data.stocks.length + " stocks).\n")	
+
+	let gainers = alterPicks(sortStocks(market.data.stocks, 'pctChng'))
+	//let gainers = sortStocks(market.data.stocks, 'pctChng').slice(0, config.NUM_POSITIONS)
+	currentTimestamp = Date.parse(market.generatedTimestamp)
+
+	tools.log("\nOK, the top " + config.NUM_POSITIONS + " gainers are as follows:\n")
+	gainers.forEach(s => {
+		tools.log("|\t [ " + s.symbol + " ]\t"  + s.price + "\t" + s.pctChng.toFixed(2) + "%\t\t(" + s.name + ")") 
+		// it seems that every day at 9:00 EST (30 min before the opening bell), BNN Bloomberg resets the daily gain/loss stats on their "market movers." I am setting this function to run shortly before that time, so hopefully this case is avoided. 
+		if (s.pctChng < 0.01) throw "BNN Bloomberg is not providing correct market data, so it is not possible to recommend positions."
+	})
+
+	//await gainers.forEach(async s => {
+	for (let s in gainers) {
+		let p = await Position.build({
+				ticker:	gainers[s].symbol,
+				price:{
+					current:gainers[s].price,
+					history:[{value: gainers[s].price, timestamp: currentTimestamp}],				
+					min:gainers[s].price,
+					max: gainers[s].price,
+					average:gainers[s].price 
+				}
+			})
+		recommendedPositions.push(p)
+	}
+
+	return recommendedPositions
+}
+
+// TODO check to make sure trade.getPositions() data is not 15 minutes behind. Maybe better to use buy confirmations?
+const confirmPositions = async (actualPositions, recommendedOnly=false) => {
+
+	let inconsistencies = 0
+
+	for (let i in actualPositions) {	
+		let p = actualPositions[i] 		
+		let el, diff, s
+		try {
+			if (recommendedOnly) {
+				el = await agent.getPositionByTicker(p.stock.symbol)
+				diff = Math.abs(p.quote.amount - el.price.average)
+				s = p.stock.symbol + " was purchased for "
+				diff != 0?  diff < 0? s += "$" + diff + " less than expected." : s += "$" + diff + " more than expected." : s += " the expected price."
+				s? tools.log(s) : null
 			}
-		})		
+			else {
+				el = await agent.getPositionByTicker(p.stock.symbol, true)
+			}
+		} 
+		catch (error) {				
+			inconsistencies++
+			tools.log("Signalling to cancel/sell " + p.stock.symbol + "...")
+			buySellEmitter.emit("cancel", p.stock.symbol)
+			delete el // is this correct?
+		}
 	}
 	
-	return tentativePositionModel
+	if (inconsistencies > 0) {
+		tools.log("In comparing the position model and the actual positions on WS, " + inconsistencies + " inconsistencies were found.")
+		throw inconsistencies
+	}
+	else {
+		
+	}
+
+
+	let i, currentPrice, newPrice
+	let changeCount = 0
+	let s = ''
+	for (let i = 0; i < positionModel.length; i++) {
+		i = positionModel[i]
+		currentPrice = i.price.current
+		newPrice = getStockBySymbol(i.stock.symbol).price
+		
+		if (currentPrice != newPrice) {
+			i.price.current = newPrice
+			i.price.history.unshift({value:newPrice, timestamp: currentTimestamp})
+
+			// extra stuff:
+			if (newPrice < i.price.min) {
+				i.price.min = newPrice
+			}
+			else if (newPrice > i.price.max) {
+				i.price.max = newPrice
+			}			
+			s += (i.stock.symbol + " ")
+			s += (newPrice - currentPrice > 0) ? "jumped" : "fell"
+			s += (" from " + currentPrice.toFixed(2) + " to " + newPrice.toFixed(2) + "...\n")	
+			changeCount++
+		}
+
+		
+		if (currentPrice > newPrice) buySellEmitter.emit("sell", i.stock.symbol, newPrice)
+	}			
+	//if (s) tools.log(s)
+	/* if (changeCount > 0) {
+		log(changeCount + " OF YOUR POSITIONS HAVE CHANGED IN VALUE:")
+		log("-------------------------------------------")
+		displayPositions()
+	} */
+
+	tools.writeJSON(positionModel, "stocks.json")
 }
 
 const evaluatePositionModel = () => {
@@ -156,14 +232,7 @@ const simulateMarketAction = (quote) => {
 
 /*----------  Polling helpers  ----------*/
 
-/**
- * Returns true iff there is a difference in price found in the entire market
- * 
- * // TODO make this happen only for stocks that we care about (i.e. positions)
- * 
- * @param {*} stockArr 
- * @param {*} n 
- */
+// Returns true iff there is a difference in price found in the entire market
 const marketDiff = (stockArr, n=market.length) => {
 
 	for (let i = 0; i < n; i++) {
@@ -214,6 +283,22 @@ const getStockBySymbol = (symbol) => {
 	}
 }
 
+const getPositionByTicker = (ticker, recommendedOnly=false) => {
+	
+	let stripped = ticker.split(":")[0]
+	if (!recommendedOnly) {
+		for (p in positions) {
+			if (positions[p].ticker == stripped) return positions[p]
+		}
+	}
+	else {
+		for (p in recommendPositions) {
+			if (recommendPositions[p].ticker == stripped) return recommendedPositions[p]
+		}
+	}
+	throw stripped + " didn't match any positions in the model. Something went wrong."
+}
+
 const sortStocks = (stockArr, sortBy) => {
 	
 	switch(sortBy) {
@@ -233,8 +318,9 @@ const sortStocks = (stockArr, sortBy) => {
 
 
 module.exports = {
+	recommendPositions,
+	confirmPositions,
 	positionModel,
-	init,
 	buySellEmitter,
 	main,
 }

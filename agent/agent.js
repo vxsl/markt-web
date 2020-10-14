@@ -1,60 +1,24 @@
 const   config = require("../config.js"),
-        readline = require('readline'),
-        wealthsimple = require("wstrade-api"),
+        tools = require("./tools/tools.js")
+const   wealthsimple = require("wstrade-api"),
         trade = wealthsimple.default,
         { getSession } = require("./credentials.js")
 
+const fake = require("./fake.js")
 
-var fakePositions = []
-var fakeInitBalance, fakeCurrentBalance
+var initBalance
 
 var session, tokens,
     account, accountID,
-    actualPositions, actualPositionQuantities   // TODO delete?
+    positions, actualPositionQuantities   // TODO delete?
+
+var positionRecords = []
 
 const main = async () => {
     await init()
     // do other stuff
 }
 
-const fakePlaceMarketBuy = (tokens, accountId, ticker, quantity, price) => {
-
-    let total = quantity*price
-    console.log("Purchased " + quantity + " " + ticker + " ... total = " + total)
-    fakeCurrentBalance -= total
-    //positionBalance += total
-
-    fakePositions.push ({
-        ticker:ticker,
-        average:price,
-        quantity:quantity,        
-        sold:false,
-        net:0,
-    })
-    return {
-        ticker:ticker,
-        average:price,
-        quantity:quantity,
-        sold:false,
-        net:0,
-    }
-}
-const fakePlaceMarketSell = (tokens, accountId, ticker, quantity, price) => {
-    
-    let p = getFakePositionByTicker(ticker)
-    let total = quantity*price
-    console.log("Sold " + quantity + " " + ticker + " ... total = " + total)
-    fakeCurrentBalance += total
-    //positionBalance -= total
-
-    let diff = (price - p.average)*quantity
-    diff > 0? console.log("profited " + diff + " on " + ticker) :  console.log("lost " + Math.abs(diff) + " on " + ticker )
-    
-    p.net = diff.toFixed(2)
-    p.sold=true
-   
-    return null
-}
 
 const init = async (auto=true) => {
 
@@ -63,7 +27,7 @@ const init = async (auto=true) => {
 
     // fetch AccountData and extract some of it
     let accountSet = await trade.getAccountData(tokens);
-    account = await chooseAccount(accountSet, auto)
+    account = await tools.chooseAccount(accountSet, auto)
     switch (account) {
         case 0:
             console.log("OK. Ending program.")
@@ -80,85 +44,59 @@ const init = async (auto=true) => {
 	accountID = account.id;
     actualPositionQuantities = account.position_quantities;
     
-    fakeInitBalance = account.current_balance.amount
-    fakeCurrentBalance = fakeInitBalance
+    initBalance = account.current_balance.amount
+    fake.fakeCurrentBalance = initBalance
 
     // fetch positions
-    actualPositions = await trade.getPositions(tokens, accountID);
+    await updatePositions()
 
-    // declare and populate array with relevant information about holdings:
+   /*  // declare and populate array with relevant information about holdings:
 	let actualPositionsArray = []
 	for (let i = 0; i < Object.keys(actualPositionQuantities).length; i++) {      
         actualPositionsArray.push({
             id:Object.keys(actualPositionQuantities)[i],
             quantity:Object.values(actualPositionQuantities)[i],
-            value:actualPositions[i].quote.amount
+            value:positions[i].quote.amount
         })
-    }
+    } */
     
     return 
 }
 
-// Find a non-TFSA, non-crypto account
-const chooseAccount = async (accountSet, auto) => {
-    
-    let result = null
-    for (let i = 0; i < accountSet.results.length; i++) {
-        if (accountSet.results[i].id.includes('tfsa') || accountSet.results[i].id.includes('crypto')) continue
-        else {
-            result = accountSet.results[i]
-            break
-        }
-    }
-    if (result !== null && !auto) {
-        while (true) {
-            let userResponse = await userPrompt("Selecting " + result.id + " (balance " + result.current_balance.amount + ", created " + result.created_at + "). \nOK?: [y/n] ");
-            if (userResponse === 'y' || userResponse === 'Y') {
-                return result
-            }
-            else if (userResponse === 'n' || userResponse === 'N') {
-                return 0
-            }
-        }
-    }
-    else if (auto) return result   
-    else return 1
-}
 
 const placeInitialOrders = async(recommendedPositions) => {
 
     let t = []
     let failureCount = 0
     for (p in recommendedPositions) {
-        let ticker = recommendedPositions[p].stock.symbol.split(":")[0] + ":TSX"
+        let formattedTicker = tools.formatTicker(recommendedPositions[p].ticker)
         try {
-            t.push(await trade.getSecurity(tokens, ticker, false))
-            if (buy(ticker, recommendedPositions[p].stock.price) == 1) failureCount++
+            t.push(await trade.getSecurity(tokens, formattedTicker, false))
+            if (await buy(formattedTicker, recommendedPositions[p].data.price.current) == 1) failureCount++
         }
         catch (error) {
-            console.log("Sorry, " + ticker + " is not listed on Wealthsimple Trade.")
+            console.log("Sorry, " + formattedTicker + " is not listed on Wealthsimple Trade.")
             failureCount++
         }
     }
-    return failureCount
+    await updatePositions()
+    return {
+        errors:failureCount, 
+        positions:positions
+    }
 }
 
-const displayActualPositions = () => {
-    // display individual info
-	for (let i = 0; i < fakePositions.length; i++) {
-		console.log(fakePositions[i].quote.amount);
-		console.log(fakePositions[i].quote.security_id);
-		console.log(fakePositions[i].stock.symbol);
-		console.log("******************")
-		//console.log(currentTotal);
-	}
-}
+// TODO return 1 if fail, probably a throw is better
+const buy = async (formattedTicker, modelPrice) => {
+    
+    //let quantity = Math.floor(initBalance / (config.NUM_POSITIONS*modelPrice))
+    let quantity = 1
 
-const buy = async (ticker, modelPrice) => {
-
-    let quantity = Math.floor(fakeInitBalance / (config.NUM_POSITIONS*modelPrice))
     //console.log("Going to BUY " + ticker + " x" + quantity + " at " + modelPrice)
-    let confirmation = fakePlaceMarketBuy(tokens, accountID, ticker, quantity, modelPrice)
+    //let confirmation = fake.FakeData.placeMarketBuy(tokens, accountID, ticker, quantity, modelPrice)
+    let confirmation = await trade.placeMarketBuy(tokens, accountID, formattedTicker, quantity).catch(error => {throw error})
+    createPositionRecord(confirmation)
+    await updatePositions() // too long of a wait?
     return confirmation
 
     /* let confirmation
@@ -173,38 +111,57 @@ const buy = async (ticker, modelPrice) => {
     } */
 }
 
-const sell = async (ticker, modelPrice) => {
+const sell = async (formattedTicker, modelPrice) => { 
 
-    let quantity = getFakePositionByTicker(ticker).quantity
+    let quantity = (await getPositionByTicker(formattedTicker)).sellable_quantity
     //console.log("Going to SELL " + ticker + " x" + quantity + " at " + modelPrice)
-    let confirmation = fakePlaceMarketSell(tokens, accountID, ticker, quantity, modelPrice)
+    let confirmation = await trade.placeMarketSell(tokens, accountID, formattedTicker, quantity)
+    //let confirmation = fake.FakeData.placeMarketSell(tokens, accountID, ticker, quantity, modelPrice)
 }
 
-const userPrompt = (message) => {
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    });
+const getPositionByTicker = async (ticker) => {
 
-    return new Promise(resolve => rl.question(message, ans => {
-        rl.close();
-        resolve(ans);
-    }))
+    if (ticker.split(":")[1] == "CT") {
+        ticker = tools.formatTicker(ticker)
+    } // TODO add other cases
+
+
+    // TODO use trade.getSecurity() instead?
+    await updatePositions()
+    for (let i in actualPositions.results) {
+        let p = actualPositions.results[i]
+
+        if (p.stock.symbol == ticker) {
+        //if (p.stock.symbol.split(":")[0] == ticker.split(":")[0]) {
+            return p
+        }
+    }
+    throw "Couldn't find position " + ticker + " in WS Trade portfolio."
 }
 
-const getFakePositionByTicker = (ticker) => {
-    for (let i = 0; i < fakePositions.length; i++) {
-        if (fakePositions[i].ticker.split(":")[0] == ticker.split(":")[0]) return fakePositions[i]
-        // TODO make it so the market view uses :TSX instead of :CT, or make it so it just has the first part before :.
-        // TODO more generally, just unify the market and agent views. Why is there redundant data in the first place?
-	}
+const updatePositions = async () => {
+    //positions = await fake.FakeData.getPositions(tokens, accountID)
+    actualPositions = await trade.getPositions(tokens, accountID)
+}
+
+const createPositionRecord = (confirmation) => {
+    let key = confirmation.security_id
+    positionRecords.push({
+        key: {
+            average:confirmation.filled_at,
+            quantity:confirmation.fill_quantity,
+            orderTime:confirmation.created_at,
+            fillPrice:undefined,
+            sold:false,
+        }
+    })
 }
 
 module.exports = {
     sell,
     init,
-    fakePositions,
-    getFakePositionByTicker,
-    placeInitialOrders
+    placeInitialOrders,
+    getPositionByTicker,
+    fake
 }
 
