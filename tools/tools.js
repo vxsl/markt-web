@@ -1,8 +1,33 @@
 const   config = require("../config.js"),
         fs = require('fs'),
-		child_process = require('child_process')
+		child_process = require('child_process'),
+		readline = require('readline')
 		
 process.chdir(config.workDir)
+
+const userPrompt = (message) => {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
+
+    return new Promise(resolve => rl.question(message, ans => {
+        rl.close();
+        resolve(ans);
+    }))
+}
+
+const safePrompt = async () => {
+	while (true) {
+		let userResponse = await userPrompt("Safe-ish mode? [y/n] ");
+		if (userResponse === 'y' || userResponse === 'Y') {
+			return true
+		}
+		else if (userResponse === 'n' || userResponse === 'N') {
+			return false
+		}
+	}
+}
 
 /**
  * delays execution of function fn until time "XX:XX". 
@@ -83,5 +108,6 @@ module.exports = {
     writeJSON,
     log,
 	refreshLog,
-	delayFunctionCall
+	delayFunctionCall,
+	safePrompt
 }

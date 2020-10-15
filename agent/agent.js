@@ -66,13 +66,12 @@ const init = async (auto=true) => {
 
 const placeInitialOrders = async(recommendedPositions) => {
 
-    let t = []
     let failureCount = 0
     for (p in recommendedPositions) {
         let formattedTicker = tools.formatTicker(recommendedPositions[p].ticker)
         try {
-            t.push(await trade.getSecurity(tokens, formattedTicker, false))
-            if (await buy(formattedTicker, recommendedPositions[p].data.price.current) == 1) failureCount++
+            if (await buy(formattedTicker, recommendedPositions[p].price.current) == 1) failureCount++
+            // TODO await until the order is fulfilled, not just pending. How?
         }
         catch (error) {
             console.log("Sorry, " + formattedTicker + " is not listed on Wealthsimple Trade.")
@@ -82,7 +81,7 @@ const placeInitialOrders = async(recommendedPositions) => {
     await updatePositions()
     return {
         errors:failureCount, 
-        positions:positions
+        actualPositions:actualPositions
     }
 }
 

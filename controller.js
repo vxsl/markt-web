@@ -31,6 +31,8 @@ const writePositionsToJSON = () => {
 }
 
 const main = async() => {
+
+    let safe = await tools.safePrompt()
     
     tools.log("\nInitializing Wealthsimple connection...")			
     await agent.init()      
@@ -39,25 +41,23 @@ const main = async() => {
     // TODO use https://ca.finance.yahoo.com/gainers/ instead to recommend gainers? Investigate API
     // Yahoo doesn't seem to reset their stats at 9:00am like BNN and Tradingview.
     // Would have to filter, because the Yahoo list includes a lot of stocks that are not on BNN list.
-    let recommendedPositions = await (await tools.delayFunctionCall(market.recommendPositions, "05:00", true))()
+    let recommendedPositions = await (await tools.delayFunctionCall(market.recommendPositions, "08:58", true))()
     
-    tools.log("\nPlacing Wealthsimple orders based on recommended positions...")
+    if (!safe) {
+        tools.log("\nPlacing Wealthsimple orders based on recommended positions...")
 
+        let initialOrders = await agent.placeInitialOrders(recommendedPositions)
+        initialOrders.errors > 0? console.log("\nOnly " + (recommendedPositions.length - initialOrders.errors) + " orders were successful.") : console.log("\nAll orders were successful.")
+        writePositionsToJSON()
 
-   /*  let initialOrders = await agent.placeInitialOrders(recommendedPositions)
-    initialOrders.errors > 0? console.log("\nOnly " + (recommendedPositions.length - initialOrders.errors) + " orders were successful.") : console.log("\nAll orders were successful.")
-    writePositionsToJSON()
-
-    tools.log("\nDouble-checking that the position model and actual positions are identical...")
-    // get price diffs
-    await market.confirmPositions(initialOrders.positions.results) */
-
-
-
+        tools.log("\nDouble-checking that the position model and actual positions are identical...")
+        // get price diffs
+        await market.confirmPositions(initialOrders.actualPositions.results)
+    }
 
     // TODO what happens when a marketBuy is placed before the market opens?
 
-    tools.delayFunctionCall(market.main, "05:00", false)  // TODO change to "09:28"
+    tools.delayFunctionCall(market.main, "09:28", false)  // TODO change to "09:28"
 }
 
 
