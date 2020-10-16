@@ -1,5 +1,7 @@
 const 	config = require('../config.js'),
-		tools = require('../tools/tools.js'),
+		tools = require('./tools'),
+		{ log } = require('../tools/tools.js'),
+		{ writeJSON } = require('../tools/tools.js'),
 		{ QuoteHarvester } = require("./bnnbloomberg-markets-scraper"),
 		{ EventEmitter } = require("events"),
 		{ ModelPosition } = require ("./ModelPosition.js")
@@ -9,30 +11,40 @@ const buySellEmitter = new EventEmitter()
 var modelPositions = []
 
 const main = async () => {
-		
+	
+	let p
+	// TODO there is a race condition leading to deadlock somewhere in here??
 	while (true) {	
-		for (let p in modelPositions) {
-			if (!modelPositions[p].lock) updateEvaluate(modelPositions[p])
+		//for (let i in modelPositions) {
+		for (let i = 0; i < modelPositions.length; i++) {
+			p = modelPositions[i]
+			if (!p.lock) {
+				p.lock = 1
+				updateEvaluate(i)
+			}
 			else await new Promise(resolve => setTimeout(resolve, 1000));
 		}
 	}
 }
 
-// TODO create some enumerable options here
+// TODO create some enumerable optfions here
 const selectionStrategy = (market, sort="pctChng") => {
 	
-	tools.log("\nSelected buying strategy: top gainers")
+	log("\nSelected buying strategy: top gainers")
 
 	switch(sort) {
 		case "pctChng":
 			market.sort((a, b) => b.pctChng - a.pctChng)
 			break
+		case "totalVolume":
+			market.sort((a, b) => b.totalVolume - a.totalVolume)
+			break	
 	}	
 
-	// get only cheap gainers < $2.00
+	// get only cheap gainers < $7.00
 	let result = []
 	for (let i = 0; i < market.length; i++) {
-		if (market[i].price < 2) result.push(market[i])
+		if (market[i].price < 7) result.push(market[i])
 		if (result.length == config.NUM_POSITIONS) break
 	}
 
@@ -44,30 +56,32 @@ const selectionStrategy = (market, sort="pctChng") => {
 
 	if (result.length != config.NUM_POSITIONS) throw "Something went wrong selecting positions."
 	
-	tools.log("\nOK, the top " + config.NUM_POSITIONS + " gainers are as follows:\n")
+	log("\nOK, the top " + config.NUM_POSITIONS + " gainers are as follows:\n")
 	return result
 }
 
 const recommendPositions = async () => {
 	
-	tools.log("Going to recommend " + config.NUM_POSITIONS + " positions.")
+	log("Going to recommend " + config.NUM_POSITIONS + " positions.")
 	
 	// get initial market model:
 	let market = await (await QuoteHarvester.build("ca")).quote()
-	tools.log("TSX market model retrieved (" + market.data.stocks.length + " stocks).\n")	
+	log("TSX market model retrieved (" + market.data.stocks.length + " stocks).\n")	
 	
-	let selectedStocks = selectionStrategy(market.data.stocks)
+	let selectedStocks = selectionStrategy(market.data.stocks, "totalVolume")
 
 	selectedStocks.forEach(s => {
-		tools.log("|\t [ " + s.symbol + " ]\t"  + s.price + "\t" + s.pctChng.toFixed(2) + "%\t\t(" + s.name + ")") 
+		log("|\t [ " + s.symbol + " ]\t"  + s.price + "\t" + s.pctChng.toFixed(2) + "%\t\t(" + s.name + ")") 
 		// it seems that every day at 9:00 EST (30 min before the opening bell), BNN Bloomberg resets the daily gain/loss stats on their "market movers." I am setting this function to run shortly before that time, so hopefully this case is avoided. 
-		if (s.pctChng < 0.01) throw "BNN Bloomberg is not providing correct market data, so it is not possible to recommend positions."
+
+		// TODO uncomment 
+		//if (s.pctChng < 0.01) throw "BNN Bloomberg is not providing correct market data, so it is not possible to recommend positions."
 	})
 
 	for (let s in selectedStocks) {
 		let p = await ModelPosition.build(selectedStocks[s].symbol, {
 				current:selectedStocks[s].price,
-				history:[{value: selectedStocks[s].price, timestamp: market.generatedTimestamp}],				
+				history:[{value: selectedStocks[s].price, timestamp: Date.parse(market.generatedTimestamp).toString()}],				
 				min:selectedStocks[s].price,
 				max: selectedStocks[s].price,
 				average:selectedStocks[s].price 
@@ -110,36 +124,36 @@ const confirmPositions = async (actualPositions) => {
 			else {
 				s += " the expected price."
 			}
-			s? tools.log(s) : null
+			s? log(s) : null
 		} 
 		catch (error) {				
 			inconsistencies++
-			tools.log("Signalling to cancel/sell " + p.stock.symbol + "...")
+			log("Signalling to cancel/sell " + p.stock.symbol + "...")
 			buySellEmitter.emit("cancel", p.stock.symbol)
 			delete el // is this correct?
 		}
 	}
 	
 	if (inconsistencies > 0) {
-		tools.log("In comparing the position model and the actual positions on WS, " + inconsistencies + " inconsistencies were found.")
+		log("In comparing the position model and the actual positions on WS, " + inconsistencies + " inconsistencies were found.")
 		throw inconsistencies
 	}
 	else {
-		tools.log("Model positions OK")
+		log("Model positions OK")
 	}
 
-	tools.writeJSON(modelPositions, "modelPositions.json")
+		(modelPositions, "modelPositions.json")
 }
 
-const updateEvaluate = async (p) => {
+const updateEvaluate = async (i) => {
 
-	p.lock = 1
+	let p = modelPositions[i]
 	
 	let newQuote = await p.quoter.quote()
-	let newTimestamp = Date.parse(newQuote.generatedTimestamp)
+	let newTimestamp = Date.parse(newQuote.generatedTimestamp).toString()
 
 	if (newTimestamp > p.price.history[0].timestamp) {
-		tools.refreshLog(newTimestamp, p.ticker + ": New update.", " [" + ((Date.now() - newTimestamp) / 1000) + " seconds late]")
+		tools.refreshLog(i, newTimestamp, p.ticker + ": New update.", " [" + ((Date.now() - newTimestamp) / 1000) + " seconds late]")
 		let newPrice = newQuote.data.stocks[0].price		
 		let currentPrice = p.price.current
 
@@ -156,19 +170,18 @@ const updateEvaluate = async (p) => {
 			else if (newPrice > p.price.max) {
 				p.price.max = newPrice
 			}			
-			s += (p.stock.symbol + " ")
+			s += (p.ticker + " ")
 			s += (newPrice - currentPrice > 0) ? "jumped" : "fell"
 			s += (" from " + currentPrice.toFixed(2) + " to " + newPrice.toFixed(2) + "...\n")	
-			changeCount++
 		}
 		
-		if (currentPrice > newPrice) buySellEmitter.emit("sell", p.stock.symbol, newPrice)
+		if (currentPrice > newPrice) buySellEmitter.emit("sell", p.ticker, newPrice)
 			
-		s? tools.log(s) : null
-		tools.writeJSON(modelPositions, "modelPositions.json")
+		s? log(s) : null
+		writeJSON(modelPositions, "modelPositions.json")
 	}
 	else {
-		tools.refreshLog(newTimestamp, p.ticker + ": Nothing to report...")
+		tools.refreshLog(i, newTimestamp, p.ticker + ": Nothing to report...")
 	}
 	p.lock = 0
 }

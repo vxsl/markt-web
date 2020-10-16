@@ -17,6 +17,7 @@ market.buySellEmitter.on("cancel", async (ticker, price) => {
 
 // TODO add pause condition if there is going to be an overly significant net loss? 
 market.buySellEmitter.on("sell", async (ticker, price) => {
+    tools.log("Trying to sell " + ticker + " for $" + price + " per share")
     let p = await agent.getPositionByTicker(ticker)
     if (p.sellable_quantity > 0) {
         await agent.sell(ticker, price)    
@@ -57,7 +58,7 @@ const main = async() => {
 
     // TODO what happens when a marketBuy is placed before the market opens?
 
-    tools.delayFunctionCall(market.main, "09:28", false)  // TODO change to "09:28"
+    tools.delayFunctionCall(market.main, "09:28", false)  // TODO change to "09:28" // TODO change to async=true
 }
 
 

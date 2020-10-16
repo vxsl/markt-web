@@ -95,6 +95,7 @@ const buy = async (formattedTicker, modelPrice) => {
     //let confirmation = fake.FakeData.placeMarketBuy(tokens, accountID, ticker, quantity, modelPrice)
     let confirmation = await trade.placeMarketBuy(tokens, accountID, formattedTicker, quantity).catch(error => {throw error})
     createPositionRecord(confirmation)
+    console.dir(confirmation)
     await updatePositions() // too long of a wait?
     return confirmation
 
@@ -110,11 +111,14 @@ const buy = async (formattedTicker, modelPrice) => {
     } */
 }
 
-const sell = async (formattedTicker, modelPrice) => { 
+const sell = async (unformattedTicker, modelPrice) => { 
 
+    let formattedTicker = tools.formatTicker(unformattedTicker)
     let quantity = (await getPositionByTicker(formattedTicker)).sellable_quantity
     //console.log("Going to SELL " + ticker + " x" + quantity + " at " + modelPrice)
-    let confirmation = await trade.placeMarketSell(tokens, accountID, formattedTicker, quantity)
+    let confirmation = await trade.placeMarketSell(tokens, accountID, formattedTicker, quantity).catch(error => {throw error})
+    console.dir(confirmation)
+    console.log(confirmation)
     //let confirmation = fake.FakeData.placeMarketSell(tokens, accountID, ticker, quantity, modelPrice)
 }
 
