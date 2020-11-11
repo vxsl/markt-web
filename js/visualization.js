@@ -13,7 +13,7 @@ const fetchPositions = async () => {
     let xhr, r    
     while (true) {
         xhr = new XMLHttpRequest();    
-        xhr.open('GET', 'js/data/stocks.json');    
+        xhr.open('GET', 'js/data/modelPositions.json');    
         xhr.send();
         return new Promise((resolve, reject) => {
             xhr.onload = () => resolve(JSON.parse(xhr.responseText))        
@@ -48,7 +48,7 @@ const init = async () => {
         let extLabel = document.createElement('div')
         extLabel.classList.add('chart-extlabel');
         let extLabelHeader = document.createElement('h2')
-        extLabelHeader.innerHTML = positions[i].stock.symbol
+        extLabelHeader.innerHTML = positions[i].ticker
         extLabel.appendChild(extLabelHeader)
         
 
@@ -64,7 +64,7 @@ const init = async () => {
             data: {
                 datasets: [{
                     fill:false,
-                    label: positions[i].stock.symbol,
+                    label: positions[i].ticker,
                     backgroundColor: MAINCOLOR,
                     borderColor: MAINCOLOR,
                     lineTension:0,
@@ -117,6 +117,7 @@ const init = async () => {
                                 //Array.prototype.push.apply(chart.data.datasets[0].data, position[i].price.current);
 
                                 let p = positions[i]
+                                //console.log(p.price)
                                 chart.data.datasets[0].data.push({
                                     //x:position[i].price.history[0].timestamp,
                                     x:Date.now(),

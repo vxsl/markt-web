@@ -89,9 +89,20 @@ canvas {
    padding:4%
 }
 
-#logContainer > pre {
+#logContainer > pre {    
     white-space:pre-wrap;
     font-size:.8vw;
+}
+
+#refreshLog {
+    font-size:.7vw;
+    color:var(--dark-grey);
+    padding-top:4%;
+
+}
+#log {    
+    font-size:.8vw;
+    color:black;
 }
 
 #clock{
@@ -100,7 +111,6 @@ canvas {
 }
 
 .chartTable-sidebar > #logContainer {
-    color:var(--dark-grey);
     padding-left:4%;
     border:solid;
     border-left:none;
