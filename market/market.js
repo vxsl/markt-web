@@ -1,5 +1,5 @@
 const 	config = require('../config.js'),
-		tools = require('./tools'),
+		tools = require('./tools/tools.js'),
 		{ log } = require('../tools/tools.js'),
 		{ writeJSON } = require('../tools/tools.js'),
 		{ QuoteHarvester } = require("./bnnbloomberg-markets-scraper"),
@@ -12,7 +12,9 @@ var modelPositions = []
 
 const main = async () => {
 	
-	let p
+	let market = await (await QuoteHarvester.build("ca")).quote()
+	console.log(market.data.stocks)
+	/* let p
 	// TODO there is a race condition leading to deadlock somewhere in here??
 	while (true) {	
 		//for (let i in modelPositions) {
@@ -24,7 +26,7 @@ const main = async () => {
 			}
 			else await new Promise(resolve => setTimeout(resolve, 1000));
 		}
-	}
+	} */
 }
 
 // TODO create some enumerable optfions here
@@ -62,6 +64,7 @@ const selectionStrategy = (market, sort="pctChng") => {
 
 const recommendPositions = async () => {
 	
+	console.log("HERRE")
 	log("Going to recommend " + config.NUM_POSITIONS + " positions.")
 	
 	// get initial market model:

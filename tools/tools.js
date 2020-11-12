@@ -2,9 +2,9 @@ const   config = require("../config.js"),
         fs = require('fs'),
 		readline = require('readline')
 		
-process.chdir(config.workDir)
+//process.chdir(config.workDir)
 
-const userPrompt = (message) => {
+/* const userPrompt = (message) => {
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
@@ -26,7 +26,7 @@ const safePrompt = async () => {
 			return false
 		}
 	}
-}
+} */
 
 /**
  * delays execution of function fn until time "XX:XX". 
@@ -65,7 +65,7 @@ const writeJSON = async (data, filename) => {
 
 const log = (message) => {
 	
-	fs.appendFileSync(config.fileDir+'log', message+"\n")
+	//fs.appendFileSync(config.fileDir+'log', message+"\n")
 	if (config.debug) console.log(message) 
 }
 
@@ -74,5 +74,5 @@ module.exports = {
     writeJSON,
     log,
 	delayFunctionCall,
-	safePrompt
+	//safePrompt
 }

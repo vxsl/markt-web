@@ -3,7 +3,7 @@ const   // nthline = require('node-nthline'),
         fs = require('fs'),
 		config = require('../../config.js')
 		
-process.chdir(config.workDir)
+//process.chdir(config.workDir)
 
 const threeDigitMillis = (timeString) => {
 	millis = timeString.getMilliseconds().toString()
