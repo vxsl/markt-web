@@ -1,11 +1,10 @@
 var positions
 var update = true
 
-
 var charts = []
 
-const MAINCOLOR = 'rgb(5, 205, 255)'
-const SECONDARYCOLOR = 'rgb(236, 236, 236)'
+const MAINCOLOR = 'rgb(61,61,61)'
+const SECONDARYCOLOR = 'rgb(61,61,61)'
 
 var updating = false
 
@@ -30,33 +29,53 @@ const fetchPositions = async () => {
     }
 }
 
-const init = async () => {
+const drawChart = (i=null) => {
+    let container = document.querySelector('.chartTable');
+    let outerCountainer = document.createElement('div')
+    outerCountainer.classList.add('chart-container-container')
 
-    positions = await fetchPositions()  // first call
-    console.log(positions)
+    let innerContainer = document.createElement('div');
+    innerContainer.classList.add('chart-container');
 
-    for (let i = 0; i < positions.length; i++) {      
+    let canvas = document.createElement('canvas');
+    let extLabel = document.createElement('div')
+    extLabel.classList.add('chart-extlabel');
+    let extLabelHeader = document.createElement('h2')
 
-        let container = document.querySelector('.chartTable');
-        let outerCountainer = document.createElement('div')
-        outerCountainer.classList.add('chart-container-container')
+    if (i == null) {
+        extLabelHeader.innerHTML = "&nbsp;"    
+        extLabel.setAttribute('style', 'opacity:0')
+        canvas.setAttribute('id', 'dummy_chart')
+    }
+    else {        
+        extLabelHeader.innerHTML = positions[i].ticker      
+    }  
+      
+    extLabel.appendChild(extLabelHeader)         
+    innerContainer.appendChild(extLabel)
+    innerContainer.appendChild(canvas);
 
-        let innerContainer = document.createElement('div');
-        innerContainer.classList.add('chart-container');
-
-        let canvas = document.createElement('canvas');
-        let extLabel = document.createElement('div')
-        extLabel.classList.add('chart-extlabel');
-        let extLabelHeader = document.createElement('h2')
-        extLabelHeader.innerHTML = positions[i].ticker
-        extLabel.appendChild(extLabelHeader)
-        
-
-        innerContainer.appendChild(extLabel)
-        innerContainer.appendChild(canvas);
+    if (i != null) {        
         outerCountainer.append(innerContainer)
-        container.appendChild(outerCountainer);        
+    }
+    else {
+        let link = document.createElement('a')   
+        link.setAttribute('id', 'dummy_chart_href')
+        link.setAttribute('href', 'google.com')
+        let linkWrap = document.createElement('div')
+        linkWrap.setAttribute('id', 'dummy_chart_overlay')
+          
+        let p = document.createElement('p')   
+        p.innerHTML = '+'
+        linkWrap.append(p)
+        link.append(linkWrap)
+        outerCountainer.append(link)
+        outerCountainer.append(innerContainer)
+    }
 
+    container.appendChild(outerCountainer);  
+
+    if (i != null) {
         let ctx = canvas.getContext('2d');
         //var config = createConfig(details.mode, details.intersect);
         charts[i] = new Chart(ctx, {
@@ -155,7 +174,7 @@ const init = async () => {
                             },*/
                             //delay:2000
                         }                
-                      }],
+                    }],
                     yAxes: [{
                         color:SECONDARYCOLOR,
                         gridLines: {
@@ -169,7 +188,77 @@ const init = async () => {
                 }
             }
         }); 
+    }
+    else {
+        let ctx = canvas.getContext('2d');
+        //var config = createConfig(details.mode, details.intersect);
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [{
+                    fill:false,
+                    label: 'test',
+                    backgroundColor: MAINCOLOR,
+                    borderColor: MAINCOLOR,
+                    lineTension:0,
+                    data: []
+                }]
+            },      
+            options: {
+                //responsive:true, 
+                events: [],        
+                elements: {
+                    point: {
+                        radius:0
+                    }
+                },
+                aspectRatio:1,
+                maintainAspectRatio:true,
+                legend: {
+                    display:false,
+                    position:'top',
+                    align:'start',
+                    onClick:null,
+                    labels: {
+                        fontColor: MAINCOLOR,
+                        //fontStyle:'bold',
+                        fontFamily:'Helvetica',
+                        boxWidth:0,
+                    },
+                },
+                scales: {                      
+                    xAxes: [{           
+                        gridLines: {
+                            color:SECONDARYCOLOR
+                        },
+                        type: 'realtime'               
+                    }],
+                    yAxes: [{
+                        color:SECONDARYCOLOR,
+                        gridLines: {
+                            color:SECONDARYCOLOR
+                        },
+                        ticks: {
+                            //suggestedMin: 0,
+                            maxTicksLimit: 4
+                        }
+                    }]
+                }
+            }
+        });
+    }
+}
+
+const init = async () => {
+
+    positions = await fetchPositions()  // first call
+    //positions = []
+
+    for (let i = 0; i < positions.length; i++) { 
+        drawChart(i)              
     };
+
+    drawChart() // extra dummy
 }
 
 init()

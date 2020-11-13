@@ -5,12 +5,11 @@
     --light-grey: rgb(236, 236, 236);
     --dark-grey: rgb(117, 117, 117)
 }
-
 body {
     font-family: "Helvetica", sans-serif !important;
-    background-color:#dddddd !important;
+    background-color:rgb(255, 254, 245);
     margin:0;
-    padding:0
+    padding:0;
 }
 
 canvas {
@@ -18,25 +17,23 @@ canvas {
     -webkit-user-select: none;
     -ms-user-select: none;
     width:100%;
-    height:100%;
 }
 .chart-container-container {
+    position:relative;
     width:20%;
-    /*height:25vh;*/
-    padding:2%;
+    margin:1em
 }
 .chart-container{
-    
-    padding:5%;
+    overflow:hidden;
     /*
     width: 500px;
     margin-left: 40px;
     margin-right: 40px;
     margin-bottom: 40px;*/
-    box-sizing:border-box;
+    /* box-sizing:border-box; */
     border:solid;
-    border-color:var(--light-grey);
-    
+    border-color:rgb(61,61,61);
+    border-width:1px;
     border-radius: 1em;
 
 }
@@ -44,26 +41,23 @@ canvas {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: right;
-    
+    position:relative;
 }
 
 .chart-extlabel {
     width:100%;
-    color:rgb(165, 165, 165);
-    padding:3%;
-    background-color:rgb(236, 236, 236);
+    color:rgb(250, 250, 250);
+    background-color:rgb(61,61,61);
     margin-bottom:10%;
-    border-top-left-radius:0.6em;
-    border-bottom-left-radius:0.6em;
-    display:table
-
+    text-align:right
 }
 .chart-extlabel > h2 {
     font-size:1vw;
-    display:table-cell;
     vertical-align:middle;
-    padding-left:5%;
+    padding-right:10%;
+    padding-top:2%;
+    padding-bottom:1%;
+    margin:0;
 }
 
 .chartTable-sidebar {
@@ -121,24 +115,100 @@ canvas {
 }
 
 
+#terminal  {
+    height:100%;
+    background-color:transparent;
+}
 
+#terminal * {
+    background-color:transparent;
+    color:black
+}
+
+#input-menu-label {
+    padding-top:5%;
+    padding-bottom:1%;
+    display:inline
+}
+
+input#symbol{
+    background-color:transparent;
+    border:solid;
+    border-radius:0.2em;
+    border-width: 1px;
+}
+
+.input-menu-item {
+    font-size:0.8em
+}
+.input-menu-subheading {
+    font-family:'Consolas', monospace;
+    color:var(--dark-grey);
+    font-size:0.7em
+}
+
+.ui-autocomplete {
+    max-height: 100px;
+    overflow-y: auto;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
+  }
+/* IE 6 doesn't support max-height
+* we use height instead, but this forces the menu to always be this tall
+*/
+* html .ui-autocomplete {
+height: 100px;
+}
 
 div#titlebar {
-    background-color:rgb(236, 236, 236);
-    margin-bottom:2%
+    position:relative;
+    background-color:rgb(255, 253, 247);
+    height:25vh
 }
 div#main-title {
-    float:right;
-    width:20%;
-    padding-right:2%
+     
 }
 div#main-title > * {
     text-align:right;
 }
 div#main-title > h1 {
+   
     font-weight:lighter;
-    color:var(--main-color)
+    color:rgb(61, 61, 61);
+    font-size:600%;
+    margin:0;
+    padding-right:3%
+
 }
 div#main-title > p {
-    color:rgb(189, 189, 189)
+    padding-right:5%;
+    color:rgb(92, 92, 92);
+    margin:0;
+}
+
+#dummy_chart {
+    
+    filter: blur(0.2em);
+}
+
+#dummy_chart_overlay {
+    position:absolute;
+    z-index:2;
+    border-radius: 1.1em;
+    width:100%;
+    height:100%;   
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#dummy_chart_href {
+    width:100%;
+    text-align:center;
+}
+
+#dummy_chart_href > * {
+    color:rgb(61, 61, 61);
+    position: absolute;
+    font-size:300%
 }
