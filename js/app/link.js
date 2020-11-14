@@ -1,4 +1,4 @@
-(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.link = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 
 },{}],2:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
@@ -501,17 +501,9 @@ class Position {
         this.lock = 0
     }
 	
-	static async build (ticker) {
+	static async build (ticker, price) {
 		try {
-            let p = await QuoteHarvester.build(ticker)
-            let price = {
-                current:p.price,
-                history:[{value: p.price, timestamp: Date.parse(p.generatedTimestamp).toString()}],				
-                min:p.price,
-                max: p.price,
-                average:p.price  
-            }
-			return new Position(p, price)
+			return new Position(await QuoteHarvester.build(ticker), price)
 		}
 		catch (error) {
 			console.log(error)
@@ -628,7 +620,7 @@ class QuoteHarvester {
 					let invalidTestResponseCount = 0
 					let response
 					while (invalidTestResponseCount < 5) {
-						response = await fetch(corsProxy + baseURI + result, fetchOptions).then(res => res.json()).catch(error => {
+						response = await fetch(baseURI + result, fetchOptions).then(res => res.json()).catch(error => {
 								console.log(error)
 								invalidTestResponseCount++
 								return 1	// invalid JSON response (happens occasionally on server error)
@@ -933,16 +925,14 @@ const buySellEmitter = new EventEmitter()
 
 var modelPositions = []
 
-const createPosition = async (ticker) => {
-
-	let result = await Position.build(ticker)
-	return result
+const test = () => {
+	return 1
 }
 
 const main = async () => {
 	
-	//let market = await (await QuoteHarvester.build("ca")).quote()
-	//console.log(market.data.stocks)
+	let market = await (await QuoteHarvester.build("ca")).quote()
+	console.log(market.data.stocks)
 	/* let p
 	// TODO there is a race condition leading to deadlock somewhere in here??
 	while (true) {	
@@ -1155,6 +1145,7 @@ const simulateMarketAction = (quote) => {
 } */
 
 module.exports = {
-	createPosition
+	modelPositions
 }
-},{"../config.js":3,"../tools/tools.js":11,"./Position.js":4,"./bnnbloomberg-markets-scraper":5,"./tools/tools.js":10,"events":2}]},{},[12]);
+},{"../config.js":3,"../tools/tools.js":11,"./Position.js":4,"./bnnbloomberg-markets-scraper":5,"./tools/tools.js":10,"events":2}]},{},[12])(12)
+});

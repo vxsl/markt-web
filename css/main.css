@@ -46,10 +46,13 @@ canvas {
 
 .chart-extlabel {
     width:100%;
-    color:rgb(250, 250, 250);
-    background-color:rgb(61,61,61);
+    color:rgb(1,61,61);
     margin-bottom:10%;
-    text-align:right
+    padding-bottom:1%;
+    padding-top:1%;
+    text-align:right;
+    border-bottom:solid;
+    border-bottom-width:1px
 }
 .chart-extlabel > h2 {
     font-size:1vw;
@@ -132,10 +135,16 @@ canvas {
 }
 
 input#symbol{
-    background-color:transparent;
     border:solid;
     border-radius:0.2em;
     border-width: 1px;
+    position:relative;
+    display:none;
+    width:50%;
+    font-size:110%;
+    font-family:Helvetica, sans-serif;
+    
+    font-weight:lighter;
 }
 
 .input-menu-item {
@@ -200,15 +209,12 @@ div#main-title > p {
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor:pointer;
 }
 
-#dummy_chart_href {
-    width:100%;
-    text-align:center;
-}
-
-#dummy_chart_href > * {
+#dummy_chart_overlay p {
+    display:block !important;
     color:rgb(61, 61, 61);
     position: absolute;
-    font-size:300%
+    font-size:600%;
 }

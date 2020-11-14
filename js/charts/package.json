@@ -1,0 +1,15 @@
+{
+  "name": "charts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "charts.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chartjs": "^0.3.24",
+    "chartjs-plugin-streaming": "^1.8.0"
+  }
+}
