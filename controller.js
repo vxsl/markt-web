@@ -46,8 +46,6 @@ const main = async() => {
 
     //tools.delayFunctionCall(market.main, "09:28", false)  // TODO change to "09:28" // TODO change to async=true
     market.main()
-    
-    console.log('here2')
 }
 
 

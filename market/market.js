@@ -4,16 +4,22 @@ const 	config = require('../config.js'),
 		{ writeJSON } = require('../tools/tools.js'),
 		{ QuoteHarvester } = require("./bnnbloomberg-markets-scraper"),
 		{ EventEmitter } = require("events"),
-		{ ModelPosition } = require ("./ModelPosition.js")
+		{ Position } = require ("./Position.js")
 
 const buySellEmitter = new EventEmitter()
 
 var modelPositions = []
 
+const createPosition = async (ticker) => {
+
+	let result = await Position.build(ticker)
+	return result
+}
+
 const main = async () => {
 	
-	let market = await (await QuoteHarvester.build("ca")).quote()
-	console.log(market.data.stocks)
+	//let market = await (await QuoteHarvester.build("ca")).quote()
+	//console.log(market.data.stocks)
 	/* let p
 	// TODO there is a race condition leading to deadlock somewhere in here??
 	while (true) {	
@@ -82,7 +88,7 @@ const recommendPositions = async () => {
 	})
 
 	for (let s in selectedStocks) {
-		let p = await ModelPosition.build(selectedStocks[s].symbol, {
+		let p = await Position.build(selectedStocks[s].symbol, {
 				current:selectedStocks[s].price,
 				history:[{value: selectedStocks[s].price, timestamp: Date.parse(market.generatedTimestamp).toString()}],				
 				min:selectedStocks[s].price,
@@ -217,10 +223,14 @@ const simulateMarketAction = (quote) => {
 	}
 }
 
-module.exports = {
+/* module.exports = {
 	recommendPositions,
 	confirmPositions,
 	modelPositions,
 	buySellEmitter,
 	main,
+} */
+
+module.exports = {
+	createPosition
 }

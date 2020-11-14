@@ -1,0 +1,19 @@
+{
+  "name": "markt",
+  "version": "1.0.0",
+  "description": "## This project is a WIP and is not ready to be used.",
+  "main": "market/market.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vxsl/markt.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vxsl/markt/issues"
+  },
+  "homepage": "https://github.com/vxsl/markt#readme"
+}
