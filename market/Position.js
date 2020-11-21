@@ -11,12 +11,15 @@ class Position {
 	static async build (ticker) {
 		try {
             let p = await QuoteHarvester.build(ticker)
+            let q = await p.quote()
+            console.dir(q)
+            let initPrice = q.data.stocks[0].price
             let price = {
-                current:p.price,
-                history:[{value: p.price, timestamp: Date.parse(p.generatedTimestamp).toString()}],				
-                min:p.price,
-                max: p.price,
-                average:p.price  
+                current:initPrice,
+                history:[{value: initPrice, timestamp: Date.parse(q.generatedTimestamp).toString()}],				
+                min:initPrice,
+                max: initPrice,
+                average:initPrice  
             }
 			return new Position(p, price)
 		}
