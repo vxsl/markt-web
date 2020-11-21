@@ -3,9 +3,52 @@ var charts = []
 
 var updating = false
 
+const updateEvaluate = async (i) => {
+console.log("UPDATE")
+	let p = positions[i]
+    console.dir(p)
+	
+	let newQuote = await p.quoter.quote()
+	let newTimestamp = Date.parse(newQuote.generatedTimestamp).toString()
 
-const refreshChart = (chart) => {
-                
+	if (newTimestamp > p.price.history[0].timestamp) {
+        console.log('inside')
+		//tools.refreshLog(i, newTimestamp, p.ticker + ": New update.", " [" + ((Date.now() - newTimestamp) / 1000) + " seconds late]")
+		let newPrice = newQuote.data.stocks[0].price		
+		let currentPrice = p.price.current
+
+		let s = ''
+		
+		if (currentPrice != newPrice) {
+			p.price.current = newPrice
+			p.price.history.unshift({value:newPrice, timestamp: newTimestamp})
+
+			// extra stuff:
+			if (newPrice < p.price.min) {
+				p.price.min = newPrice
+			}
+			else if (newPrice > p.price.max) {
+				p.price.max = newPrice
+			}			
+			s += (p.ticker + " ")
+			s += (newPrice - currentPrice > 0) ? "jumped" : "fell"
+			s += (" from " + currentPrice.toFixed(2) + " to " + newPrice.toFixed(2) + "...\n")	
+		}
+		
+		if (currentPrice > newPrice) buySellEmitter.emit("sell", p.ticker, newPrice)
+			
+		s? console.log(s) : null
+		//writeJSON(modelPositions, "modelPositions.json")
+	}
+	else {
+		/* tools.refreshLog(i, newTimestamp, p.ticker + ": Nothing to report...") */
+	}
+	p.lock = 0
+}
+
+const refreshChart = async (i) => {
+    let chart = charts[i]
+    console.log('here')            
     if (!updating) {
         updating = true
         /* positions = await fetchPositions() */
@@ -13,7 +56,8 @@ const refreshChart = (chart) => {
     let p = positions[i]
     chart.data.datasets[0].data.push({
         x:Date.now(),
-        y:p.price.current
+        //y:p.price.current
+        y:Date.now()
     })
 
     chart.data.datasets[0].data = chart.data.datasets[0].data.slice(-10)
@@ -25,6 +69,8 @@ const refreshChart = (chart) => {
     if (i+1 === positions.length) {
         updating = false
     }
+    
+    console.log('end')      
 }
 
 const createChart = (i=null) => {
@@ -90,11 +136,10 @@ const createChart = (i=null) => {
 
     document.getElementById("positionsTable").appendChild(outerContainer);    
     
-
     let ctx = canvas.getContext('2d');  
-    i == null? new Chart(ctx, dummy()) : charts[i] = new Chart(ctx, reg(positions[i].ticker))
 
     if (i == null) {
+        new Chart(ctx, dummy())
         console.log($("#symbol"))
         $( "#symbol" ).autocomplete({    
             minLength: 0,
@@ -111,6 +156,10 @@ const createChart = (i=null) => {
             .append( "<div class='input-menu-item'>" + item.label + "<br><div class='input-menu-subheading'>" + item.name + "</div></div>" )
             .appendTo( ul );
         };
+    }
+    else {
+        charts[i] = new Chart(ctx, reg(i))
+        //charts[i].options.scales.xAxes[0].realtime.onRefresh = refreshChart(i)
     }
 }
 

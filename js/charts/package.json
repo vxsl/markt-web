@@ -9,7 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "chartjs": "^0.3.24",
     "chartjs-plugin-streaming": "^1.8.0"
   }
 }

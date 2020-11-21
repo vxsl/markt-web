@@ -58,13 +58,13 @@ const dummy = () => {
     }
 }
 
-const reg = (label) => {
+const reg = (i) => {
     return {
         type: 'line',
         data: {
             datasets: [{
                 fill:false,
-                label: label,
+                label: positions[i].ticker,
                 backgroundColor: MAINCOLOR,
                 borderColor: MAINCOLOR,
                 lineTension:0,
@@ -106,7 +106,40 @@ const reg = (label) => {
                     gridLines: {
                         color:SECONDARYCOLOR
                     },
-                    type: 'realtime'       
+                    type: 'realtime',
+                    realtime: {
+                        onRefresh: async function(chart) {
+                            console.log('start')                                
+                            if (!updating) {
+                                charts[i].updating = true
+                                await updateEvaluate(i)
+                                //positions = await fetchPositions()
+                            } 
+                           
+                            //Array.prototype.push.apply(chart.data.datasets[0].data, position[i].price.current);
+
+                            let p = positions[0]
+                            //console.log(p.price)
+                            chart.data.datasets[0].data.push({
+                                //x:position[i].price.history[0].timestamp,
+                                x:Date.now(),
+                                y:p.price.current
+                            })
+
+                            chart.data.datasets[0].data = chart.data.datasets[0].data.slice(-10)
+                            
+                            //console.log(i + ": " + position[i].price.current)
+                            //console.log(chart.data.datasets[0].data)
+                            //chart.update()
+
+                            // adjust min/max of the chart if necessary
+                            chart.options.scales.yAxes[0].ticks.min = Math.max(0, 0.995*p.price.min);
+                            chart.options.scales.yAxes[0].ticks.max = 1.025*p.price.max;      
+                            
+                            charts[i].updating = false
+                            console.log('end')       
+                        },
+                    }
                 }],
                 yAxes: [{
                     color:SECONDARYCOLOR,
