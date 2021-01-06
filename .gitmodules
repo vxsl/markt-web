@@ -1,0 +1,3 @@
+[submodule "markt"]
+	path = js/app/markt
+	url = https://github.com/vxsl/markt.git
