@@ -1,0 +1,10 @@
+$theme-colors: (
+    "primary": #370aff,
+    "secondary":#EF3E36,
+    "light": #f3f3f3,
+    "dark":#2E282A,
+    "info":#3F88C5
+);
+
+// Bootstrap and its default variables
+@import "../node_modules/bootstrap/scss/bootstrap";
