@@ -13,8 +13,9 @@
             </div>
         </b-col>-->
         <b-col class="col-6"></b-col>
-        <b-col class="col-6 chartTable" id="positionsTable">            
           <PositionCard v-for="position in positions" :key="position.ticker" :ticker="position.ticker"/>
+          <DummyCard/>            
+        <b-col class="col-6 chartTable" id="positionsTable">
         </b-col>
     </b-row>
   </b-container>
@@ -29,16 +30,18 @@ require('@/js/charts/charts.js') */
 <script>
 //require('@/js/app/app.js')
 const appLink = require('@/js/app/appLink.js')
-require('@/js/data/knownSymbols.js')
+//require('@/js/data/knownSymbols.js')
 
 
 import PositionCard from '@/components/PositionCard.vue'
+import DummyCard from '@/components/DummyCard.vue'
 
 export default {
 
   name: 'Home',
   components: {
-    PositionCard
+    PositionCard,
+    DummyCard
   },
   data() {
         return {

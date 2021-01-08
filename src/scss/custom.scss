@@ -1,0 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200;300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,100;0,200;0,300;1,300&display=swap');
+
+$theme-colors: (
+    "primary": #370aff,
+    "secondary":#EF3E36,
+    "light": #f3f3f3,
+    "dark":#2E282A,
+    "info":#3F88C5
+);
+
+@import "../../node_modules/bootstrap/scss/bootstrap";

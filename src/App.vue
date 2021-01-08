@@ -13,9 +13,7 @@
 </template>
 
 <style lang="scss">
-@import '../scss/custom.scss';
-@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200;300;400;500;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,100;0,200;0,300;1,300&display=swap');
+@import '@/scss/custom.scss';
 
 #app {
   font-family: Inconsolata, Courier, monospace;
