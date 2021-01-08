@@ -17,8 +17,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200;300;400;500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,100;0,200;0,300;1,300&display=swap');
 
-
-
 #app {
   font-family: Inconsolata, Courier, monospace;
   letter-spacing:0.001em;
@@ -31,7 +29,7 @@
   font-weight:700;
 }
 #nav-container {
-  position:absolute;
+  position:relative;
   z-index:4;
   width:100%;
   padding-top:1.2em;

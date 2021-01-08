@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const MAINCOLOR = 'rgb(61,61,61)'
 const SECONDARYCOLOR = MAINCOLOR
 

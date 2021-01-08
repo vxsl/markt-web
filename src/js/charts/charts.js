@@ -1,3 +1,4 @@
+/* eslint-disable */
 var positions = []
 var charts = []
 
@@ -164,7 +165,6 @@ const createChart = (i=null) => {
 }
 
 const init = async() => {
-    
     for (let i in positions) {
         createChart(i)
     }

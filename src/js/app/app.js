@@ -479,6 +479,34 @@ function once(emitter, name) {
 }
 
 },{}],3:[function(require,module,exports){
+(function (global){(function (){
+"use strict";
+
+// ref: https://github.com/tc39/proposal-global
+var getGlobal = function () {
+	// the only reliable means to get the global object is
+	// `Function('return this')()`
+	// However, this causes CSP violations in Chrome apps.
+	if (typeof self !== 'undefined') { return self; }
+	if (typeof window !== 'undefined') { return window; }
+	if (typeof global !== 'undefined') { return global; }
+	throw new Error('unable to locate global object');
+}
+
+var global = getGlobal();
+
+module.exports = exports = global.fetch;
+
+// Needed for TypeScript and Webpack.
+if (global.fetch) {
+	exports.default = global.fetch.bind(global);
+}
+
+exports.Headers = global.Headers;
+exports.Request = global.Request;
+exports.Response = global.Response;
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],4:[function(require,module,exports){
 const NUM_POSITIONS = 2
 const fileDir = '../data/'
 const workDir = './'
@@ -490,7 +518,7 @@ module.exports = {
     workDir,
     debug
 }
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 const { QuoteHarvester } = require("./bnnbloomberg-markets-scraper/QuoteHarvester")
 
 class Position {
@@ -530,7 +558,7 @@ class Position {
 module.exports = {
     Position
 }
-},{"./bnnbloomberg-markets-scraper/QuoteHarvester":5}],5:[function(require,module,exports){
+},{"./bnnbloomberg-markets-scraper/QuoteHarvester":6}],6:[function(require,module,exports){
 const { corsProxy } = require('./config.js')
 const { QuoteLogger } = require('./QuoteLogger.js')
 const { fetch, baseURI, resources, types, fetchOptions } = require('./params.js')
@@ -666,7 +694,7 @@ module.exports = {
 	QuoteHarvester
 }
 
-},{"./QuoteLogger.js":6,"./config.js":7,"./params.js":9}],6:[function(require,module,exports){
+},{"./QuoteLogger.js":7,"./config.js":8,"./params.js":9}],7:[function(require,module,exports){
 class QuoteLogger {
     
     reqInit = async () => {
@@ -710,40 +738,12 @@ module.exports = {
 
     QuoteLogger
 }
-},{}],7:[function(require,module,exports){
-const corsProxy = "https://kylegrimsrudma.nz:8080/"    // for using bnnbloomberg-markets-scraper in a browser, you must pass your requests through a CORS proxy. See https://github.com/Rob--W/cors-anywhere
+},{}],8:[function(require,module,exports){
+const corsProxy = "https://kylegrimsrudma.nz:8081/"    // for using bnnbloomberg-markets-scraper in a browser, you must pass your requests through a CORS proxy. See https://github.com/Rob--W/cors-anywhere
 
 module.exports = {
     corsProxy
 }
-},{}],8:[function(require,module,exports){
-(function (global){(function (){
-"use strict";
-
-// ref: https://github.com/tc39/proposal-global
-var getGlobal = function () {
-	// the only reliable means to get the global object is
-	// `Function('return this')()`
-	// However, this causes CSP violations in Chrome apps.
-	if (typeof self !== 'undefined') { return self; }
-	if (typeof window !== 'undefined') { return window; }
-	if (typeof global !== 'undefined') { return global; }
-	throw new Error('unable to locate global object');
-}
-
-var global = getGlobal();
-
-module.exports = exports = global.fetch;
-
-// Needed for TypeScript and Webpack.
-if (global.fetch) {
-	exports.default = global.fetch.bind(global);
-}
-
-exports.Headers = global.Headers;
-exports.Request = global.Request;
-exports.Response = global.Response;
-}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],9:[function(require,module,exports){
 const fetch = require('node-fetch')
 const Headers = fetch.Headers;
@@ -802,7 +802,7 @@ const fetchOptions = {
 module.exports = {
     fetch, baseURI, resources, types, fetchOptions
 }
-},{"node-fetch":8}],10:[function(require,module,exports){
+},{"node-fetch":3}],10:[function(require,module,exports){
 const   // nthline = require('node-nthline'),
 		child_process = require('child_process'),
         fs = require('fs'),
@@ -844,7 +844,7 @@ const refreshLog = async (index, timestamp, message, extra="") => {
 module.exports = {
     refreshLog
 }
-},{"../../config.js":3,"child_process":1,"fs":1}],11:[function(require,module,exports){
+},{"../../config.js":4,"child_process":1,"fs":1}],11:[function(require,module,exports){
 const   config = require("../config.js"),
         fs = require('fs'),
 		readline = require('readline')
@@ -923,7 +923,7 @@ module.exports = {
 	delayFunctionCall,
 	//safePrompt
 }
-},{"../config.js":3,"fs":1,"readline":1}],12:[function(require,module,exports){
+},{"../config.js":4,"fs":1,"readline":1}],12:[function(require,module,exports){
 const 	config = require('../config.js'),
 		tools = require('./tools/tools.js'),
 		{ log } = require('../tools/tools.js'),
@@ -1160,4 +1160,4 @@ const simulateMarketAction = (quote) => {
 module.exports = {
 	createPosition
 }
-},{"../config.js":3,"../tools/tools.js":11,"./Position.js":4,"./bnnbloomberg-markets-scraper":5,"./tools/tools.js":10,"events":2}]},{},[12]);
+},{"../config.js":4,"../tools/tools.js":11,"./Position.js":5,"./bnnbloomberg-markets-scraper":6,"./tools/tools.js":10,"events":2}]},{},[12]);
