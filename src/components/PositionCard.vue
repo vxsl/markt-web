@@ -5,7 +5,7 @@
                 <h2>{{ticker}}</h2>
             </div>
             <!-- <canvas></canvas> -->
-            <PositionChart/>
+            <PositionChart :position='position'/>
         </div>
     </div>
 </template>
@@ -14,15 +14,22 @@
 import PositionChart from '@/components/PositionChart.vue'
 
 export default {
-  props: {
-    ticker: String,    
-  },
-  components: {
-      PositionChart
-  },
-  created() {
-      this.$emit('newPositionCard', this)
-  }
+    data() {
+        return {
+        }
+    },
+    props: {
+        ticker: String,   
+        position: {
+            
+        } 
+    },
+    components: {
+        PositionChart
+    },
+    created() {
+        this.$emit('newPositionCard', this)
+    }
 }
 </script>
 

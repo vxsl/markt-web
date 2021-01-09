@@ -1,18 +1,24 @@
 <template>
-  <div ref="test" class="chart-container-container">
-    <div id="dummy_chart_overlay" @click="initPosition">
+  <div class="chart-container-container">
+    <div ref="overlay" id="dummy_chart_overlay" @click="initPosition">
       <p ref="plus" v-show="!selecting">+</p>
       <div class="autocomplete-container">
         <AutocompleteWrapper
           v-if="selecting"
           @submit="createPosition"
+          @quit="selecting = false"
+          @loading="startLoading"
         >
         </AutocompleteWrapper>
-      </div>
+        <div 
+          class="spinner-border" 
+          role="status"
+          ref="spinner"/>
+        </div>
     </div>
     <div class="chart-container">
       <div class="chart-extlabel">
-        <h2>&nbsp;</h2>
+        <h2>N/A</h2>
       </div>
       <DummyChart />
     </div>
@@ -27,7 +33,8 @@ const appLink = require('@/js/app/appLink.js')
 export default {
   data() {
       return {
-          selecting: false
+          selecting: false,
+          selected: false
       }
   },
   props: {
@@ -40,9 +47,9 @@ export default {
   mounted() {
   },
   methods: {
-      async createPosition(input) {
-        try {
-          console.log("creating with " + input)
+    async createPosition(input) {
+      try {
+        console.log("creating with " + input)
           let newPosition = await appLink.createPosition(input)
           this.$emit('newPosition', newPosition)
           this.selecting = false
@@ -55,7 +62,17 @@ export default {
       initPosition() {
         this.selecting = true;
 
-      }
+      },
+      startLoading() {
+        this.$refs.overlay.style.cursor = 'wait'
+        this.$refs.spinner.style.display = 'block'
+        this.$refs.plus.style.opacity = '0'
+      },
+      stopLoading() {
+        this.$refs.overlay.style.cursor = 'pointer'
+        this.$refs.spinner.style.display = 'none'
+        this.$refs.plus.style.opacity = '1'
+      },
   }
 }
 </script>
@@ -64,8 +81,11 @@ export default {
 <style scoped lang="scss">
 @import "../scss/autocomplete-custom.css";
 
+.spinner-border {
+  display:none
+}
 .chart-container {
-  filter: blur(0.3em);    
+  filter: blur(0.2em);    
   border:none !important
 }
 

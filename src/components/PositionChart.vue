@@ -6,9 +6,20 @@ const MAINCOLOR = 'rgb(61,61,61)'
 const SECONDARYCOLOR = MAINCOLOR
 
 export default {
+  data() {
+    return {
+    }
+  },
   name: 'PositionChart',
   extends: Line,
+  created() {
+    /* console.log('here')
+    console.dir(this.position) */
+  },
   props: {
+    position: {
+
+    },
     plugins: [{
         /* Adjust label font size according to chart size */
             beforeDraw: function(c) {
@@ -17,7 +28,54 @@ export default {
             //streaming: 30
         }],
   },
+  methods: {
+    async updateEvaluate() {
+      /* console.dir(this.position)
+      console.log("UPDATE") */
+      let p = this.position
+      
+      let newQuote = await p.quoter.quote()
+      let newTimestamp = Date.parse(newQuote.generatedTimestamp).toString()
+
+      if (newTimestamp > p.price.history[0].timestamp) {
+        //console.log('inside')
+        //tools.refreshLog(i, newTimestamp, p.ticker + ": New update.", " [" + ((Date.now() - newTimestamp) / 1000) + " seconds late]")
+        let newPrice = newQuote.data.stocks[0].price		
+        let currentPrice = p.price.current
+
+        let s = ''
+        
+        if (currentPrice != newPrice) {
+          p.price.current = newPrice
+          p.price.history.unshift({value:newPrice, timestamp: newTimestamp})
+
+          // extra stuff:
+          if (newPrice < p.price.min) {
+            p.price.min = newPrice
+          }
+          else if (newPrice > p.price.max) {
+            p.price.max = newPrice
+          }			
+          s += (p.ticker + " ")
+          s += (newPrice - currentPrice > 0) ? "jumped" : "fell"
+          s += (" from " + currentPrice.toFixed(2) + " to " + newPrice.toFixed(2) + "...\n")	
+        }
+        
+        // TODO: uncomment
+        //if (currentPrice > newPrice) buySellEmitter.emit("sell", p.ticker, newPrice)
+          
+        s? console.log(s) : null
+        //writeJSON(modelPositions, "modelPositions.json")
+      }
+      else {
+        /* tools.refreshLog(i, newTimestamp, p.ticker + ": Nothing to report...") */
+      }
+      p.lock = 0
+    }
+  },
   mounted () {
+    const updateEvaluate = this.updateEvaluate
+    const p = this.position
     this.renderChart(
       // data:
       {
@@ -58,23 +116,18 @@ export default {
                 color:SECONDARYCOLOR,    
                 gridLines: {
                     color:SECONDARYCOLOR,
+                    display:false
                 },
                 ticks: {
                   display:false
                 },
                 type: 'realtime',
-                /* realtime: {
+                realtime: {
                     onRefresh: async function(chart) {
-                        console.log('start')                                
-                        if (!updating) {
-                            charts[i].updating = true
-                            await updateEvaluate(i)
-                            //positions = await fetchPositions()
-                        } 
+                        await updateEvaluate()
                         
                         //Array.prototype.push.apply(chart.data.datasets[0].data, position[i].price.current);
-
-                        let p = positions[0]
+              
                         //console.log(p.price)
                         chart.data.datasets[0].data.push({
                             //x:position[i].price.history[0].timestamp,
@@ -90,12 +143,9 @@ export default {
 
                         // adjust min/max of the chart if necessary
                         chart.options.scales.yAxes[0].ticks.min = Math.max(0, 0.995*p.price.min);
-                        chart.options.scales.yAxes[0].ticks.max = 1.025*p.price.max;      
-                        
-                        charts[i].updating = false
-                        console.log('end')       
+                        chart.options.scales.yAxes[0].ticks.max = 1.025*p.price.max;                              
                     },
-                } */
+                }
             }],
             yAxes: [{
                 color:SECONDARYCOLOR,

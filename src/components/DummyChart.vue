@@ -45,6 +45,7 @@ export default {
             xAxes: [{           
                 gridLines: {
                     color:SECONDARYCOLOR,
+                    display:false
                 },
                 ticks: {
                     display:false
