@@ -15,7 +15,7 @@
         <b-col class="col-3"></b-col>
         <b-col class="col-9 chartTable" id="positionsTable">
           <PositionCard v-for="position in positions" :key="position.ticker" :ticker="position.ticker"/>
-          <DummyCard/>            
+          <DummyCard @newPosition="newPosition"/>            
         </b-col>
     </b-row>
   </b-container>
@@ -57,6 +57,11 @@ export default {
       console.dir(obj)
       this.positions.push(obj)
       console.dir(this)
+    },
+    newPosition(position) {
+      console.log("done")
+      console.dir(position)
+      this.positions.push(position)
     }
   }
 }
@@ -78,15 +83,18 @@ canvas {
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
-    width:100%;
 }
 .chart-container-container {
     position:relative;
     width:20%;
-    margin:1em
+    margin:1em;
+    user-select:none;
 }
 .chart-container{
     overflow:hidden;
+    height:100%;
+    padding:1em;
+
     /*
     width: 500px;
     margin-left: 40px;
@@ -97,14 +105,13 @@ canvas {
     border-color:rgb(61,61,61);
     border-width:1px;
     border-radius: 1em;
-
 }
 
 .chart-extlabel {
     width:100%;
     color:rgb(1,61,61);
-    margin-bottom:10%;
     padding-bottom:1%;
+    margin-bottom:0.6em;
     padding-top:1%;
     text-align:right;
     border-bottom:solid;
