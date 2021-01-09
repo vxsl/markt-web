@@ -3,14 +3,11 @@
     <div id="dummy_chart_overlay" @click="initPosition">
       <p ref="plus" v-show="!selecting">+</p>
       <div class="autocomplete-container">
-        <autocomplete
+        <AutocompleteWrapper
           v-if="selecting"
-          class="ticker-input"
-          ref="tickerInput"
-          :search="search"
           @submit="createPosition"
         >
-        </autocomplete>
+        </AutocompleteWrapper>
       </div>
     </div>
     <div class="chart-container">
@@ -24,10 +21,8 @@
 
 <script>
 import DummyChart from '@/components/DummyChart.vue'
-import Autocomplete from '@trevoreyre/autocomplete-vue'
-import knownSymbols from '@/js/data/knownSymbols.json'
+import AutocompleteWrapper from '@/components/AutocompleteWrapper.vue'
 const appLink = require('@/js/app/appLink.js')
-console.dir(knownSymbols)
 
 export default {
   data() {
@@ -40,20 +35,12 @@ export default {
   },
   components: {
       DummyChart,
-      Autocomplete
+      AutocompleteWrapper
   },
   mounted() {
   },
   methods: {
-      search(input) {
-        return knownSymbols.ca.filter(symbol => {
-            return symbol.label.startsWith(input.toUpperCase())
-        }).map(a => a.label)
-      },
       async createPosition(input) {
-        if (input === undefined) {
-          return
-        }
         try {
           console.log("creating with " + input)
           let newPosition = await appLink.createPosition(input)
@@ -67,25 +54,6 @@ export default {
       },
       initPosition() {
         this.selecting = true;
-        let input = this.$refs.tickerInput.$el.children[0].children[0]
-        input.focus()
-        input.select()
-
-        /* $( "#symbol" ).autocomplete({    
-            minLength: 0,
-            source: knownSymbols.ca.concat(knownSymbols.nasdaq),        
-            select: async function( event, ui ) {
-                $( "#symbol" ).val( ui.item.label );    
-                positions.push(await appLink.createPosition(ui.item.label))
-                updateTable()        
-                return false;
-            }
-        })
-        .autocomplete( "instance" )._renderItem = function( ul, item ) {
-            return $( "<li>" )
-            .append( "<div class='input-menu-item'>" + item.label + "<br><div class='input-menu-subheading'>" + item.name + "</div></div>" )
-            .appendTo( ul );
-        }; */
 
       }
   }

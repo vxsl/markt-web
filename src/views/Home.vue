@@ -14,7 +14,7 @@
         </b-col>-->
         <b-col class="col-3"></b-col>
         <b-col class="col-9 chartTable" id="positionsTable">
-          <PositionCard v-for="position in positions" :key="position.ticker" :ticker="position.ticker"/>
+          <PositionCard v-for="position in positions" :key="position.ticker" :ticker="position.ticker" @newPositionCard="newPositionCard"/>
           <DummyCard @newPosition="newPosition"/>            
         </b-col>
     </b-row>
@@ -62,6 +62,10 @@ export default {
       console.log("done")
       console.dir(position)
       this.positions.push(position)
+      //this.$emit(position)
+    },
+    newPositionCard(card) {
+      console.dir(card)
     }
   }
 }

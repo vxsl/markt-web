@@ -19,6 +19,9 @@ export default {
   },
   components: {
       PositionChart
+  },
+  created() {
+      this.$emit('newPositionCard', this)
   }
 }
 </script>
