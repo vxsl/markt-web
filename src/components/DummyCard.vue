@@ -1,10 +1,17 @@
 <template>
     <div ref="test" class="chart-container-container">
         <div class="chart-container">
-            <div id="dummy_chart_overlay" @click="initPosition()">
+            <div id="dummy_chart_overlay" @click="initPosition">
                 <p ref="plus" v-show="!selecting">+</p>
                 <div class="autocomplete-container">
-                    <autocomplete v-show="selecting" class="ticker-input" ref="tickerInput" :search="search"></autocomplete>
+                    <autocomplete 
+                        v-show="selecting" 
+                        class="ticker-input" 
+                        ref="tickerInput" 
+                        :search="search"
+                        @submit="createPosition"
+                        >
+                    </autocomplete>
                 </div>
             </div>
             <div class="chart-extlabel">

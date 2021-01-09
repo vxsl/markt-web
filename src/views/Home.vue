@@ -12,10 +12,10 @@
                 <table id="positionsData"></table>
             </div>
         </b-col>-->
-        <b-col class="col-6"></b-col>
+        <b-col class="col-3"></b-col>
+        <b-col class="col-9 chartTable" id="positionsTable">
           <PositionCard v-for="position in positions" :key="position.ticker" :ticker="position.ticker"/>
           <DummyCard/>            
-        <b-col class="col-6 chartTable" id="positionsTable">
         </b-col>
     </b-row>
   </b-container>
@@ -66,6 +66,7 @@ export default {
 
 .chartTable {
     border:solid;
+    border-width:1px;
     border-color:blue;
     display: flex;
     flex-direction: row;
