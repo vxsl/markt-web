@@ -15,7 +15,6 @@ export default {
             fill:false,
             label: 'test',
             backgroundColor: MAINCOLOR,
-            borderColor: MAINCOLOR,
             lineTension:0,
             data: []
         }]
@@ -45,7 +44,10 @@ export default {
         scales: {                      
             xAxes: [{           
                 gridLines: {
-                    color:SECONDARYCOLOR
+                    color:SECONDARYCOLOR,
+                },
+                ticks: {
+                    display:false
                 },
                 type: 'realtime'               
             }],
@@ -67,7 +69,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-#line-chart {
-    filter: blur(0.2em);    
-}
 </style>
