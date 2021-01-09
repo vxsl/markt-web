@@ -10,12 +10,14 @@
   "dependencies": {
     "@taeuk-gang/chartjs-plugin-streaming": "^1.8.1",
     "@trevoreyre/autocomplete-vue": "^2.2.0",
+    "axios": "^0.21.1",
     "bootstrap-vue": "^2.21.2",
     "chart.js": "^2.9.4",
     "core-js": "^3.6.5",
     "vue": "^2.6.12",
     "vue-chartjs": "^3.5.1",
-    "vue-router": "^3.2.0"
+    "vue-router": "^3.2.0",
+    "vuex": "^3.6.0"
   },
   "devDependencies": {
     "@babel/polyfill": "^7.11.5",

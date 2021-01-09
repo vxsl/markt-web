@@ -2,6 +2,9 @@
   <div id="app" class="bg-light">
       <div id="nav-container" fixed="top">
         <b-navbar id="nav">
+          <div v-if="isLoggedIn">
+            Logged in as xxxx.
+          </div>
           <b-navbar-nav class="ml-auto" id="right-items">
             <div id="markt-title" class="display-4">MARKT</div>
             <div id="markt-subtitle" class="lead">made by <a href="https://kylegrimsrudma.nz">Kyle</a></div>
@@ -12,6 +15,30 @@
   </div>
 </template>
 
+<script>
+
+export default {
+  computed : {
+    isLoggedIn() {
+      return this.$store.getters.isLoggedIn
+    }
+  },
+  mounted() {
+    if (this.$route.name != 'Splash') {
+      this.$router.push({name: 'Splash'})
+    }
+  },
+  methods: {
+    logout: function () {
+      this.$store.dispatch('logout')
+      .then(() => {
+        this.$router.push('/login')
+      })
+    }
+  },
+}
+</script>
+
 <style lang="scss">
 @import '@/scss/custom.scss';
 
@@ -19,6 +46,7 @@
   font-family: Inconsolata, Courier, monospace;
   letter-spacing:0.001em;
   transition: background 1s;
+  min-height:100vh;
 }
 #right-items {
   display:block;
