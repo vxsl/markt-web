@@ -139,7 +139,7 @@ const confirmPositions = async (actualPositions) => {
 			inconsistencies++
 			log("Signalling to cancel/sell " + p.stock.symbol + "...")
 			buySellEmitter.emit("cancel", p.stock.symbol)
-			delete el // is this correct?
+			// delete el // is this correct?
 		}
 	}
 	
