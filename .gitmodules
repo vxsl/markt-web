@@ -1,3 +1,3 @@
 [submodule "bnnbloomberg-markets-scraper"]
-	path = src/js/markt/market/bnnbloomberg-markets-scraper
+	path = src/js/app/markt/market/bnnbloomberg-markets-scraper
 	url = https://github.com/vxsl/bnnbloomberg-markets-scraper
