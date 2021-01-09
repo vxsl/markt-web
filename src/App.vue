@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="bg-light">
+  <div id="app" class="bg-light min-vh-100">
       <div id="nav-container" fixed="top">
         <b-navbar id="nav">
           <b-navbar-nav class="ml-auto" id="right-items">
