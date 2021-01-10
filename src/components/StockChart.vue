@@ -11,15 +11,11 @@ export default {
     return {
     }
   },
-  name: 'PositionChart',
+  name: 'StockChart',
   extends: Line,
-  created() {
-    /* console.log('here')
-    console.dir(this.position) */
-  },
   props: {
     insane: Boolean,
-    position: {
+    stock: {
 
     },
     plugins: [{
@@ -32,9 +28,7 @@ export default {
   },
   methods: {
     async updateEvaluate() {
-      /* console.dir(this.position)
-      console.log("UPDATE") */
-      let p = this.position
+      let p = this.stock
       
       let newQuote = await p.quoter.quote()
       if (this.insane) {
@@ -43,7 +37,6 @@ export default {
       let newTimestamp = Date.parse(newQuote.generatedTimestamp).toString()
 
       if (newTimestamp > p.price.history[0].timestamp) {
-        //console.log('inside')
         //tools.refreshLog(i, newTimestamp, p.ticker + ": New update.", " [" + ((Date.now() - newTimestamp) / 1000) + " seconds late]")
         let newPrice = newQuote.data.stocks[0].price		
         let currentPrice = p.price.current
@@ -66,12 +59,7 @@ export default {
           s += (" from " + currentPrice.toFixed(2) + " to " + newPrice.toFixed(2) + "...\n")	
         }
         
-        // TODO: uncomment
-        //if (currentPrice > newPrice) buySellEmitter.emit("sell", p.ticker, newPrice)
-          
-        //s? console.log(s) : null
         s? log(s) : null
-        //writeJSON(modelPositions, "modelPositions.json")
       }
       else {
         /* tools.refreshLog(i, newTimestamp, p.ticker + ": Nothing to report...") */
@@ -81,7 +69,7 @@ export default {
   },
   mounted () {
     const updateEvaluate = this.updateEvaluate
-    const p = this.position
+    const p = this.stock
     this.renderChart(
       // data:
       {
@@ -96,7 +84,6 @@ export default {
       },  
       // options:  
       {
-        //responsive:true, 
         events: [],        
         elements: {
             point: {
@@ -113,7 +100,6 @@ export default {
             labels: {
                 fontColor: MAINCOLOR,
                 //fontStyle:'bold',
-                fontFamily:'Helvetica',
                 boxWidth:0,
             },
         },
@@ -132,20 +118,11 @@ export default {
                     onRefresh: async function(chart) {
                         await updateEvaluate()
                         
-                        //Array.prototype.push.apply(chart.data.datasets[0].data, position[i].price.current);
-              
-                        //console.log(p.price)
                         chart.data.datasets[0].data.push({
-                            //x:position[i].price.history[0].timestamp,
                             x:Date.now(),
                             y:p.price.current
                         })
-
                         chart.data.datasets[0].data = chart.data.datasets[0].data.slice(-10)
-                        
-                        //console.log(i + ": " + position[i].price.current)
-                        //console.log(chart.data.datasets[0].data)
-                        //chart.update()
 
                         // adjust min/max of the chart if necessary
                         chart.options.scales.yAxes[0].ticks.min = Math.max(0, 0.995*p.price.min);

@@ -1,6 +1,6 @@
 <template>
   <div class="chart-container-container">
-    <div ref="overlay" id="dummy_chart_overlay" @click="initPosition">
+    <div ref="overlay" id="dummy-overlay" @click="initStock">
       <p ref="plus" v-show="!selecting">+</p>
       <div class="autocomplete-container">
         <AutocompleteWrapper
@@ -17,7 +17,7 @@
             role="status"
             />
           </div>
-        </div>
+      </div>
     </div>
     <div class="chart-container">
       <div class="chart-extlabel">
@@ -54,8 +54,8 @@ export default {
     async createPosition(input) {
       try {
         console.log("creating with " + input)
-          let newPosition = await appLink.createPosition(input)
-          this.$emit('newPosition', newPosition)
+          let newStock = await appLink.createPosition(input)
+          this.$emit('newStock', newStock)
           this.selecting = false
         }
         catch {
@@ -63,7 +63,7 @@ export default {
           alert('There was an error creating that position.')
         }
       },
-      initPosition() {
+      initStock() {
         this.selecting = true;
 
       },
@@ -105,7 +105,7 @@ export default {
   border:none !important
 }
 
-#dummy_chart_overlay {
+#dummy-overlay {
   user-select:none;
   position: absolute;
   z-index: 2;
@@ -125,11 +125,12 @@ export default {
   p {
     user-select: none;
     display: block !important;
-    color: rgb(61, 61, 61);
+    color: theme-color("dark");
     position: absolute;
     font-size: 5em;
     margin-bottom:0 !important;
   }
+
 
   .autocomplete-container {
     padding: 1em;

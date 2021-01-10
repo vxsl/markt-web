@@ -19,28 +19,30 @@
           <Log id="log" ref="log"/>
           <Clock/>
       </div>
-      <div class="sidebar-padded">
+    <div> 
         <table id="positionsData" class="table table-dark">
           <thead>
             <tr>
               <th></th>
-              <th>Current</th>
-              <th>Max</th>
+              <th>Quantity</th>
+              <th>Value</th>
+              <th>Margin</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="position in positions" :key="position.ticker">
-                <td>{{position.ticker}}</td>
-                <td>{{parseFloat(position.price.current).toFixed(2)}}</td>
-                <td>{{parseFloat(position.price.max).toFixed(2)}}</td>
+            <tr v-for="(position, ticker) in positions" :key="ticker">
+                <td>{{ticker}}</td>
+                <td>{{position.quantity}}</td>
+                <td>{{parseFloat(stocks[ticker].price.current).toFixed(2)}}</td>
+                <td>{{parseFloat(stocks[ticker].price.max).toFixed(2)}}</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
-    <div class="chartTable module" id="positionsTable">
-      <PositionCard v-for="position in positions" :key="position.ticker" :ticker="position.ticker" :position="position" :insane="insane" @newPositionCard="newPositionCard"/>
-      <DummyCard ref="dummy" @newPosition="newPosition"/>            
+    <div class="stocksTable module">
+      <StockCard v-for="(stock, ticker) in stocks" :key="ticker" :ticker="ticker" :stock="stock" :insane="insane" @buy="newPosition" @sell="sellPosition"/>
+      <DummyCard ref="dummy" @newStock="newStock"/>            
     </div>
   </div>
 </template>
@@ -58,14 +60,14 @@ const appLink = require('@/js/app/appLink.js')
 import ToggleButton from '@/components/ToggleButton.vue'
 import Log from '@/components/Log.vue'
 import Clock from '@/components/Clock.vue'
-import PositionCard from '@/components/PositionCard.vue'
+import StockCard from '@/components/StockCard.vue'
 import DummyCard from '@/components/DummyCard.vue'
 
 export default {
 
   name: 'Home',
   components: {
-    PositionCard,
+    StockCard,
     DummyCard,
     Log,
     Clock,
@@ -73,8 +75,9 @@ export default {
   },
   data() {
         return {
-          positions: [],
-          examples: [],
+          positions: {},
+          stocks: {},
+          balance:1000.00,
           insane: false
         }
     },
@@ -82,15 +85,19 @@ export default {
     console.dir(this)
     console.log(this.$refs.log.stream === this.$refs.dummy.link.logEmitter)
     console.dir(this.$refs.dummy.link.logEmitter)
+    console.log(this.test)
   },
   methods: {
-    newPosition(position) {
-      this.positions.push(position)
+    newStock(stock) {
+      //this.stocks[stock.ticker] = stock
+      this.$set(this.stocks, stock.ticker, stock)
       this.$refs.dummy.stopLoading()
-      //this.$emit(position)
     },
-    newPositionCard(card) {
-      console.dir(card)
+    newPosition(ticker, quantity) {
+      this.$set(this.positions, ticker, {'quantity':quantity, 'sold':false})
+    },
+    sellPosition(ticker) {
+      this.$set(this.positions, ticker, {'quantity':0, 'sold':true})
     },
     toggleInsane(insane) {
       this.insane = insane
@@ -130,13 +137,14 @@ export default {
   }
   .sidebar-padded {
     padding:1em;
-    table {
-      width:100%;
-      border-collapse: collapse;
-      tr, td {
-        text-align:left;
-        vertical-align:middle
-      }
+    padding-left:0;
+  }
+  table {
+    width:100%;
+    border-collapse: collapse;
+    tr, td {
+      text-align:left;
+      vertical-align:middle
     }
   }
 }
@@ -157,13 +165,16 @@ export default {
   border-radius:1em;
   height:100%;
 }
-.chartTable {
+.stocksTable {
   float:right;
   width:66%;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   position:relative;
+  border-right:none !important;
+  border-top-right-radius:0 !important;
+  border-bottom-right-radius:0 !important;
 }
 
 canvas {

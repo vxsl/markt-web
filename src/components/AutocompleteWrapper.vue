@@ -4,6 +4,7 @@
           v-show="!done"
           class="ticker-input"
           ref="tickerInput"
+          placeholder="Search..."
           :search="search"
           @submit="passInput"
           @blur="done? $emit('loading') : $emit('quit')"
