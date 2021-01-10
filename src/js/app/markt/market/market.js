@@ -1,6 +1,7 @@
 const 	config = require('../config.js'),
 		tools = require('./tools/tools.js'),
 		{ log } = require('../tools/tools.js'),
+		{ logEmitter } = require('../tools/tools.js'),
 		{ writeJSON } = require('../tools/tools.js'),
 		{ QuoteHarvester } = require("./bnnbloomberg-markets-scraper"),
 		{ EventEmitter } = require("events"),
@@ -232,5 +233,8 @@ const simulateMarketAction = (quote) => {
 } */
 
 module.exports = {
-	createPosition
+	main,
+	buySellEmitter,
+	createPosition,
+	logEmitter
 }

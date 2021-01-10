@@ -1,6 +1,7 @@
 <script>
 import { Line } from 'vue-chartjs'
 import '@taeuk-gang/chartjs-plugin-streaming';
+const { log } = require('@/js/log.js')
 
 const MAINCOLOR = 'rgb(61,61,61)'
 const SECONDARYCOLOR = MAINCOLOR
@@ -15,8 +16,10 @@ export default {
   created() {
     /* console.log('here')
     console.dir(this.position) */
+    this.simulateAction = true;
   },
   props: {
+    simulateAction: Boolean,
     position: {
 
     },
@@ -35,6 +38,9 @@ export default {
       let p = this.position
       
       let newQuote = await p.quoter.quote()
+      if (this.simulateAction) {
+        newQuote.data.stocks[0].price += Math.random()
+      }
       let newTimestamp = Date.parse(newQuote.generatedTimestamp).toString()
 
       if (newTimestamp > p.price.history[0].timestamp) {
@@ -64,7 +70,8 @@ export default {
         // TODO: uncomment
         //if (currentPrice > newPrice) buySellEmitter.emit("sell", p.ticker, newPrice)
           
-        s? console.log(s) : null
+        //s? console.log(s) : null
+        s? log(s) : null
         //writeJSON(modelPositions, "modelPositions.json")
       }
       else {

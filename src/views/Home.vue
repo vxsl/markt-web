@@ -1,24 +1,34 @@
 <template>
-  <b-container>
-    <button type="button" class="btn btn-primary">Do something</button>
-    <b-row>             
-        <!--<b-col class="col-4">
-            <div class="chartTable-sidebar">
-                <div id="logContainer">
-                    <pre id="log"></pre>
-                    <pre id="refreshLog"></pre>
-                    <pre id="clock">XX:XX:XX:XXX XX</pre>
-                </div>
-                <table id="positionsData"></table>
-            </div>
-        </b-col>-->
-        <b-col class="col-3"></b-col>
-        <b-col class="col-9 chartTable" id="positionsTable">
-          <PositionCard v-for="position in positions" :key="position.ticker" :ticker="position.ticker" :position="position" @newPositionCard="newPositionCard"/>
-          <DummyCard ref="dummy" @newPosition="newPosition"/>            
-        </b-col>
-    </b-row>
-  </b-container>
+  <div id="page">
+    <div class="sidebar bg-dark text-light">
+      <div id="logContainer">
+          <Log id="log" ref="log"/>
+          <Clock/>
+      </div>
+      <div class="sidebar-padded">
+        <table id="positionsData" class="table table-dark">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Current</th>
+              <th>Max</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="position in positions" :key="position.ticker">
+                <td>{{position.ticker}}</td>
+                <td>{{parseFloat(position.price.current).toFixed(2)}}</td>
+                <td>{{parseFloat(position.price.max).toFixed(2)}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="chartTable module" id="positionsTable">
+      <PositionCard v-for="position in positions" :key="position.ticker" :ticker="position.ticker" :position="position" @newPositionCard="newPositionCard"/>
+      <DummyCard ref="dummy" @newPosition="newPosition"/>            
+    </div>
+  </div>
 </template>
 
 <!--
@@ -32,7 +42,8 @@ require('@/js/charts/charts.js') */
 const appLink = require('@/js/app/appLink.js')
 //require('@/js/data/knownSymbols.js')
 
-
+import Log from '@/components/Log.vue'
+import Clock from '@/components/Clock.vue'
 import PositionCard from '@/components/PositionCard.vue'
 import DummyCard from '@/components/DummyCard.vue'
 
@@ -41,7 +52,9 @@ export default {
   name: 'Home',
   components: {
     PositionCard,
-    DummyCard
+    DummyCard,
+    Log,
+    Clock
   },
   data() {
         return {
@@ -50,6 +63,9 @@ export default {
         }
     },
   mounted() {
+    console.dir(this)
+    console.log(this.$refs.log.stream === this.$refs.dummy.link.logEmitter)
+    console.dir(this.$refs.dummy.link.logEmitter)
   },
   methods: {
     newPosition(position) {
@@ -65,15 +81,70 @@ export default {
 </script>
 
 <style lang="scss">
+@import '@/scss/custom.scss';
 
-.chartTable {
+
+.sidebar {
+  user-select:none;
+  position:absolute;
+  top:0;
+  left:0;
+  width:30%;
+  height:100vh !important;
+  border-right:solid;
+  border-right-width:1px;
+  #log {
+    max-height:40vh;
+    padding-left:0;
+    margin:0.2em;
+  }
+  #logContainer {
+    user-select:text;
+    padding-left:4%;
     border:solid;
-    border-width:1px;
-    border-color:blue;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    position:relative;
+    border-left:none;
+    border-top-right-radius:1em;
+    border-bottom-right-radius:1em;
+    border-width: 1px;
+    margin:2em;
+    margin-left:0;
+  }
+  .sidebar-padded {
+    padding:1em;
+    table {
+      width:100%;
+      border-collapse: collapse;
+      tr, td {
+        text-align:left;
+        vertical-align:middle
+      }
+    }
+  }
+}
+
+
+#logContainer > pre * {    
+    white-space:pre-wrap;
+    font-size:.8vw;
+    word-wrap: break-word;
+}
+
+#page {
+}
+.module {
+  border:solid;
+  border-width:1px;
+  border-color:rgb(219, 219, 219);
+  border-radius:1em;
+  height:100%;
+}
+.chartTable {
+  float:right;
+  width:66%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  position:relative;
 }
 
 canvas {
@@ -123,8 +194,4 @@ canvas {
     margin:0;
 }
 
-PositionCard {
-  border:solid;
-  border-color:red;
-}
 </style>

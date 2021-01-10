@@ -1,7 +1,9 @@
 const   config = require("../config.js"),
         fs = require('fs'),
-		readline = require('readline')
-		
+        readline = require('readline'),
+        { EventEmitter } = require("events")
+
+const logEmitter = new EventEmitter()
 //process.chdir(config.workDir)
 
 /* const userPrompt = (message) => {
@@ -65,14 +67,16 @@ const writeJSON = async (data, filename) => {
 
 const log = (message) => {
 	
-	//fs.appendFileSync(config.fileDir+'log', message+"\n")
-	if (config.debug) console.log(message) 
+    //fs.appendFileSync(config.fileDir+'log', message+"\n")
+    logEmitter.emit('new', message)
+	if (config.debug) console.log(message)
 }
 
 
 module.exports = {
     writeJSON,
     log,
-	delayFunctionCall,
+    delayFunctionCall,
+    logEmitter
 	//safePrompt
 }

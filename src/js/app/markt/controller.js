@@ -3,7 +3,6 @@ const   market = require("./market/market.js"),
         tools = require("./tools/tools.js"),
         fs = require("fs")
 
-
 // TODO add pause condition if there is going to be an overly significant net loss? 
 market.buySellEmitter.on("sell", async (ticker, price) => {
     /* tools.log("Trying to sell " + ticker + " for $" + price + " per share")
@@ -45,10 +44,20 @@ const main = async() => {
     // TODO what happens when a marketBuy is placed before the market opens?
 
     //tools.delayFunctionCall(market.main, "09:28", false)  // TODO change to "09:28" // TODO change to async=true
+
     market.main()
 }
 
-
-
-
 main()
+
+const   createPosition = market.createPosition, 
+        logEmitter = market.logEmitter
+
+logEmitter.on('new', (msg) => {
+    console.log('here' + msg)
+})
+    
+module.exports = {
+	createPosition,
+	logEmitter
+}

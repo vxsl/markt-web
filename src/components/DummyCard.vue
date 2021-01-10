@@ -10,10 +10,13 @@
           @loading="startLoading"
         >
         </AutocompleteWrapper>
-        <div 
-          class="spinner-border" 
-          role="status"
-          ref="spinner"/>
+        <div class="loading" ref="loading">
+          <p>Contacting BNN server...</p>
+          <div 
+            class="spinner-border" 
+            role="status"
+            />
+          </div>
         </div>
     </div>
     <div class="chart-container">
@@ -33,6 +36,7 @@ const appLink = require('@/js/app/appLink.js')
 export default {
   data() {
       return {
+          link: appLink,
           selecting: false,
           selected: false
       }
@@ -65,12 +69,12 @@ export default {
       },
       startLoading() {
         this.$refs.overlay.style.cursor = 'wait'
-        this.$refs.spinner.style.display = 'block'
+        this.$refs.loading.style.display = 'block'
         this.$refs.plus.style.opacity = '0'
       },
       stopLoading() {
         this.$refs.overlay.style.cursor = 'pointer'
-        this.$refs.spinner.style.display = 'none'
+        this.$refs.loading.style.display = 'none'
         this.$refs.plus.style.opacity = '1'
       },
   }
@@ -81,8 +85,20 @@ export default {
 <style scoped lang="scss">
 @import "../scss/autocomplete-custom.css";
 
-.spinner-border {
-  display:none
+.loading {
+  display:none;
+  text-align:center;
+  max-width:100%;
+  overflow:hidden;
+  * {
+    position:relative !important;
+  }
+  p {
+    font-size:1em !important;
+  }
+  div {
+    margin-top:20%;
+  }
 }
 .chart-container {
   filter: blur(0.2em);    
@@ -111,14 +127,13 @@ export default {
     display: block !important;
     color: rgb(61, 61, 61);
     position: absolute;
-    font-size: 600%;
+    font-size: 5em;
     margin-bottom:0 !important;
-  }
-  .ticker-input {
   }
 
   .autocomplete-container {
     padding: 1em;
+    max-width:100%;
   }
 }
 </style>

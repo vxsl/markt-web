@@ -32,7 +32,7 @@
   width:100%;
   padding-top:1.2em;
   padding-bottom:1.2em;
-  padding-right:16%;
+  padding-right:2%;
   user-select:none;
   #markt-title {
     font-family:Rubik;
