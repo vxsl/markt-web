@@ -28,7 +28,6 @@ export default {
 
 .log-container {
   padding:1em;
-  max-height:100;
   overflow:hidden;
   user-select:text;
   .log-line {

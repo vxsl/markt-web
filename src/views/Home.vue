@@ -1,5 +1,19 @@
 <template>
   <div id="page">
+
+    <div id="nav-container" fixed="top">
+      <b-navbar id="nav">
+        <div id="options" class="module">
+          <p>Options</p>
+          <ToggleButton @toggled="toggleInsane" class="option-button" onText="Insane mode" offText="Boring mode" />
+        </div>
+        <b-navbar-nav class="ml-auto" id="right-items">
+          <div id="markt-title" class="display-4">MARKT</div>
+          <div id="markt-subtitle" class="lead">made by <a href="https://kylegrimsrudma.nz">Kyle</a></div>
+        </b-navbar-nav>
+      </b-navbar>
+    </div>
+
     <div class="sidebar bg-dark text-light">
       <div id="logContainer">
           <Log id="log" ref="log"/>
@@ -25,7 +39,7 @@
       </div>
     </div>
     <div class="chartTable module" id="positionsTable">
-      <PositionCard v-for="position in positions" :key="position.ticker" :ticker="position.ticker" :position="position" @newPositionCard="newPositionCard"/>
+      <PositionCard v-for="position in positions" :key="position.ticker" :ticker="position.ticker" :position="position" :insane="insane" @newPositionCard="newPositionCard"/>
       <DummyCard ref="dummy" @newPosition="newPosition"/>            
     </div>
   </div>
@@ -41,7 +55,7 @@ require('@/js/charts/charts.js') */
 //require('@/js/app/app.js')
 const appLink = require('@/js/app/appLink.js')
 //require('@/js/data/knownSymbols.js')
-
+import ToggleButton from '@/components/ToggleButton.vue'
 import Log from '@/components/Log.vue'
 import Clock from '@/components/Clock.vue'
 import PositionCard from '@/components/PositionCard.vue'
@@ -54,12 +68,14 @@ export default {
     PositionCard,
     DummyCard,
     Log,
-    Clock
+    Clock,
+    ToggleButton
   },
   data() {
         return {
           positions: [],
-          examples: []
+          examples: [],
+          insane: false
         }
     },
   mounted() {
@@ -75,6 +91,9 @@ export default {
     },
     newPositionCard(card) {
       console.dir(card)
+    },
+    toggleInsane(insane) {
+      this.insane = insane
     }
   }
 }
@@ -94,7 +113,7 @@ export default {
   border-right:solid;
   border-right-width:1px;
   #log {
-    max-height:40vh;
+    height:40vh;
     padding-left:0;
     margin:0.2em;
   }
@@ -192,6 +211,47 @@ canvas {
     padding-top:2%;
     padding-bottom:1%;
     margin:0;
+}
+
+
+#options {
+  padding:1em;
+  width:50%;
+  .option-button {
+    width:auto
+  }
+}
+
+#right-items {
+  display:block;
+  float:right;
+  text-align:right;
+  font-weight:700;
+}
+#nav-container {
+  position:relative;
+  z-index:4;
+  width:66%;
+  float:right;
+  padding-top:1.2em;
+  padding-bottom:1.2em;
+  padding-right:2%;
+  user-select:none;
+  #markt-title {
+    font-family:Rubik;
+    font-weight:100;
+  }
+  #markt-subtitle {
+    margin-right:5%;
+  }
+}
+
+.nav-link {
+  color:theme-color("primary") !important;
+}
+
+a:hover {
+  font-weight:700;
 }
 
 </style>

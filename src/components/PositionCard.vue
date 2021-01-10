@@ -5,7 +5,7 @@
                 <h2>{{ticker}}</h2>
             </div>
             <!-- <canvas></canvas> -->
-            <PositionChart :position='position'/>
+            <PositionChart :position='position' :insane="insane"/>
         </div>
     </div>
 </template>
@@ -22,7 +22,8 @@ export default {
         ticker: String,   
         position: {
             
-        } 
+        },
+        insane: Boolean 
     },
     components: {
         PositionChart

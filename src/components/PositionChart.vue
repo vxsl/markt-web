@@ -16,10 +16,9 @@ export default {
   created() {
     /* console.log('here')
     console.dir(this.position) */
-    this.simulateAction = true;
   },
   props: {
-    simulateAction: Boolean,
+    insane: Boolean,
     position: {
 
     },
@@ -38,7 +37,7 @@ export default {
       let p = this.position
       
       let newQuote = await p.quoter.quote()
-      if (this.simulateAction) {
+      if (this.insane) {
         newQuote.data.stocks[0].price += Math.random()
       }
       let newTimestamp = Date.parse(newQuote.generatedTimestamp).toString()
