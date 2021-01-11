@@ -12,7 +12,7 @@
         <h2>{{ ticker }}</h2>
       </div>
       <!-- <canvas></canvas> -->
-      <StockChart :stock="stock" :insane="insane" />
+      <StockChart :stock="stock" :bought="bought" :insane="insane" />
     </div>
   </div>
 </template>
@@ -77,6 +77,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+
 #stock-overlay {
   user-select: none;
   position: absolute;

@@ -1,25 +1,28 @@
 <template>
   <div id="page">
 
-    <div id="nav-container" fixed="top">
+    <div id="nav-container" ref="navContainer" class="alter-on-insane" fixed="top">
       <b-navbar id="nav">
         <div id="options" class="module">
           <p>Options</p>
-          <ToggleButton @toggled="toggleInsane" class="option-button" onText="Insane mode" offText="Boring mode" />
+          <ToggleButton @toggled="toggleInsane" ref="toggleInsane" class="option-button alter-on-insane" onText="Insane mode" offText="Boring mode" />
         </div>
         <b-navbar-nav class="ml-auto" id="right-items">
           <div id="markt-title" class="display-4">MARKT</div>
-          <div id="markt-subtitle" class="lead">made by <a href="https://kylegrimsrudma.nz">Kyle</a></div>
+          <div id="markt-subtitle" class="lead">a WIP by <a href="https://kylegrimsrudma.nz">Kyle</a></div>
         </b-navbar-nav>
       </b-navbar>
     </div>
 
-    <div class="sidebar bg-dark text-light">
-      <div id="logContainer">
-          <Log id="log" ref="log"/>
-          <Clock/>
+    <div class="sidebar">
+      <div class="upper-sidebar d-flex align-items-center">
+        <div id="logContainer" class="bg-dark text-light">
+            <Log id="log" ref="log" class="text-light"/>
+            <Clock/>
+        </div>
       </div>
-    <div> 
+      <div class="lower-sidebar bg-dark text-light"> 
+        <p class="lead">Positions</p>
         <table id="positionsData" class="table table-dark">
           <thead>
             <tr>
@@ -41,8 +44,8 @@
       </div>
     </div>
     <div class="stocksTable module">
-      <StockCard v-for="(stock, ticker) in stocks" :key="ticker" :ticker="ticker" :stock="stock" :insane="insane" @buy="newPosition" @sell="sellPosition"/>
-      <DummyCard ref="dummy" @newStock="newStock"/>            
+      <StockCard v-for="(stock, ticker) in stocks" class="rounded-card bg-light text-dark" :ref="ticker.replace(':', '')+'Chart'" :key="ticker" :ticker="ticker" :stock="stock" :insane="insane" @buy="newPosition" @sell="sellPosition"/>
+      <DummyCard ref="dummy" class="rounded-card bg-light text-dark" @newStock="newStock"/>            
     </div>
   </div>
 </template>
@@ -95,12 +98,16 @@ export default {
     },
     newPosition(ticker, quantity) {
       this.$set(this.positions, ticker, {'quantity':quantity, 'sold':false})
+      let ref = ticker.replace(':', '') + 'Chart'
+      console.dir(this.$refs[ref])
+      this.$refs[ref][0].$children[0].draw()
     },
     sellPosition(ticker) {
       this.$set(this.positions, ticker, {'quantity':0, 'sold':true})
     },
     toggleInsane(insane) {
-      this.insane = insane
+      this.insane = insane;
+      this.$emit('insane', this.insane)
     }
   }
 }
@@ -108,7 +115,7 @@ export default {
 
 <style lang="scss">
 @import '@/scss/custom.scss';
-
+@import '@/scss/animations.scss';
 
 .sidebar {
   user-select:none;
@@ -117,47 +124,42 @@ export default {
   left:0;
   width:30%;
   height:100vh !important;
-  border-right:solid;
-  border-right-width:1px;
-  #log {
+  .upper-sidebar {
+    position:relative;
     height:40vh;
-    padding-left:0;
-    margin:0.2em;
+    #logContainer {
+      width:100%;
+      #log {
+        height:30vh;
+        padding-left:0;
+      }
+      overflow:hidden;
+      position:relative;
+      user-select:text;
+      padding-left:4%;
+      border:solid;
+      border-left:none;
+      border-top-right-radius:1em;
+      border-bottom-right-radius:1em;
+      border-width: 1px;
+    }
   }
-  #logContainer {
-    user-select:text;
-    padding-left:4%;
-    border:solid;
-    border-left:none;
+  .lower-sidebar {
+    position:relative;
+    height:60vh;
     border-top-right-radius:1em;
-    border-bottom-right-radius:1em;
-    border-width: 1px;
-    margin:2em;
-    margin-left:0;
-  }
-  .sidebar-padded {
-    padding:1em;
-    padding-left:0;
-  }
-  table {
-    width:100%;
-    border-collapse: collapse;
-    tr, td {
-      text-align:left;
-      vertical-align:middle
+    table {
+
+      width:100%;
+      border-collapse: collapse;
+      tr, td {
+        text-align:left;
+        vertical-align:middle
+      }
     }
   }
 }
 
-
-#logContainer > pre * {    
-    white-space:pre-wrap;
-    font-size:.8vw;
-    word-wrap: break-word;
-}
-
-#page {
-}
 .module {
   border:solid;
   border-width:1px;
@@ -175,6 +177,9 @@ export default {
   border-right:none !important;
   border-top-right-radius:0 !important;
   border-bottom-right-radius:0 !important;
+  .rounded-card {
+    border-radius:1em
+  }
 }
 
 canvas {
@@ -230,6 +235,14 @@ canvas {
   width:50%;
   .option-button {
     width:auto
+  }
+  .option-button.insane {
+    -webkit-animation-name: shake;
+    animation-name: shake;
+    -webkit-animation-duration: 1s;
+    animation-duration: 1s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
   }
 }
 

@@ -3,9 +3,6 @@ import { Line } from 'vue-chartjs'
 import '@taeuk-gang/chartjs-plugin-streaming';
 const { log } = require('@/js/log.js')
 
-const MAINCOLOR = 'rgb(61,61,61)'
-const SECONDARYCOLOR = MAINCOLOR
-
 export default {
   data() {
     return {
@@ -14,6 +11,7 @@ export default {
   name: 'StockChart',
   extends: Line,
   props: {
+    bought: Boolean,
     insane: Boolean,
     stock: {
 
@@ -65,84 +63,96 @@ export default {
         /* tools.refreshLog(i, newTimestamp, p.ticker + ": Nothing to report...") */
       }
       p.lock = 0
-    }
+    },
+    draw() {
+      console.log('HERE' + this.bought)
+      const updateEvaluate = this.updateEvaluate
+      const p = this.stock
+      let mainColour
+      if (this.bought) {
+        mainColour = '#370aff'
+      }
+      else {
+        mainColour = '#2E282A'
+      }    
+      this.renderChart(
+        // data:
+        {
+          datasets: [{
+              fill:false,
+              //label: positions[i].ticker,
+              backgroundColor: mainColour,
+              borderColor: mainColour,
+              lineTension:0,
+              data: []
+          }]
+        },  
+        // options:  
+        {
+          events: [],        
+          elements: {
+              point: {
+                  radius:0
+              }
+          },
+          aspectRatio:1,
+          maintainAspectRatio:true,
+          legend: {
+              display:false,
+              position:'top',
+              align:'start',
+              onClick:null,
+              labels: {
+                  fontColor: mainColour,
+                  //fontStyle:'bold',
+                  boxWidth:0,
+              },
+          },
+          scales: {
+              xAxes: [{                    
+                  color:mainColour,    
+                  gridLines: {
+                      color:mainColour,
+                      display:false
+                  },
+                  ticks: {
+                    display:false
+                  },
+                  type: 'realtime',
+                  realtime: {
+                      onRefresh: async function(chart) {
+                          await updateEvaluate()
+                          
+                          chart.data.datasets[0].data.push({
+                              x:Date.now(),
+                              y:p.price.current
+                          })
+                          chart.data.datasets[0].data = chart.data.datasets[0].data.slice(-10)
+
+                          // adjust min/max of the chart if necessary
+                          chart.options.scales.yAxes[0].ticks.min = Math.max(0, 0.995*p.price.min);
+                          chart.options.scales.yAxes[0].ticks.max = 1.025*p.price.max;                              
+                      },
+                  }
+              }],
+              yAxes: [{
+                  color:mainColour,
+                  gridLines: {
+                      color:mainColour
+                  },
+                  ticks: {
+                      //suggestedMin: 0,
+                      maxTicksLimit: 4
+                  }
+              }]
+          }
+        }
+      );
+      
+    },
   },
   mounted () {
-    const updateEvaluate = this.updateEvaluate
-    const p = this.stock
-    this.renderChart(
-      // data:
-      {
-        datasets: [{
-            fill:false,
-            //label: positions[i].ticker,
-            backgroundColor: MAINCOLOR,
-            borderColor: MAINCOLOR,
-            lineTension:0,
-            data: []
-        }]
-      },  
-      // options:  
-      {
-        events: [],        
-        elements: {
-            point: {
-                radius:0
-            }
-        },
-        aspectRatio:1,
-        maintainAspectRatio:true,
-        legend: {
-            display:false,
-            position:'top',
-            align:'start',
-            onClick:null,
-            labels: {
-                fontColor: MAINCOLOR,
-                //fontStyle:'bold',
-                boxWidth:0,
-            },
-        },
-        scales: {
-            xAxes: [{                    
-                color:SECONDARYCOLOR,    
-                gridLines: {
-                    color:SECONDARYCOLOR,
-                    display:false
-                },
-                ticks: {
-                  display:false
-                },
-                type: 'realtime',
-                realtime: {
-                    onRefresh: async function(chart) {
-                        await updateEvaluate()
-                        
-                        chart.data.datasets[0].data.push({
-                            x:Date.now(),
-                            y:p.price.current
-                        })
-                        chart.data.datasets[0].data = chart.data.datasets[0].data.slice(-10)
-
-                        // adjust min/max of the chart if necessary
-                        chart.options.scales.yAxes[0].ticks.min = Math.max(0, 0.995*p.price.min);
-                        chart.options.scales.yAxes[0].ticks.max = 1.025*p.price.max;                              
-                    },
-                }
-            }],
-            yAxes: [{
-                color:SECONDARYCOLOR,
-                gridLines: {
-                    color:SECONDARYCOLOR
-                },
-                ticks: {
-                    //suggestedMin: 0,
-                    maxTicksLimit: 4
-                }
-            }]
-        }
-      }
-    );
+    this.draw()
   }
 }
 </script>
