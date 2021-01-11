@@ -53,7 +53,6 @@ export default {
   methods: {
     async createPosition(input) {
       try {
-        console.log("creating with " + input)
           let newStock = await appLink.createPosition(input)
           this.$emit('newStock', newStock)
           this.selecting = false

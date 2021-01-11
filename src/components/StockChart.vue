@@ -65,7 +65,6 @@ export default {
       p.lock = 0
     },
     draw() {
-      console.log('HERE' + this.bought)
       const updateEvaluate = this.updateEvaluate
       const p = this.stock
       let mainColour

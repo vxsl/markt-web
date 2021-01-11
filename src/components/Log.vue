@@ -2,7 +2,7 @@
   <div class="wrapper">
     <div class="log-container">
       <div class="log-lines">
-        <p v-for="msg in messages" :key='msg'>{{msg}}</p>
+        <p v-for="msg in messages">{{msg}}</p>
       </div>
     </div>
   </div>

@@ -85,10 +85,6 @@ export default {
         }
     },
   mounted() {
-    console.dir(this)
-    console.log(this.$refs.log.stream === this.$refs.dummy.link.logEmitter)
-    console.dir(this.$refs.dummy.link.logEmitter)
-    console.log(this.test)
   },
   methods: {
     newStock(stock) {

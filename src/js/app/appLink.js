@@ -613,7 +613,6 @@ const   config = require("../config.js"),
         readline = require('readline'),
         { EventEmitter } = require("events")
 
-console.log("HERE")
 const logEmitter = new EventEmitter()
 //process.chdir(config.workDir)
 

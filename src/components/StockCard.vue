@@ -1,6 +1,6 @@
 <template>
   <div class="chart-container-container">
-    <div ref="overlay" id="stock-overlay" @click="buyOrSell" @blur="abort">
+    <div ref="overlay" id="stock-overlay" @click="buyOrSell">
       <p ref="buySellLabel" class="buy-sell-label lead">{{ bought ? "SELL" : "BUY" }}</p>
       <form ref="quantityInputContainer" class="quantity-input-container" @submit.prevent="buy">
         <input required type="number" ref="quantityInput" name="quantity-input" min="1" max="1000" @change="getTentativePurchasePrice">
@@ -66,11 +66,6 @@ export default {
       this.$emit('sell', this.ticker)
       this.bought = false
     },
-    abort() {
-      console.log("here")
-      console.log(this.$refs.quantityInput.value)
-    }
-
   }
 };
 </script>
