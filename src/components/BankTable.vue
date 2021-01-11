@@ -1,6 +1,23 @@
 <template>
-    <div>
-        <span class="lead">{{}}</span>
+    <div id="banktable-container">
+        <span :class="balanceStyle" class="main-balance">${{parseFloat(stats.balance).toFixed(2)}}</span>
+        <br>
+        <span :class="balanceStyle" class="balance-sub">${{parseFloat(bank.cash).toFixed(2)}} cash</span>
+        <br>
+        <span :class="balanceStyle" class="balance-sub">${{parseFloat(bank.positions).toFixed(2)}} tied up</span>
+        
+        <table class="table table-dark table-striped ">
+            <tbody>
+                <tr>
+                    <th>Return</th>
+                    <td>{{'$' + parseFloat(stats.return.dollar).toFixed(2) + ' (' + parseFloat(stats.return.percent).toFixed(2) + '%)'}}</td>
+                </tr>
+                <tr>
+                    <th>Activity</th>
+                    <td>xxxxxx</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </template>
 
@@ -8,16 +25,53 @@
 export default {
     props: {
         positions: {},
-        stocks: {}
+        stocks: {},
+        bank: {},
+        stats: {}
+    },
+    computed: {
+        balanceStyle() {
+            if (this.bank.balance > this.bank.totalDeposited) {
+                return 'gain'
+            }
+            else if (this.bank.balance < this.bank.totalDeposited) {
+                return 'loss'
+            }
+            return ''
+        }
     }
 }
 </script>
 
 <style lang="scss">
-#positionsData {
-    border-radius:1em;
-    td {
-        border:none !important;
+@import '@/scss/custom.scss';
+
+#banktable-container {
+    text-align:right;
+    .main-balance {
+        font-weight:100;
+        font-size:2.5em;
+    }
+    .balance-sub {
+        font-weight:100;
+        font-style:italic
+    }
+    .gain {
+        color:theme-color('positive');
+    }
+    .loss {
+        color:theme-color('danger');
+    }
+    table {
+        margin-top:1em;
+        border-radius:1em;
+        td, th {
+            border:none;
+        }
+        th {
+            font-weight:100;
+        }
     }
 }
+
 </style>

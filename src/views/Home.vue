@@ -11,31 +11,12 @@
     </transition>
     <transition name="fade">
       <div v-if="!loading" id="page" ref="page">
-        <div id="nav-container" ref="navContainer" fixed="top">
-          <b-navbar id="nav">
-            <div id="options" class="module">
-              <p ref="optionsTitle" class="invert-on-insane">Options</p>
-              <ToggleButton @toggled="toggleInsane" ref="toggleInsane" class="option-button alter-on-insane" onText="Insane mode" offText="Boring mode" />
-            </div>
-            <b-navbar-nav class="ml-auto" id="right-items">
-              <div id="markt-title" ref="main-title" class="display-4 alter-on-insane">MARKT</div>
-              <div id="markt-subtitle" ref="main-subtitle" class="lead hide-on-insane">a WIP by <a href="https://kylegrimsrudma.nz">Kyle</a></div>
-            </b-navbar-nav>
-          </b-navbar>
-        </div>
-
         <div class="sidebar">
-          <div class="upper-sidebar d-flex align-items-center">
-            <div id="logContainer" class="bg-dark text-light">
-                <Log id="log" ref="log" class="text-light"/>
-                <Clock id="clock"/>
-            </div>
-          </div>
-          <div class="lower-sidebar bg-dark text-light">
+          <div class="inner-sidebar bg-dark text-light">
             <p class="lead table-title">BANK</p>
             <p class="table-sub">A summary of your finances is shown here.</p>
             <hr class="bg-light">
-            <BankTable :positions='positions' :stocks='stocks' :bank="bank"/>
+            <BankTable :positions='positions' :stocks='stocks' :bank="bank" :stats="bankStats"/>
             <p class="lead table-title">POSITIONS</p>
             <p class="table-sub">A summary of your positions is shown here.</p>
             <hr class="bg-light">
@@ -89,11 +70,25 @@ export default {
           positions: {},
           stocks: {},
           bank: {
-            balance:1000.00,
-          },
-          insane: false
+            cash:1000.00,
+            positions:0.00,
+            totalDeposited:1000.00,
+          }
         }
+          },
+  computed: {
+    bankStats() {
+      let balance = this.bank.cash + this.bank.positions
+      let diff = balance - this.bank.totalDeposited
+      return {
+        balance: balance,
+        return: {
+          dollar: diff,
+          percent: diff / balance
+        }
+      }
     },
+  },
   mounted() {
     window.addEventListener('load', () => {
       this.loading = false
@@ -184,10 +179,23 @@ export default {
       border-width: 1px;
     }
   }
-  .lower-sidebar {
+
+.sidebar {
+  user-select:none;
+  position:absolute;
+  top:0;
+  left:0;
+  width:30vw;
+  height:100vh !important;
+  padding:2vh;
+  padding-right:0;
+  padding-left:0;
+  .inner-sidebar {
     position:relative;
-    height:60vh;
+    height:100%;
     border-top-right-radius:1em;
+    border-bottom-right-radius:1em;
+
     padding:1em;
     p {
       margin-bottom:0;
@@ -197,6 +205,7 @@ export default {
       font-weight:400;
     }
     .table-sub {
+      font-size:0.85em;
       font-style:italic
     }
     table {
