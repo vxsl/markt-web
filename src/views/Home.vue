@@ -4,12 +4,12 @@
     <div id="nav-container" ref="navContainer" class="alter-on-insane" fixed="top">
       <b-navbar id="nav">
         <div id="options" class="module">
-          <p>Options</p>
+              <p ref="optionsTitle" class="invert-on-insane">Options</p>
           <ToggleButton @toggled="toggleInsane" ref="toggleInsane" class="option-button alter-on-insane" onText="Insane mode" offText="Boring mode" />
         </div>
         <b-navbar-nav class="ml-auto" id="right-items">
-          <div id="markt-title" class="display-4">MARKT</div>
-          <div id="markt-subtitle" class="lead">a WIP by <a href="https://kylegrimsrudma.nz">Kyle</a></div>
+              <div id="markt-title" ref="main-title" class="display-4 alter-on-insane">MARKT</div>
+              <div id="markt-subtitle" ref="main-subtitle" class="lead hide-on-insane">a WIP by <a href="https://kylegrimsrudma.nz">Kyle</a></div>
         </b-navbar-nav>
       </b-navbar>
     </div>

@@ -30,6 +30,22 @@ export default {
             el.classList.remove('insane')
           }
         }
+        else if (el.classList.contains('invert-on-insane')) {
+          if (insane) {
+            el.classList.add('text-light')
+          }
+          else {
+            el.classList.remove('text-light')
+          }
+        }
+        else if (el.classList.contains('hide-on-insane')) {
+          if (insane) {
+            el.style.visibility = 'hidden'
+          }
+          else {
+            el.style.visibility = 'visible'
+          }
+        }
       }
     }
   }
@@ -46,6 +62,13 @@ export default {
 
 #app.insane {
   background:theme-color('dark') !important;
+}
+
+.hide-on-insane {
+  transition: visibility 0.5s
+}
+.invert-on-insane {
+  transition: color 0.5s
 }
 
 .alter-on-insane.insane {
