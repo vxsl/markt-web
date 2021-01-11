@@ -19,6 +19,7 @@ import knownSymbols from '@/js/data/knownSymbols.json'
 export default {
   data() {
       return {
+        symbols: [],
         done:false
       }
   },
@@ -31,10 +32,11 @@ export default {
     let input = this.$refs.tickerInput.$el.children[0].children[0]
     input.focus()
     input.select()
+    this.symbols = knownSymbols.ca.concat(knownSymbols.nasdaq)
   },
   methods: {
       search(input) {
-        return knownSymbols.ca.filter(symbol => {
+        return this.symbols.filter(symbol => {
             return symbol.label.startsWith(input.toUpperCase())
         }).map(a => a.label)
       },
