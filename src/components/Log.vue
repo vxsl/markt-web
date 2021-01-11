@@ -55,7 +55,7 @@ export default {
 
   position: absolute;
   top: 30vh;
-  width: calc(100% - 3vh);
+  width: calc(100% - 5vh);
   height:0;
   .log-lines {
     word-wrap:break-word !important;

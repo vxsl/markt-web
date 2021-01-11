@@ -22,11 +22,18 @@
         </div>
       </div>
       <div class="lower-sidebar bg-dark text-light"> 
-        <p class="lead">Positions</p>
+            <p class="lead table-title">BANK</p>
+            <p class="table-sub">A summary of your finances is shown here.</p>
+            <hr class="bg-light">
+            <BankTable :positions='positions' :stocks='stocks' :bank="bank"/>
+            <p class="lead table-title">POSITIONS</p>
+            <p class="table-sub">A summary of your positions is shown here.</p>
+            <hr class="bg-light">
         <PositionsTable :positions='positions' :stocks='stocks'/>
       </div>
     </div>
-    <div class="stocksTable module">
+        <div class="stocksGrid module">
+          <p v-if="Object.keys(stocks).length > 0" class="stocks-info-text">Click on a stock to purchase some shares.</p>
       <StockCard v-for="(stock, ticker) in stocks" class="rounded-card bg-light text-dark" :ref="ticker.replace(':', '')+'Chart'" :key="ticker" :ticker="ticker" :stock="stock" :insane="insane" @buy="newPosition" @sell="sellPosition"/>
       <DummyCard ref="dummy" class="rounded-card bg-light text-dark" @newStock="newStock"/>            
     </div>
@@ -49,6 +56,8 @@ import Clock from '@/components/Clock.vue'
 import StockCard from '@/components/StockCard.vue'
 import DummyCard from '@/components/DummyCard.vue'
 import PositionsTable from '@/components/PositionsTable.vue'
+import BankTable from '@/components/BankTable.vue'
+
 
 export default {
 
@@ -59,13 +68,16 @@ export default {
     Log,
     Clock,
     ToggleButton,
-    PositionsTable
+    PositionsTable,
+    BankTable
   },
   data() {
         return {
           positions: {},
           stocks: {},
+          bank: {
           balance:1000.00,
+          },
           insane: false
         }
     },
@@ -134,8 +146,18 @@ export default {
     position:relative;
     height:60vh;
     border-top-right-radius:1em;
+    padding:1em;
+    p {
+      margin-bottom:0;
+      text-align:right;
+    }
+    .table-title {
+      font-weight:400;
+    }
+    .table-sub {
+      font-style:italic
+    }
     table {
-
       width:100%;
       border-collapse: collapse;
       tr, td {
@@ -153,7 +175,7 @@ export default {
   border-radius:1em;
   height:100%;
 }
-.stocksTable {
+.stocksGrid {
   float:right;
   width:66%;
   display: flex;
@@ -165,6 +187,13 @@ export default {
   border-bottom-right-radius:0 !important;
   .rounded-card {
     border-radius:1em
+  }
+  .stocks-info-text {
+    padding:1em;
+    padding-bottom:0;
+    display:block;
+    width:100%;
+    user-select:none;
   }
 }
 
