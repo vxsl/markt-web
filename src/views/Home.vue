@@ -18,29 +18,12 @@
       <div class="upper-sidebar d-flex align-items-center">
         <div id="logContainer" class="bg-dark text-light">
             <Log id="log" ref="log" class="text-light"/>
-            <Clock/>
+            <Clock id="clock"/>
         </div>
       </div>
       <div class="lower-sidebar bg-dark text-light"> 
         <p class="lead">Positions</p>
-        <table id="positionsData" class="table table-dark">
-          <thead>
-            <tr>
-              <th></th>
-              <th>Quantity</th>
-              <th>Value</th>
-              <th>Margin</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(position, ticker) in positions" :key="ticker">
-                <td>{{ticker}}</td>
-                <td>{{position.quantity}}</td>
-                <td>{{parseFloat(stocks[ticker].price.current).toFixed(2)}}</td>
-                <td>{{parseFloat(stocks[ticker].price.max).toFixed(2)}}</td>
-            </tr>
-          </tbody>
-        </table>
+        <PositionsTable :positions='positions' :stocks='stocks'/>
       </div>
     </div>
     <div class="stocksTable module">
@@ -65,6 +48,7 @@ import Log from '@/components/Log.vue'
 import Clock from '@/components/Clock.vue'
 import StockCard from '@/components/StockCard.vue'
 import DummyCard from '@/components/DummyCard.vue'
+import PositionsTable from '@/components/PositionsTable.vue'
 
 export default {
 
@@ -74,7 +58,8 @@ export default {
     DummyCard,
     Log,
     Clock,
-    ToggleButton
+    ToggleButton,
+    PositionsTable
   },
   data() {
         return {
@@ -125,6 +110,11 @@ export default {
     height:40vh;
     #logContainer {
       width:100%;
+      #clock {
+        user-select:none;
+        float:right;
+        padding-right:2vh;
+      }
       #log {
         height:30vh;
         padding-left:0;
