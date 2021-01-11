@@ -9,11 +9,12 @@
 export default {
     props: {
         onText: String,
-        offText: String
+        offText: String,
+        action: String
     },
     methods: {
         toggle() {
-            this.$emit('toggled', this.$refs.toggle.checked)
+          eval(this.action)
         }
     }
 }

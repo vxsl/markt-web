@@ -61,7 +61,7 @@ export default {
 }
 
 #app.insane {
-  background:theme-color('dark') !important;
+  background:theme-color('insane') !important;
 }
 
 .hide-on-insane {

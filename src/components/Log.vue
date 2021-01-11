@@ -54,7 +54,7 @@ export default {
 .log-container {
 
   position: absolute;
-  top: 30vh;
+  top: 20vh;
   width: calc(100% - 5vh);
   height:0;
   .log-lines {
