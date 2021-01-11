@@ -1,27 +1,37 @@
 <template>
-  <div id="page">
-
-    <div id="nav-container" ref="navContainer" class="alter-on-insane" fixed="top">
-      <b-navbar id="nav">
-        <div id="options" class="module">
-              <p ref="optionsTitle" class="invert-on-insane">Options</p>
-          <ToggleButton @toggled="toggleInsane" ref="toggleInsane" class="option-button alter-on-insane" onText="Insane mode" offText="Boring mode" />
-        </div>
-        <b-navbar-nav class="ml-auto" id="right-items">
-              <div id="markt-title" ref="main-title" class="display-4 alter-on-insane">MARKT</div>
-              <div id="markt-subtitle" ref="main-subtitle" class="lead hide-on-insane">a WIP by <a href="https://kylegrimsrudma.nz">Kyle</a></div>
-        </b-navbar-nav>
-      </b-navbar>
-    </div>
-
-    <div class="sidebar">
-      <div class="upper-sidebar d-flex align-items-center">
-        <div id="logContainer" class="bg-dark text-light">
-            <Log id="log" ref="log" class="text-light"/>
-            <Clock id="clock"/>
+  <div>
+    <transition name="fade">
+      <div v-if="loading" class="spinner-splash min-vh-100 d-flex justify-content-center align-items-center">
+        <div class="spinner-inner-container text-light">
+          <b-spinner/>
+          <span class="break-here"></span>
+          <p class="lead">LOADING</p>
         </div>
       </div>
-      <div class="lower-sidebar bg-dark text-light"> 
+    </transition>
+    <transition name="fade">
+      <div v-if="!loading" id="page" ref="page">
+        <div id="nav-container" ref="navContainer" fixed="top">
+          <b-navbar id="nav">
+            <div id="options" class="module">
+              <p ref="optionsTitle" class="invert-on-insane">Options</p>
+              <ToggleButton @toggled="toggleInsane" ref="toggleInsane" class="option-button alter-on-insane" onText="Insane mode" offText="Boring mode" />
+            </div>
+            <b-navbar-nav class="ml-auto" id="right-items">
+              <div id="markt-title" ref="main-title" class="display-4 alter-on-insane">MARKT</div>
+              <div id="markt-subtitle" ref="main-subtitle" class="lead hide-on-insane">a WIP by <a href="https://kylegrimsrudma.nz">Kyle</a></div>
+            </b-navbar-nav>
+          </b-navbar>
+        </div>
+
+        <div class="sidebar">
+          <div class="upper-sidebar d-flex align-items-center">
+            <div id="logContainer" class="bg-dark text-light">
+                <Log id="log" ref="log" class="text-light"/>
+                <Clock id="clock"/>
+            </div>
+          </div>
+          <div class="lower-sidebar bg-dark text-light">
             <p class="lead table-title">BANK</p>
             <p class="table-sub">A summary of your finances is shown here.</p>
             <hr class="bg-light">
@@ -29,14 +39,16 @@
             <p class="lead table-title">POSITIONS</p>
             <p class="table-sub">A summary of your positions is shown here.</p>
             <hr class="bg-light">
-        <PositionsTable :positions='positions' :stocks='stocks'/>
-      </div>
-    </div>
+            <PositionsTable :positions='positions' :stocks='stocks'/>
+          </div>
+        </div>
         <div class="stocksGrid module">
           <p v-if="Object.keys(stocks).length > 0" class="stocks-info-text">Click on a stock to purchase some shares.</p>
-      <StockCard v-for="(stock, ticker) in stocks" class="rounded-card bg-light text-dark" :ref="ticker.replace(':', '')+'Chart'" :key="ticker" :ticker="ticker" :stock="stock" :insane="insane" @buy="newPosition" @sell="sellPosition"/>
-      <DummyCard ref="dummy" class="rounded-card bg-light text-dark" @newStock="newStock"/>            
-    </div>
+          <StockCard v-for="(stock, ticker) in stocks" class="rounded-card bg-light text-dark" :ref="ticker.replace(':', '')+'Chart'" :key="ticker" :ticker="ticker" :stock="stock" :insane="insane" @buy="newPosition" @sell="sellPosition"/>
+          <DummyCard ref="dummy" class="rounded-card bg-light text-dark" @newStock="newStock"/>            
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -73,15 +85,19 @@ export default {
   },
   data() {
         return {
+          loading: true,
           positions: {},
           stocks: {},
           bank: {
-          balance:1000.00,
+            balance:1000.00,
           },
           insane: false
         }
     },
   mounted() {
+    window.addEventListener('load', () => {
+      this.loading = false
+    })
   },
   methods: {
     newStock(stock) {
@@ -109,6 +125,32 @@ export default {
 <style lang="scss">
 @import '@/scss/custom.scss';
 @import '@/scss/animations.scss';
+
+.fade-enter-active {
+    transition: opacity 2s
+}
+
+.fade-enter,
+.fade-leave-to,
+.fade-leave-active {
+    opacity: 0
+}
+
+.spinner-splash {
+  background:theme-color("dark");
+  user-select:none;
+  flex-wrap:wrap;
+  .spinner-inner-container {
+    text-align:center;
+    p {
+      padding:1em;
+      margin:0;
+    }
+    .break-here {
+      flex-basis:100%
+    }
+  }
+}
 
 .sidebar {
   user-select:none;
