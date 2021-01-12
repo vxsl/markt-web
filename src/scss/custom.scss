@@ -1,17 +1,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200;300;400;500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,100;0,200;0,300;1,300&display=swap');
 
-$theme-colors: (
-    "primary": #370aff,
-    "secondary":#EF3E36,
-    "danger":#EF3E36,
-    "light": #f3f3f3,
-    "dark":#2E282A,
-    "grey":#7e7e7e,
-    "info":#3F88C5,
-    "positive":#d65656,
-    "insane":#2E282A,
+$primary-color: #370aff;
+$secondary-color:#EF3E36;
+$danger-color:#EF3E36;
+$light-color: #f3f3f3;
+$dark-color:#2E282A;
+$grey-color:#7e7e7e;
+$info-color:#3F88C5;
+$positive-color:#d65656;
+$insane-color:#2E282A;
 
-);
+:export {
+    primaryColor: $primary-color;
+    secondaryColor: $secondary-color;
+    dangerColor: $danger-color;
+    lightColor: $light-color;
+    darkColor: $dark-color;
+    greyColor: $grey-color;
+    infoColor: $info-color;
+    positiveColor: $positive-color;
+    insaneColor: $insane-color;
+}
 
 @import "../../node_modules/bootstrap/scss/bootstrap";
