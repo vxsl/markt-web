@@ -32,6 +32,7 @@ export default {
     ticker: String,
     stock: {},
     insane: Boolean,
+    bank: Object
   },
   computed: {
     quantityMessage() {
@@ -72,11 +73,19 @@ export default {
       }
     },
     buy() {
+      let tentativePrice = this.stock.price.current * this.quantity
+      if (this.bank.cash >= tentativePrice) {
+        this.initPrice = this.stock.price.current
+        this.$refs.chart.initPrice = this.initPrice
       this.$emit('buy', this.ticker, this.quantity)
       this.bought = true
       this.$refs.buySellLabel.style.display = "block"
       this.$refs.quantityInputContainer.style.display = "none"
       this.$refs.chartContainer.style.filter = 'none'
+      }
+      else {
+        this.$emit('toast', 'Not enough cash', "Sorry, you don't have enough cash to purchase " + this.quantity + " shares of " + this.stock.ticker + ".")
+      }
     },
     sell() {
       this.$emit('sell', this.ticker)

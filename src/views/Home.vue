@@ -51,7 +51,7 @@
             </b-navbar>
           </div>
           <div class="stocksGrid">
-            <StockCard v-for="(stock, ticker) in stocks" class="rounded-card" :ref="ticker.replace(':', '')+'Chart'" :key="ticker" :ticker="ticker" :stock="stock" :insane="insane" @buy="buyPosition" @sell="sellPosition"/>
+            <StockCard v-for="(stock, ticker) in stocks" class="rounded-card" :ref="ticker.replace(':', '')+'Chart'" :key="ticker" :ticker="ticker" :stock="stock" :insane="insane" :bank="bank" @buy="buyPosition" @sell="sellPosition" @toast="childToast"/>
             <DummyCard ref="dummy" class="rounded-card bg-light text-dark" @newStock="newStock"/>            
           </div>
         </div>
@@ -121,6 +121,9 @@ export default {
         solid: true,
         appendToast: append
       })
+    },
+    childToast(title, message) {
+      this.toast(title, message)
     },
     newStock(stock) {
       if (this.stocks[stock.ticker]) {
