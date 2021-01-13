@@ -8,18 +8,18 @@ import colors from '@/scss/custom.scss'
 export default {
   data() {
     return {
+      initPrice: Number
     }
   },
   name: 'StockChart',
   extends: Line,
   props: {
-    bought: Boolean,
+    active: Boolean,
     insane: Boolean,
     stock: {
 
     },
     quantity: Number,
-    initPrice: Number,
     plugins: [{
         /* Adjust label font size according to chart size */
             beforeDraw: function(c) {
@@ -30,7 +30,7 @@ export default {
   },
   computed: {
     status() {
-      if (this.bought) {
+      if (this.active) {
         let diff = this.stock.price.current - this.initPrice
         if (diff > 0) {
           return 2
@@ -64,17 +64,16 @@ export default {
       this.$data._chart.options.scales.yAxes[0].gridLines.color = newColor
       this.$data._chart.options.scales.yAxes[0].ticks.fontColor = newColor
       this.$data._chart.options.legend.labels.fontColor = newColor
-
       this.$data._chart.update({preservation:true})
       this.$emit('redraw', this.status)
     },
-    insane(insaneValue) {
-      if (insaneValue) {
+    insane(insaneVal) {
+      if (insaneVal && this.active) {
         this.$data._chart.config.data.datasets[0].borderColor = colors.lightColor
       }
       else {
         this.$data._chart.config.data.datasets[0].borderColor = colors.darkColor
-      }
+      } 
     }
   },
   methods: {
@@ -131,7 +130,7 @@ export default {
         {
           datasets: [{
               fill:false,
-              borderColor: this.insane? colors.lightColor : colors.darkColor,
+              borderColor: this.color,
               lineTension:0,
               data: []
           }]

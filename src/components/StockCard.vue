@@ -1,7 +1,7 @@
 <template>
   <div ref="outerContainer" class="chart-outer-container inactive">
     <div ref="overlay" class="stock-overlay" @click="buyOrSell">
-      <p ref="buySellLabel" class="buy-sell-label lead">{{ bought ? "SELL" : "BUY" }}</p>
+      <p ref="buySellLabel" class="buy-sell-label lead">{{ active ? "SELL" : "BUY" }}</p>
       <form ref="quantityInputContainer" class="quantity-input-container" @submit.prevent="buy">
         <input required v-model="quantity" type="number" name="quantity-input" value="1" min="1" max="1000">
         <input type="submit" :value="quantityMessage" ref="quantitySubmit">
@@ -11,7 +11,7 @@
       <div class="chart-extlabel">
       <h2>{{ ticker }}</h2>
       </div>
-      <StockChart :stock="stock" :initPrice="initPrice" :bought="bought" :quantity="parseInt(quantity)" @redraw="redraw" :insane="insane" />
+      <StockChart ref='chart' :stock="stock" :initPrice="initPrice" :active="active" :quantity="parseInt(quantity)" @redraw="redraw" :insane="insane" />
     </div>
   </div>
 </template>
@@ -22,10 +22,9 @@ import StockChart from "@/components/StockChart.vue";
 export default {
   data() {
     return {
-      bought: false,
+      active: false,
       quantity: 1,
-      initPrice: Number,
-      redrawFlag: false
+      initPrice: Number
     };
   },
   props: {
@@ -45,12 +44,28 @@ export default {
     }
   },
   watch: {
-    insane(insaneVal) {
-      if (!insaneVal) {
-        this.$refs.chartContainer.classList.add('boring-bg')
+    active(activeVal) {
+      if (activeVal) {
+        this.$refs.outerContainer.classList.remove('inactive')
       }
       else {
-        this.$refs.chartContainer.classList.remove('boring-bg')
+        this.$refs.outerContainer.classList.add('inactive')
+      }
+    },
+    insane(insaneVal) {
+      if (insaneVal) {
+        this.$refs.outerContainer.classList.add('insane')
+        if (!this.active) {
+          this.$refs.chart.$el.classList.add('insane-invert')
+          this.$refs.overlay.classList.add('insane-invert')
+        }
+      }
+      else {
+        this.$refs.outerContainer.classList.remove('insane')
+        if (!this.active) {
+          this.$refs.chart.$el.classList.remove('insane-invert')
+          this.$refs.overlay.classList.remove('insane-invert')
+        }
       }
     }
   },
@@ -58,12 +73,18 @@ export default {
     StockChart,
   },
   created() {
-    this.initPrice = this.stock.price.current
     this.$emit("newStockCard", this);
+  },
+  mounted() {
+    if (this.insane) {
+      this.$refs.outerContainer.classList.add('insane')
+      this.$refs.chart.$el.classList.add('insane-invert')
+      this.$refs.overlay.classList.add('insane-invert')
+    }
   },
   methods: {
     buyOrSell() {
-      if (this.bought) {
+      if (this.active) {
         this.sell()
       }
       else {
@@ -77,11 +98,11 @@ export default {
       if (this.bank.cash >= tentativePrice) {
         this.initPrice = this.stock.price.current
         this.$refs.chart.initPrice = this.initPrice
-      this.$emit('buy', this.ticker, this.quantity)
-      this.bought = true
-      this.$refs.buySellLabel.style.display = "block"
-      this.$refs.quantityInputContainer.style.display = "none"
-      this.$refs.chartContainer.style.filter = 'none'
+        this.$emit('buy', this.ticker, this.quantity)
+        this.active = true
+        this.$refs.buySellLabel.style.display = "block"
+        this.$refs.quantityInputContainer.style.display = "none"
+        this.$refs.chartContainer.style.filter = 'none'
       }
       else {
         this.$emit('toast', 'Not enough cash', "Sorry, you don't have enough cash to purchase " + this.quantity + " shares of " + this.stock.ticker + ".")
@@ -89,10 +110,13 @@ export default {
     },
     sell() {
       this.$emit('sell', this.ticker)
-      this.bought = false
+      this.active = false
     },
     redraw(newStatus) {
-      this.redrawFlag = !this.redrawFlag
+      if (newStatus != -1) {
+        this.$refs.chart.$el.classList.remove('insane-invert')
+        this.$refs.overlay.classList.remove('insane-invert')
+      }
       this.$refs.outerContainer.classList = 'chart-outer-container '
       switch (newStatus) {
         case 2:
@@ -117,6 +141,10 @@ export default {
 <style lang="scss">
 @import "@/scss/custom.scss";
 
+.insane-invert {
+  filter:invert(100%) !important;
+}
+
 canvas {
     -moz-user-select: none;
     -webkit-user-select: none;
@@ -129,6 +157,14 @@ canvas {
       border-color:$dark-color;
       .chart-extlabel {
         color:$dark-color;
+      }
+    }
+  }
+  &.inactive.insane {
+    .chart-container{
+      border-color:$light-color;
+      .chart-extlabel {
+        color:$light-color;
       }
     }
   }
@@ -172,9 +208,6 @@ canvas {
   margin:1em;
   user-select:none;
   .chart-container{
-    &.boring-bg {
-      background:$light-grey-color;
-    }
     overflow:hidden;
     height:100%;
     padding:1em;
@@ -214,6 +247,7 @@ canvas {
   cursor: pointer;
   p {
     font-size:1.5em;
+    font-weight:400;
     user-select: none;
     color: $dark-color;
     margin-bottom: 0 !important;
