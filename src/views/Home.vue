@@ -51,7 +51,7 @@
             </b-navbar>
           </div>
           <div class="stocksGrid">
-            <StockCard v-for="(stock, ticker) in stocks" class="rounded-card bg-light text-dark" :ref="ticker.replace(':', '')+'Chart'" :key="ticker" :ticker="ticker" :stock="stock" :insane="insane" @buy="buyPosition" @sell="sellPosition"/>
+            <StockCard v-for="(stock, ticker) in stocks" class="rounded-card" :ref="ticker.replace(':', '')+'Chart'" :key="ticker" :ticker="ticker" :stock="stock" :insane="insane" @buy="buyPosition" @sell="sellPosition"/>
             <DummyCard ref="dummy" class="rounded-card bg-light text-dark" @newStock="newStock"/>            
           </div>
         </div>
@@ -136,11 +136,9 @@ export default {
     buyPosition(ticker, quantity) {
       this.$set(this.positions, ticker, {'quantity':quantity, 'sold':false})
       let ref = ticker.replace(':', '') + 'Chart'
-      console.dir(this.$refs[ref])
       let amount = this.stocks[ticker].price.current * quantity
       this.bank.cash -= amount
       this.bank.positions += amount
-      this.$refs[ref][0].$children[0].draw()
     },
     sellPosition(ticker) {
       console.log('sell ' + this.stocks[ticker].price.current + " * " + this.positions[ticker].quantity)
@@ -160,6 +158,8 @@ export default {
 <style lang="scss">
 @import '@/scss/custom.scss';
 @import '@/scss/animations.scss';
+
+
 
 .fade-enter-active {
   transition: opacity 2s

@@ -1,4 +1,5 @@
 <script>
+import Chart from 'chart.js'
 import { Line } from 'vue-chartjs'
 import '@taeuk-gang/chartjs-plugin-streaming';
 const { log } = require('@/js/log.js')
@@ -29,30 +30,51 @@ export default {
   },
   computed: {
     status() {
-      let diff = this.stock.price.current - this.initPrice
-      if (diff > 0) {
-        return 2
+      if (this.bought) {
+        let diff = this.stock.price.current - this.initPrice
+        if (diff > 0) {
+          return 2
+        }
+        else if (diff == 0) {
+          return 1
+        }
+        else if (diff < 0) {
+          return 0
+        }
       }
-      else if (diff == 0) {
-        return 1
+      return -1
+    },
+    color() {
+      switch (this.status) {
+        case 2:
+          return colors.positiveColor
+        case 1:
+          return colors.primaryColor
+        case 0:
+          return colors.dangerColor
+        case -1:
+        default:
+          return colors.darkColor
       }
-      else if (diff < 0) {
-        return 0
-      }
-      return 0
     }
   },
   watch: {
-    bought(boughtVal) {
-      if (boughtVal) {
-        this.draw(1)
+    color(newColor) {
+      this.$data._chart.options.scales.xAxes[0].color = newColor
+      this.$data._chart.options.scales.yAxes[0].gridLines.color = newColor
+      this.$data._chart.options.scales.yAxes[0].ticks.fontColor = newColor
+      this.$data._chart.options.legend.labels.fontColor = newColor
+
+      this.$data._chart.update({preservation:true})
+      this.$emit('redraw', this.status)
+    },
+    insane(insaneValue) {
+      if (insaneValue) {
+        this.$data._chart.config.data.datasets[0].borderColor = colors.lightColor
       }
       else {
-        this.draw()
+        this.$data._chart.config.data.datasets[0].borderColor = colors.darkColor
       }
-    },
-    status(newStatus) {
-      this.draw(newStatus)
     }
   },
   methods: {
@@ -100,23 +122,7 @@ export default {
       }
       p.lock = 0
     },
-    draw(statusCode=-1) {
-      console.log("HERE " + statusCode)
-      let mainColour
-      switch (statusCode) {
-        case -1:
-          mainColour = colors.darkColor
-          break
-        case 0:
-          mainColour = colors.dangerColor
-          break
-        case 1: 
-          mainColour = colors.primaryColor
-          break
-        case 2:
-          mainColour = colors.positiveColor
-          break
-      }
+    draw() {
       const updateEvaluate = this.updateEvaluate
       const p = this.stock
       
@@ -125,9 +131,7 @@ export default {
         {
           datasets: [{
               fill:false,
-              //label: positions[i].ticker,
-              backgroundColor: mainColour,
-              borderColor: mainColour,
+              borderColor: this.insane? colors.lightColor : colors.darkColor,
               lineTension:0,
               data: []
           }]
@@ -148,16 +152,14 @@ export default {
               align:'start',
               onClick:null,
               labels: {
-                  fontColor: mainColour,
-                  //fontStyle:'bold',
+                  fontColor: this.color,
                   boxWidth:0,
               },
           },
           scales: {
               xAxes: [{                    
-                  color:mainColour,    
+                  color:this.color,    
                   gridLines: {
-                      color:mainColour,
                       display:false
                   },
                   ticks: {
@@ -181,14 +183,13 @@ export default {
                   }
               }],
               yAxes: [{
-                  color:mainColour,
                   gridLines: {
-                      color:mainColour
+                      color:this.color
                   },
                   ticks: {
                       //suggestedMin: 0,
                       maxTicksLimit: 4,
-                      fontColor:mainColour
+                      fontColor:this.color
                   }
               }]
           }

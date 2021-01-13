@@ -1,6 +1,6 @@
 <template>
-  <div class="chart-outer-container">
-    <div ref="overlay" id="stock-overlay" @click="buyOrSell">
+  <div ref="outerContainer" class="chart-outer-container inactive">
+    <div ref="overlay" class="stock-overlay" @click="buyOrSell">
       <p ref="buySellLabel" class="buy-sell-label lead">{{ bought ? "SELL" : "BUY" }}</p>
       <form ref="quantityInputContainer" class="quantity-input-container" @submit.prevent="buy">
         <input required v-model="quantity" type="number" name="quantity-input" value="1" min="1" max="1000">
@@ -11,7 +11,7 @@
       <div class="chart-extlabel">
       <h2>{{ ticker }}</h2>
       </div>
-      <StockChart :stock="stock" :initPrice="initPrice" :bought="bought" :quantity="quantity" :insane="insane" />
+      <StockChart :stock="stock" :initPrice="initPrice" :bought="bought" :quantity="parseInt(quantity)" @redraw="redraw" :insane="insane" />
     </div>
   </div>
 </template>
@@ -24,7 +24,8 @@ export default {
     return {
       bought: false,
       quantity: 1,
-      initPrice: Number
+      initPrice: Number,
+      redrawFlag: false
     };
   },
   props: {
@@ -40,6 +41,16 @@ export default {
       result += parseFloat(this.quantity * this.stock.price.current).toFixed(2)
       result += ']'
       return result
+    }
+  },
+  watch: {
+    insane(insaneVal) {
+      if (!insaneVal) {
+        this.$refs.chartContainer.classList.add('boring-bg')
+      }
+      else {
+        this.$refs.chartContainer.classList.remove('boring-bg')
+      }
     }
   },
   components: {
@@ -71,6 +82,24 @@ export default {
       this.$emit('sell', this.ticker)
       this.bought = false
     },
+    redraw(newStatus) {
+      this.redrawFlag = !this.redrawFlag
+      this.$refs.outerContainer.classList = 'chart-outer-container '
+      switch (newStatus) {
+        case 2:
+          this.$refs.outerContainer.classList += 'active positive'
+          break
+        case 1:
+          this.$refs.outerContainer.classList += 'active neutral'
+          break
+        case 0:
+          this.$refs.outerContainer.classList += 'active negative'
+          break
+        case -1:
+        default:
+          this.$refs.outerContainer.classList += 'inactive'
+      }
+    }
   }
 };
 </script>
@@ -85,48 +114,86 @@ canvas {
     -ms-user-select: none;
 }
 .chart-outer-container {
-    position:relative;
-    width:20%;
-    margin:1em;
-    user-select:none;
-}
-.chart-container{
+
+  &.inactive {
+    .chart-container{
+      border-color:$dark-color;
+      .chart-extlabel {
+        color:$dark-color;
+      }
+    }
+  }
+  &.active {
+    .chart-container{
+        border-width:2px;
+        .chart-extlabel {
+          h2 {
+            font-weight:700;
+          }
+        }
+      }
+    &.neutral {
+      .chart-container{
+        border-color:$primary-color;
+        .chart-extlabel {
+          color:$primary-color;
+        }
+      }
+    }
+    &.negative {
+      .chart-container{
+        border-color:$danger-color;
+        .chart-extlabel {
+          color:$danger-color;
+        }
+      }
+    }
+    &.positive {
+      .chart-container{
+        border-color:$positive-color;
+        .chart-extlabel {
+          color:$positive-color;
+        }
+      }
+    }
+  }
+
+  position:relative;
+  width:20%;
+  margin:1em;
+  user-select:none;
+  .chart-container{
+    &.boring-bg {
+      background:$light-grey-color;
+    }
     overflow:hidden;
     height:100%;
     padding:1em;
+    padding-top:0.5em;
+    padding-bottom:0.5em;
 
-    /*
-    width: 500px;
-    margin-left: 40px;
-    margin-right: 40px;
-    margin-bottom: 40px;*/
-    /* box-sizing:border-box; */
     border:solid;
-    border-color:rgb(61,61,61);
+    border-color:$dark-color;
     border-width:1px;
     border-radius: 1em;
+    .chart-extlabel {
+      width:100%;
+      color:$dark-color;
+      padding-bottom:1%;
+      margin-bottom:0.6em;
+      text-align:right;
+      border-bottom:solid;
+      border-bottom-width:1px;
+      h2 {
+          font-size:1.3vw;
+          vertical-align:middle;
+          margin:0;
+      }
+    }
+  }
 }
 
-.chart-extlabel {
-    width:100%;
-    color:rgb(1,61,61);
-    padding-bottom:1%;
-    margin-bottom:0.6em;
-    padding-top:1%;
-    text-align:right;
-    border-bottom:solid;
-    border-bottom-width:1px
-}
-.chart-extlabel > h2 {
-    font-size:1vw;
-    vertical-align:middle;
-    padding-right:10%;
-    padding-top:2%;
-    padding-bottom:1%;
-    margin:0;
-}
-
-#stock-overlay {
+.stock-overlay {
   user-select: none;
   position: absolute;
   z-index: 2;
@@ -151,6 +218,7 @@ canvas {
   }
   &:hover + .chart-container {
     filter:blur(0.1em) !important;
+
   }  
   .quantity-input-container {
     display:none;

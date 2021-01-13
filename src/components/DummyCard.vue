@@ -21,7 +21,7 @@
     </div>
     <div class="chart-container">
       <div class="chart-extlabel">
-        <h2>N/A</h2>
+        <h2>&#10240; &#x2800;</h2>
       </div>
       <DummyChart />
     </div>
@@ -100,9 +100,37 @@ export default {
     margin-top:20%;
   }
 }
-.chart-container {
-  filter: blur(0.2em);    
-  border:none !important
+
+.chart-outer-container {
+  
+  position:relative;
+  width:20%;
+  margin:1em;
+  user-select:none;
+  .chart-container{
+    filter: blur(0.2em);    
+    border:none !important;
+    overflow:hidden;
+    height:100%;
+    padding:1em;
+    padding-top:0.5em;
+    padding-bottom:0.5em;
+    .chart-extlabel {
+      width:100%;
+      color:$dark-color;
+      padding-bottom:1%;
+      margin-bottom:0.6em;
+      text-align:right;
+      border-bottom:solid;
+      border-bottom-width:1px;
+      h2 {
+        white-space:pre !important;
+        font-size:1.3vw;
+        vertical-align:middle;
+        margin:0;
+      }
+    }
+  }
 }
 
 #dummy-overlay {
