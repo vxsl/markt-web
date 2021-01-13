@@ -4,7 +4,7 @@
                 <thead>
                     <tr>
                         <th></th>
-                        <th>Quantity</th>
+                        <th>Qty</th>
                         <th>Value</th>
                         <th>Margin</th>
                     </tr>
@@ -40,7 +40,11 @@ export default {
 <style lang="scss">
 #positionsData {
     border-radius:1em;
-    td {
+    th {
+        width:100%;
+        font-weight:100;
+    }
+    td, th {
         border:none !important;
     }
 }
