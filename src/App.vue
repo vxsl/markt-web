@@ -18,33 +18,38 @@ export default {
     },
     toggleInsaneClassOnChildren(insane) {
       for (let key in this.$children[0].$refs) {
-        let el = this.$children[0].$refs[key]
-        if (el._isVue) {
-          el = el.$el
+        try {
+          let el = this.$children[0].$refs[key]
+          if (el._isVue) {
+            el = el.$el
+          }
+          if (el.classList.contains('alter-on-insane')) {
+            if (insane) {
+              el.classList.add('insane')
+            }
+            else {
+              el.classList.remove('insane')
+            }
+          }
+          else if (el.classList.contains('invert-on-insane')) {
+            if (insane) {
+              el.classList.add('text-light')
+            }
+            else {
+              el.classList.remove('text-light')
+            }
+          }
+          else if (el.classList.contains('hide-on-insane')) {
+            if (insane) {
+              el.style.visibility = 'hidden'
+            }
+            else {
+              el.style.visibility = 'visible'
+            }
+          }
         }
-        if (el.classList.contains('alter-on-insane')) {
-          if (insane) {
-            el.classList.add('insane')
-          }
-          else {
-            el.classList.remove('insane')
-          }
-        }
-        else if (el.classList.contains('invert-on-insane')) {
-          if (insane) {
-            el.classList.add('text-light')
-          }
-          else {
-            el.classList.remove('text-light')
-          }
-        }
-        else if (el.classList.contains('hide-on-insane')) {
-          if (insane) {
-            el.style.visibility = 'hidden'
-          }
-          else {
-            el.style.visibility = 'visible'
-          }
+        catch (e) {
+          console.log(e.message)
         }
       }
     }
