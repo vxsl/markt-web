@@ -110,6 +110,7 @@ export default {
   mounted() {
     window.addEventListener('load', () => {
       this.loading = false
+      this.toast('Warning', 'Please note that this project is still a WIP, and many features are still missing.')
     })
   },
   methods: {
