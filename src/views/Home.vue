@@ -13,13 +13,17 @@
       <div v-if="!loading" id="page" ref="page">
         <div class="sidebar">          
           <div class="inner-sidebar bg-dark text-light">
-            <p class="lead table-title">BANK</p>
-            <p class="table-sub">A summary of your finances is shown here.</p>
-            <hr class="bg-light">
-            <BankTable :positions='positions' :stocks='stocks' :bank="bank" :stats="bankStats"/>
-            <p class="lead table-title">POSITIONS</p>
-            <p class="table-sub">A summary of your positions is shown here.</p>
-            <hr class="bg-light">
+            <div id="bank">
+              <p class="lead table-title">BANK</p>
+              <p class="table-sub">A summary of your finances is shown here.</p>
+              <hr class="bg-light">
+              <BankTable :positions='positions' :stocks='stocks' :bank="bank" :stats="bankStats"/>
+            </div>
+            <div id="positions">
+              <p class="lead table-title">POSITIONS</p>
+              <p class="table-sub">A summary of your positions is shown here.</p>
+              <hr class="bg-light">
+            </div>
             <PositionsTable :positions='positions' :stocks='stocks'/>
           </div>
         </div>
@@ -47,12 +51,8 @@
             </b-navbar>
           </div>
           <div class="stocksGrid">
-            <StockCard v-for="(stock, ticker) in stocks" class="rounded-card bg-light text-dark" :ref="ticker.replace(':', '')+'Chart'" :key="ticker" :ticker="ticker" :stock="stock" :insane="insane" @buy="newPosition" @sell="sellPosition"/>
+            <StockCard v-for="(stock, ticker) in stocks" class="rounded-card bg-light text-dark" :ref="ticker.replace(':', '')+'Chart'" :key="ticker" :ticker="ticker" :stock="stock" :insane="insane" @buy="buyPosition" @sell="sellPosition"/>
             <DummyCard ref="dummy" class="rounded-card bg-light text-dark" @newStock="newStock"/>            
-            <div v-if="true || Object.keys(stocks).length > 0" class="stocks-header">
-              <p class="col-3 stocks-info-text">Click on a stock to purchase some shares.</p>
-              
-            </div>
           </div>
         </div>
       </div>
@@ -113,21 +113,39 @@ export default {
     })
   },
   methods: {
+    toast(title, message, append = false) {
+      this.$bvToast.toast(message, {
+        title: title,
+        toaster: 'b-toaster-bottom-right',
+        solid: true,
+        appendToast: append
+      })
+    },
     newStock(stock) {
-      //this.stocks[stock.ticker] = stock
+      if (this.stocks[stock.ticker]) {
+        this.toast('Error', 'Sorry, you may not add duplicate stocks.')
+        return
+      }
+      else if (Object.keys(this.stocks).length == 0) {
+        this.toast('Nice!', 'Click on a stock to buy some shares.')
+      }
       this.$set(this.stocks, stock.ticker, stock)
       this.$refs.dummy.stopLoading()
     },
-    newPosition(ticker, quantity) {
+    buyPosition(ticker, quantity) {
       this.$set(this.positions, ticker, {'quantity':quantity, 'sold':false})
       let ref = ticker.replace(':', '') + 'Chart'
       console.dir(this.$refs[ref])
-      this.bank.balance -= this.stocks[ticker].price.current * quantity
+      let amount = this.stocks[ticker].price.current * quantity
+      this.bank.cash -= amount
+      this.bank.positions += amount
       this.$refs[ref][0].$children[0].draw()
     },
     sellPosition(ticker) {
       console.log('sell ' + this.stocks[ticker].price.current + " * " + this.positions[ticker].quantity)
-      this.bank.balance += this.stocks[ticker].price.current * this.positions[ticker].quantity
+      let amount = this.stocks[ticker].price.current * this.positions[ticker].quantity
+      this.bank.cash += amount
+      this.bank.positions -= amount
       this.$set(this.positions, ticker, {'quantity':0, 'sold':true})
     },
     toggleInsane(insane) {
@@ -192,7 +210,7 @@ export default {
     position:relative;
     user-select:text;
     border:solid;
-    border-left:none;
+    border-top:none;
     border-bottom-left-radius:1em;
     border-bottom-right-radius:1em;
     border-width: 1px;
@@ -214,7 +232,6 @@ export default {
     height:100%;
     border-top-right-radius:1em;
     border-bottom-right-radius:1em;
-
     padding:1em;
     p {
       margin-bottom:0;
@@ -234,6 +251,9 @@ export default {
         text-align:left;
         vertical-align:middle
       }
+    }
+    #positions {
+      margin-top:2em;
     }
   }
 }

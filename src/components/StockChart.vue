@@ -2,6 +2,7 @@
 import { Line } from 'vue-chartjs'
 import '@taeuk-gang/chartjs-plugin-streaming';
 const { log } = require('@/js/log.js')
+import colors from '@/scss/custom.scss'
 
 export default {
   data() {
@@ -16,6 +17,8 @@ export default {
     stock: {
 
     },
+    quantity: Number,
+    initPrice: Number,
     plugins: [{
         /* Adjust label font size according to chart size */
             beforeDraw: function(c) {
@@ -24,13 +27,46 @@ export default {
             //streaming: 30
         }],
   },
+  computed: {
+    status() {
+      let diff = this.stock.price.current - this.initPrice
+      if (diff > 0) {
+        return 2
+      }
+      else if (diff == 0) {
+        return 1
+      }
+      else if (diff < 0) {
+        return 0
+      }
+      return 0
+    }
+  },
+  watch: {
+    bought(boughtVal) {
+      if (boughtVal) {
+        this.draw(1)
+      }
+      else {
+        this.draw()
+      }
+    },
+    status(newStatus) {
+      this.draw(newStatus)
+    }
+  },
   methods: {
     async updateEvaluate() {
       let p = this.stock
       
       let newQuote = await p.quoter.quote()
       if (this.insane) {
-        newQuote.data.stocks[0].price += Math.random()
+        if (Math.random() > 0.5) {
+          newQuote.data.stocks[0].price += Math.random()
+        }
+        else {
+          newQuote.data.stocks[0].price -= Math.random()
+        }
       }
       let newTimestamp = Date.parse(newQuote.generatedTimestamp).toString()
 
@@ -64,16 +100,26 @@ export default {
       }
       p.lock = 0
     },
-    draw() {
+    draw(statusCode=-1) {
+      console.log("HERE " + statusCode)
+      let mainColour
+      switch (statusCode) {
+        case -1:
+          mainColour = colors.darkColor
+          break
+        case 0:
+          mainColour = colors.dangerColor
+          break
+        case 1: 
+          mainColour = colors.primaryColor
+          break
+        case 2:
+          mainColour = colors.positiveColor
+          break
+      }
       const updateEvaluate = this.updateEvaluate
       const p = this.stock
-      let mainColour
-      if (this.bought) {
-        mainColour = '#370aff'
-      }
-      else {
-        mainColour = '#2E282A'
-      }    
+      
       this.renderChart(
         // data:
         {
@@ -141,7 +187,8 @@ export default {
                   },
                   ticks: {
                       //suggestedMin: 0,
-                      maxTicksLimit: 4
+                      maxTicksLimit: 4,
+                      fontColor:mainColour
                   }
               }]
           }

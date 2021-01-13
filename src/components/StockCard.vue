@@ -1,18 +1,17 @@
 <template>
-  <div class="chart-container-container">
+  <div class="chart-outer-container">
     <div ref="overlay" id="stock-overlay" @click="buyOrSell">
       <p ref="buySellLabel" class="buy-sell-label lead">{{ bought ? "SELL" : "BUY" }}</p>
       <form ref="quantityInputContainer" class="quantity-input-container" @submit.prevent="buy">
-        <input required type="number" ref="quantityInput" name="quantity-input" min="1" max="1000" @change="getTentativePurchasePrice">
-        <input type="submit" value="Buy" ref="quantitySubmit">
+        <input required v-model="quantity" type="number" name="quantity-input" value="1" min="1" max="1000">
+        <input type="submit" :value="quantityMessage" ref="quantitySubmit">
       </form>
     </div>
     <div ref="chartContainer" class="chart-container">
       <div class="chart-extlabel">
-        <h2>{{ ticker }}</h2>
+      <h2>{{ ticker }}</h2>
       </div>
-      <!-- <canvas></canvas> -->
-      <StockChart :stock="stock" :bought="bought" :insane="insane" />
+      <StockChart :stock="stock" :initPrice="initPrice" :bought="bought" :quantity="quantity" :insane="insane" />
     </div>
   </div>
 </template>
@@ -24,7 +23,8 @@ export default {
   data() {
     return {
       bought: false,
-      quantity: Number,
+      quantity: 1,
+      initPrice: Number
     };
   },
   props: {
@@ -32,19 +32,24 @@ export default {
     stock: {},
     insane: Boolean,
   },
+  computed: {
+    quantityMessage() {
+      let result = 'BUY ' + this.quantity + ' SHARE'
+      this.quantity > 1? result += 'S' : null
+      result += ' ' + this.ticker + ' [$' 
+      result += parseFloat(this.quantity * this.stock.price.current).toFixed(2)
+      result += ']'
+      return result
+    }
+  },
   components: {
     StockChart,
   },
   created() {
+    this.initPrice = this.stock.price.current
     this.$emit("newStockCard", this);
   },
   methods: {
-    getTentativePurchasePrice() {
-      let result = 'Buy [$' 
-      result += parseFloat(this.$refs.quantityInput.value * this.stock.price.current).toFixed(2)
-      result += ']'
-      this.$refs.quantitySubmit.value = result
-    },
     buyOrSell() {
       if (this.bought) {
         this.sell()
@@ -56,7 +61,7 @@ export default {
       }
     },
     buy() {
-      this.$emit('buy', this.ticker, this.$refs.quantityInput.value)
+      this.$emit('buy', this.ticker, this.quantity)
       this.bought = true
       this.$refs.buySellLabel.style.display = "block"
       this.$refs.quantityInputContainer.style.display = "none"
@@ -157,8 +162,6 @@ canvas {
       margin:5%;
     }
   }
-  
-
 }
 
 
