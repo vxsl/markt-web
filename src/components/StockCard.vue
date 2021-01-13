@@ -71,7 +71,55 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
+<style lang="scss">
+@import "@/scss/custom.scss";
+
+canvas {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+.chart-outer-container {
+    position:relative;
+    width:20%;
+    margin:1em;
+    user-select:none;
+}
+.chart-container{
+    overflow:hidden;
+    height:100%;
+    padding:1em;
+
+    /*
+    width: 500px;
+    margin-left: 40px;
+    margin-right: 40px;
+    margin-bottom: 40px;*/
+    /* box-sizing:border-box; */
+    border:solid;
+    border-color:rgb(61,61,61);
+    border-width:1px;
+    border-radius: 1em;
+}
+
+.chart-extlabel {
+    width:100%;
+    color:rgb(1,61,61);
+    padding-bottom:1%;
+    margin-bottom:0.6em;
+    padding-top:1%;
+    text-align:right;
+    border-bottom:solid;
+    border-bottom-width:1px
+}
+.chart-extlabel > h2 {
+    font-size:1vw;
+    vertical-align:middle;
+    padding-right:10%;
+    padding-top:2%;
+    padding-bottom:1%;
+    margin:0;
+}
 
 #stock-overlay {
   user-select: none;
@@ -86,7 +134,7 @@ export default {
   p {
     font-size:1.5em;
     user-select: none;
-    color: theme-color("dark");
+    color: $dark-color;
     margin-bottom: 0 !important;
   }
   .buy-sell-label {

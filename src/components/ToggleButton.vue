@@ -72,7 +72,7 @@ https://codepen.io/mallendeo/pen/eLIiG */
     border-radius:0.5em;
     border:solid;
     border-width:1px;
-    border-color:theme-color('dark');
+    border-color:$dark-color;
     backface-visibility: hidden;
     transition: all 0.2s ease;
     background: transparent;
@@ -105,8 +105,8 @@ https://codepen.io/mallendeo/pen/eLIiG */
   }
 
   &:checked + .tgl-btn {
-    background:theme-color("primary");
-    color:theme-color("light");
+    background:$primary-color;
+    color:$light-color;
     &:before {
         display:none;
       opacity:0;

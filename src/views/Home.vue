@@ -153,7 +153,7 @@ export default {
 }
 
 .spinner-splash {
-  background:theme-color("dark");
+  background:$dark-color;
   user-select:none;
   flex-wrap:wrap;
   .spinner-inner-container {
@@ -247,52 +247,6 @@ export default {
 }
 
 
-canvas {
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-}
-.chart-container-container {
-    position:relative;
-    width:20%;
-    margin:1em;
-    user-select:none;
-}
-.chart-container{
-    overflow:hidden;
-    height:100%;
-    padding:1em;
-
-    /*
-    width: 500px;
-    margin-left: 40px;
-    margin-right: 40px;
-    margin-bottom: 40px;*/
-    /* box-sizing:border-box; */
-    border:solid;
-    border-color:rgb(61,61,61);
-    border-width:1px;
-    border-radius: 1em;
-}
-
-.chart-extlabel {
-    width:100%;
-    color:rgb(1,61,61);
-    padding-bottom:1%;
-    margin-bottom:0.6em;
-    padding-top:1%;
-    text-align:right;
-    border-bottom:solid;
-    border-bottom-width:1px
-}
-.chart-extlabel > h2 {
-    font-size:1vw;
-    vertical-align:middle;
-    padding-right:10%;
-    padding-top:2%;
-    padding-bottom:1%;
-    margin:0;
-}
 .stocksGrid {
   float:right;
   display: flex;
@@ -305,18 +259,6 @@ canvas {
   border-bottom-right-radius:0 !important;
   .rounded-card {
     border-radius:1em
-  }
-  .stocks-header {
-    margin-top:1em;
-    font-size:1em;
-    .stocks-info-text {
-      padding:1em;
-      display:inline-block;
-      padding-bottom:0;
-      user-select:none;
-    }
-    width:100%;
-    display:block;
   }
 }
 #options {
@@ -374,7 +316,7 @@ canvas {
 }
 
 .nav-link {
-  color:theme-color("primary") !important;
+  color:$primary-color !important;
 }
 
 a:hover {

@@ -57,10 +57,10 @@ export default {
         font-style:italic
     }
     .gain {
-        color:theme-color('positive');
+        color:$positive-color;
     }
     .loss {
-        color:theme-color('danger');
+        color:$danger-color;
     }
     table {
         margin-top:1em;

@@ -1,5 +1,5 @@
 <template>
-  <div class="chart-container-container">
+  <div class="chart-outer-container">
     <div ref="overlay" id="dummy-overlay" @click="initStock">
       <p ref="plus" v-show="!selecting">+</p>
       <div class="autocomplete-container">
@@ -82,6 +82,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+@import "@/scss/custom.scss";
 @import "../scss/autocomplete-custom.css";
 
 .loading {
@@ -124,7 +125,7 @@ export default {
   p {
     user-select: none;
     display: block !important;
-    color: theme-color("dark");
+    color: $dark-color;
     position: absolute;
     font-size: 5em;
     margin-bottom:0 !important;

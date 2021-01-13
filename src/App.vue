@@ -54,14 +54,16 @@ export default {
 
 <style lang="scss">
 @import '@/scss/custom.scss';
+
 #app {
   font-family: Inconsolata, Courier, monospace;
+  min-width:100vw;
   letter-spacing:0.001em;
   transition: background 1s;
 }
 
 #app.insane {
-  background:theme-color('insane') !important;
+  background:$dark-color !important;
 }
 
 .hide-on-insane {
@@ -81,14 +83,14 @@ export default {
 
 @keyframes colorchange
 {
-  0%    {color: theme-color('light');}
-  100%  {color: theme-color('dark');}
+  0%    {color: $light-color;}
+  100%  {color: $dark-color;}
 }
 
 @-webkit-keyframes colorchange 
 {
-  0%    {color: theme-color('light');}
-  100%  {color: theme-color('dark');}
+  0%    {color: $light-color;}
+  100%  {color: $dark-color;}
 }
 
 
