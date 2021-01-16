@@ -30,12 +30,7 @@ export default {
         closeable: Boolean
     },
     mounted() {
-        let closeFn = this.close
-        document.addEventListener("keyup", function(event) {
-            if (event.keyCode == 27) {  // esc
-                closeFn()
-            }
-        });
+        document.addEventListener("keyup", this.close);
     },
     methods: {
         close() {
