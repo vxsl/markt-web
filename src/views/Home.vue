@@ -11,7 +11,7 @@
     </transition>
     <Modal v-for="(dialog, title) in modals" :key="title" :closeable="dialog.closeable" :title="title" :message="dialog.message" @done="$delete(modals, title)"/>
     <transition name="fade">
-      <div v-if="!loading && !mobile" id="page" ref="page">
+      <div v-if="!loading && screenSize != 'mobile'" id="content" :class="screenSize">
         <div class="sidebar">          
           <div class="inner-sidebar bg-dark text-light">
             <div id="bank">
@@ -99,8 +99,19 @@ export default {
     }
   },
   computed: {
-    mobile() {
-      return screen.width <= 760? true : false
+    screenSize() {
+      if (screen.width > 2400) {
+        return 'xl'
+      }
+      else if (screen.width > 2000) {
+        return 'l'
+      }
+      else if (screen.width > 760) {
+        return 'm'
+      }
+      else {
+        return 'mobile'
+      }
     },
     bankStats() {
       let balance = this.bank.cash + this.bank.positions
@@ -117,10 +128,10 @@ export default {
   mounted() {
     window.addEventListener('load', () => {
       this.loading = false
-      if (!this.mobile) {
+      if (this.screenSize != 'mobile') {
         this.$set(this.modals, 'Welcome to markt!', 
           {
-            message:"Try buying and selling some stocks.\n\nMarket data is retrieved using <a href=https://github.com/vxsl/bnnbloomberg-markets-api>my unofficial Javascript wrapper for BNN Bloomberg's market data API</a>.\n\nIf you find the real stock market boring, you can disable boring mode and give insane mode a try...",
+            message:"Try buying and selling some stocks. If you find the real stock market boring, you can disable boring mode and give insane mode a try...\n\nMarket data is retrieved using <a href=https://github.com/vxsl/bnnbloomberg-markets-api>my unofficial Javascript wrapper for BNN Bloomberg's market data API</a>.\nNote that although they advertise their quote data as realtime, in practice it is unfortunately not always reliable.\n\nAt this time, mostly Canadian stocks are available.",
             closeable:true
           })
         this.toast('Warning', 'Please note that this project is still a WIP, and many features are still missing.')
@@ -183,7 +194,11 @@ export default {
 @import '@/scss/custom.scss';
 @import '@/scss/animations.scss';
 
-
+#content {
+  &.xl {
+    font-size:1.15em;
+  }
+}
 
 .fade-enter-active {
   transition: opacity 2s
