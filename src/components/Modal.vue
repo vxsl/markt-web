@@ -18,7 +18,7 @@
             </div>
         </div>
         </div>
-        <div class="modal-backdrop fade show" ref="modalBackdrop"></div>
+        <div class="modal-backdrop fade show" ref="modalBackdrop" @click="close"></div>
     </div>
 </template>
 
@@ -29,14 +29,30 @@ export default {
         message: String,
         closeable: Boolean
     },
+    mounted() {
+        let closeFn = this.close
+        document.addEventListener("keyup", function(event) {
+            if (event.keyCode == 27) {  // esc
+                closeFn()
+            }
+        });
+    },
     methods: {
         close() {
-            this.$refs.modal.classList.remove('show')
-            this.$refs.modal.style.display = "none"
-            this.$refs.modalBackdrop.classList.remove('show')
-            this.$refs.modalBackdrop.style.display = "none"
-            this.$emit('done', this.title)
+            if (this.closeable) {
+                this.$refs.modal.classList.remove('show')
+                this.$refs.modal.style.display = "none"
+                this.$refs.modalBackdrop.classList.remove('show')
+                this.$refs.modalBackdrop.style.display = "none"
+                this.$emit('done', this.title)
+            }
         }
     }
 }
 </script>
+
+<style lang="scss" scoped>
+.modal {
+    user-select:none;
+}
+</style>
