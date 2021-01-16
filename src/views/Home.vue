@@ -9,7 +9,7 @@
         </div>
       </div>
     </transition>
-    <Modal v-for="(dialog, title) in modals" :key="title" :closeable="dialog.closeable" :title="title" :message="dialog.message" @done="$delete(modals, title)"/>
+    <Modal v-for="(dialog, title) in modals" :key="title" :closeable="dialog.closeable" :title="title" :message="dialog.message" @done="destroyModal"/>
     <transition name="fade">
       <div v-if="!loading && screenSize != 'mobile'" id="content" :class="screenSize">
         <div class="sidebar">          
@@ -146,6 +146,9 @@ export default {
     })
   },
   methods: {
+    destroyModal(title) {
+      this.$delete(this.modals, title)
+    },
     toast(title, message, append = false) {
       this.$bvToast.toast(message, {
         title: title,

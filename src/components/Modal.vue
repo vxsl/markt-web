@@ -39,6 +39,7 @@ export default {
                 this.$refs.modal.style.display = "none"
                 this.$refs.modalBackdrop.classList.remove('show')
                 this.$refs.modalBackdrop.style.display = "none"
+                document.removeEventListener("keyup", this.close);
                 this.$emit('done', this.title)
             }
         }
