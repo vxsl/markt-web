@@ -10,7 +10,6 @@
                 </button>
             </div>
             <div class="modal-body" style="white-space: pre-line" v-html="message">
-                <!-- {{message}} -->
             </div>
             <div v-if="closeable" class="modal-footer">
                 <button type="button" class="btn btn-primary" @click="close">OK</button>
@@ -31,8 +30,16 @@ export default {
     },
     mounted() {
         document.addEventListener("keyup", this.close);
+        document.addEventListener("click", this.handleClick)
     },
     methods: {
+        handleClick(event) {
+            if (event.target.className != 'modal-body'
+                && event.target.className != 'modal-header'
+                && event.target.className != 'modal-footer') {
+                    this.close()
+            }
+        },
         close() {
             if (this.closeable) {
                 this.$refs.modal.classList.remove('show')
@@ -40,6 +47,7 @@ export default {
                 this.$refs.modalBackdrop.classList.remove('show')
                 this.$refs.modalBackdrop.style.display = "none"
                 document.removeEventListener("keyup", this.close);
+                document.removeEventListener("click", this.handleClick);
                 this.$emit('done', this.title)
             }
         }
