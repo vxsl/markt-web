@@ -27,6 +27,9 @@ export default {
       initPrice: Number
     };
   },
+  components: {
+    StockChart,
+  },
   props: {
     ticker: String,
     stock: {},
@@ -69,9 +72,6 @@ export default {
       }
     }
   },
-  components: {
-    StockChart,
-  },
   created() {
     this.$emit("newStockCard", this);
   },
@@ -103,6 +103,9 @@ export default {
         this.$refs.buySellLabel.style.display = "block"
         this.$refs.quantityInputContainer.style.display = "none"
         this.$refs.chartContainer.style.filter = 'none'
+        this.$refs.outerContainer.classList.remove('inactive')
+        this.$refs.outerContainer.classList.add('active')
+        this.$refs.outerContainer.classList.add('neutral')
       }
       else {
         this.$emit('toast', 'Not enough cash', "Sorry, you don't have enough cash to purchase " + this.quantity + " shares of " + this.stock.ticker + ".")
@@ -152,9 +155,13 @@ canvas {
     -ms-user-select: none;
 }
 .chart-outer-container {
-  border-radius:1em;
+  border-radius:0.5em;
   &.inactive {
+    animation: none;
+    -webkit-animation: none;
     .chart-container{
+      border:solid;
+      border-width:1px;
       border-color:$dark-color;
       .chart-extlabel {
         color:$dark-color;
@@ -170,8 +177,8 @@ canvas {
     }
   }
   &.active {
-    animation: pulse-animation 1s infinite; 
-    -webkit-animation: pulse-animation 1s infinite alternate;
+    animation: pulse-animation 1s infinite !important; 
+    -webkit-animation: pulse-animation 1s infinite alternate !important;
     .chart-container{
         border:none;
         .chart-extlabel {
@@ -211,7 +218,8 @@ canvas {
   margin:1em;
   user-select:none;
   .chart-container{
-    border-radius:1em;
+    transition: filter 0.5s;
+    border-radius:0.5em;
     overflow:hidden;
     height:100%;
     padding:1em;
@@ -263,7 +271,6 @@ canvas {
   }
   &:hover + .chart-container {
     filter:blur(0.1em) !important;
-
   }  
   .quantity-input-container {
     display:none;
