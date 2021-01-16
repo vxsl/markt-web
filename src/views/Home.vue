@@ -264,18 +264,15 @@ export default {
   left:0;
   width:30vw;
   height:100vh !important;
-  padding:2vh;
-  padding-right:0;
-  padding-left:0;
+  padding-bottom:2vh;
   .inner-sidebar {
     position:relative;
     height:100%;
-    border-top-right-radius:1em;
     border-bottom-right-radius:1em;
     padding:1em;
     p {
       margin-bottom:0;
-      text-align:right;
+      text-align:left;
     }
     .table-title {
       font-weight:400;
@@ -321,26 +318,6 @@ export default {
     border-radius:1em
   }
 }
-#options {
-
-  float:right;
-  border:solid;
-  border-width:1px;
-  border-bottom-right-radius:1em;
-  border-bottom-left-radius:1em;
-  border-top:none;
-
-  .option-button {
-    &.insane {
-      -webkit-animation-name: shake;
-      animation-name: shake;
-      -webkit-animation-duration: 1s;
-      animation-duration: 1s;
-      -webkit-animation-fill-mode: both;
-      animation-fill-mode: both;
-    }
-  }
-}
 
 .content {
   width:69vw;
@@ -372,6 +349,32 @@ export default {
   }
   nav {
     padding:0;
+  }
+  
+  #options {
+    padding-top:1em;
+    float:right;
+    border:solid;
+    min-height:20vh;
+    border-width:1px;
+    border-bottom-right-radius:1em;
+    border-bottom-left-radius:1em;
+    border-top:none;
+    border-color:$grey-color;
+    color:$grey-color;
+    .option-button {
+    .tgl-btn {
+      border-color:$grey-color;
+    }
+      &.insane {
+        -webkit-animation-name: shake;
+        animation-name: shake;
+        -webkit-animation-duration: 1s;
+        animation-duration: 1s;
+        -webkit-animation-fill-mode: both;
+        animation-fill-mode: both;
+      }
+    }
   }
 }
 
