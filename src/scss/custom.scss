@@ -5,12 +5,25 @@ $primary-color: #370aff;
 $secondary-color:#EF3E36;
 $danger-color:#ff2600;
 $light-color: #f3f3f3;
-$dark-color:#2E282A;
-$grey-color:#7e7e7e;
+$dark-color:#353232;
+$grey-color:#afafaf;
 $light-grey-color:rgb(238, 238, 238);
 $info-color:#3F88C5;
 $positive-color:#a8ff6e;
 $insane-color:#2E282A;
+
+$theme-colors: (
+  "primary": $primary-color,
+  "secondary": $secondary-color,
+  "danger": $danger-color,
+  "light": $light-color,
+  "dark": $dark-color,
+  "grey": $grey-color,
+  "light-grey": $light-grey-color,
+  "info": $info-color,
+  "positive": $positive-color,
+  "insane": $insane-color
+);
 
 :export {
     primaryColor: $primary-color;
