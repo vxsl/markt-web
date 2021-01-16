@@ -1,24 +1,4 @@
-# markt
+# markt-web
+A stock market simulator built with Vue.js and Bootstrap. Please visit https://markt.kylegrimsrudma.nz to try it out. 
 
-## Project setup
-```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+Market data is retrieved using [bnnbloomberg-markets-api](https://github.com/vxsl/bnnbloomberg-markets-api), my unofficial Javascript wrapper for BNN Bloomberg's market data API.
