@@ -1,13 +1,15 @@
-/* credit to https://www.theappguruz.com/tag-tools/web/CSSAnimations/ */
+@import '@/scss/custom.scss';
 
+@keyframes pulse-animation {
+    0% {
+        box-shadow: 0 0 0 0em $light-color;
+    }
+    100% {
+        box-shadow: 0 0 0 0.4em $dark-color;
+    }
+}
 
-/* -webkit-animation-name: shake;
-    animation-name: shake;
-    -webkit-animation-duration: 1s;
-    animation-duration: 1s;
-    -webkit-animation-fill-mode: both;
-    animation-fill-mode: both; */ 
-
+/* shake: credit to https://www.theappguruz.com/tag-tools/web/CSSAnimations/ */
 @-webkit-keyframes shake {
     0%, 100% {
     -webkit-transform: translate3d(0, 0, 0);
