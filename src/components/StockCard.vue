@@ -140,6 +140,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
 @import "@/scss/custom.scss";
+@import "@/scss/animations.scss";
 
 .insane-invert {
   filter:invert(100%) !important;
@@ -151,7 +152,7 @@ canvas {
     -ms-user-select: none;
 }
 .chart-outer-container {
-
+  border-radius:1em;
   &.inactive {
     .chart-container{
       border-color:$dark-color;
@@ -169,8 +170,10 @@ canvas {
     }
   }
   &.active {
+    animation: pulse-animation 1s infinite; 
+    -webkit-animation: pulse-animation 1s infinite alternate;
     .chart-container{
-        border-width:2px;
+        border:none;
         .chart-extlabel {
           h2 {
             font-weight:700;
@@ -179,9 +182,9 @@ canvas {
       }
     &.neutral {
       .chart-container{
-        border-color:$primary-color;
+        border-color:$dark-color;
         .chart-extlabel {
-          color:$primary-color;
+          color:$dark-color;
         }
       }
     }
@@ -208,16 +211,15 @@ canvas {
   margin:1em;
   user-select:none;
   .chart-container{
+    border-radius:1em;
     overflow:hidden;
     height:100%;
     padding:1em;
     padding-top:0.5em;
     padding-bottom:0.5em;
-
     border:solid;
     border-color:$dark-color;
     border-width:1px;
-    border-radius: 1em;
     .chart-extlabel {
       width:100%;
       color:$dark-color;
