@@ -49,7 +49,7 @@ export default {
         case 2:
           return colors.positiveColor
         case 1:
-          return colors.primaryColor
+          return this.insane? colors.lightColor : colors.darkColor
         case 0:
           return colors.dangerColor
         case -1:
