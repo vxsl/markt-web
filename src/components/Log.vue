@@ -13,7 +13,7 @@ const { logEmitter } = require('@/js/log.js')
 export default {
   data() {
     return {
-      messages: ['Welcome to Markt! Try buying and selling some stocks.', '\n', "Market data is retrieved from BNN Bloomberg's realtime API. If you find the real stock market boring, give insane mode a try."]
+      messages: []
     };
   },
   async created() { 

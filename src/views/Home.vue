@@ -9,8 +9,9 @@
         </div>
       </div>
     </transition>
+    <Modal v-for="(dialog, title) in modals" :key="title" :closeable="dialog.closeable" :title="title" :message="dialog.message" @done="$delete(modals, title)"/>
     <transition name="fade">
-      <div v-if="!loading" id="page" ref="page">
+      <div v-if="!loading && !mobile" id="page" ref="page">
         <div class="sidebar">          
           <div class="inner-sidebar bg-dark text-light">
             <div id="bank">
@@ -62,6 +63,7 @@
 
 <script>
 import ToggleButton from '@/components/ToggleButton.vue'
+import Modal from '@/components/Modal.vue'
 import Log from '@/components/Log.vue'
 import Clock from '@/components/Clock.vue'
 import StockCard from '@/components/StockCard.vue'
@@ -79,22 +81,27 @@ export default {
     Clock,
     ToggleButton,
     PositionsTable,
-    BankTable
+    BankTable,
+    Modal
   },
   data() {
-        return {
-          loading: true,
-          positions: {},
-          stocks: {},
-          insane: false,
-          bank: {            
-            cash:1000.00,
-            positions:0.00,
-            totalDeposited:1000.00,
-          }
-        }
+    return {
+      loading: true,
+      positions: {},
+      stocks: {},
+      insane: false,
+      bank: {            
+        cash:1000.00,
+        positions:0.00,
+        totalDeposited:1000.00,
+      },
+      modals: {}
+    }
   },
   computed: {
+    mobile() {
+      return screen.width <= 760? true : false
+    },
     bankStats() {
       let balance = this.bank.cash + this.bank.positions
       let diff = balance - this.bank.totalDeposited
@@ -110,7 +117,21 @@ export default {
   mounted() {
     window.addEventListener('load', () => {
       this.loading = false
-      this.toast('Warning', 'Please note that this project is still a WIP, and many features are still missing.')
+      if (!this.mobile) {
+        this.$set(this.modals, 'Welcome to markt!', 
+          {
+            message:"Try buying and selling some stocks.\n\nMarket data is retrieved using <a href=https://github.com/vxsl/bnnbloomberg-markets-api>my wrapper for BNN Bloomberg's market data API</a>.\n\nIf you find the real stock market boring, you can disable boring mode and give insane mode a try...",
+            closeable:true
+          })
+        this.toast('Warning', 'Please note that this project is still a WIP, and many features are still missing.')
+      }
+      else {
+        this.$set(this.modals, 'Welcome to markt!', 
+          {
+            message:"Unfortunately this webapp has not yet been optimized for mobile use. Please visit again on a larger display.",
+            closeable:false
+          })
+      }
     })
   },
   methods: {
