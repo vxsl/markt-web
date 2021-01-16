@@ -31,12 +31,20 @@ export default {
               el.classList.remove('insane')
             }
           }
-          else if (el.classList.contains('invert-on-insane')) {
+          else if (el.classList.contains('light-text-on-insane')) {
             if (insane) {
               el.classList.add('text-light')
             }
             else {
               el.classList.remove('text-light')
+            }
+          }
+          else if (el.classList.contains('invert-on-insane')) {
+            if (insane) {
+              el.style.filter = 'invert(100%)'
+            }
+            else {
+              el.style.filter = ''
             }
           }
           else if (el.classList.contains('hide-on-insane')) {
@@ -74,10 +82,12 @@ export default {
 .hide-on-insane {
   transition: visibility 0.5s
 }
-.invert-on-insane {
-  transition: color 0.5s
+.light-text-on-insane {
+  transition: color 1s
 }
-
+.invert-on-insane {
+  transition: filter 2s
+}
 .alter-on-insane.insane {
   animation: colorchange 0.5s ease 0.5s infinite; 
   -webkit-animation: colorchange 0.5s ease 0s infinite alternate;

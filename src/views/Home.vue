@@ -32,7 +32,7 @@
           <div id="nav-container" ref="navContainer" fixed="top">
             <b-navbar id="nav" class="d-flex align-items-start">
               <div id="options" class="col-2">
-                <p ref="optionsTitle" class="invert-on-insane">Options</p>
+                <p ref="optionsTitle" class="light-text-on-insane">OPTIONS</p>
                 <ToggleButton action="this.$emit('toggled', this.$refs.toggle.checked)" @toggled="toggleInsane" ref="toggleInsane" class="option-button alter-on-insane" onText="Insane mode" offText="Boring mode" />
 
               </div>
@@ -53,7 +53,7 @@
           </div>
           <div class="stocksGrid">
             <StockCard v-for="(stock, ticker) in stocks" class="rounded-card" :ref="ticker.replace(':', '')+'Chart'" :key="ticker" :ticker="ticker" :stock="stock" :insane="insane" :bank="bank" @buy="buyPosition" @sell="sellPosition" @toast="childToast"/>
-            <DummyCard ref="dummy" class="rounded-card bg-light text-dark" @newStock="newStock"/>            
+            <DummyCard id="dummy" ref="dummy" class="rounded-card bg-light text-dark invert-on-insane" @newStock="newStock"/>            
           </div>
         </div>
       </div>
