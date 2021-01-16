@@ -1,8 +1,9 @@
 <script>
 import { Line } from 'vue-chartjs'
 import '@taeuk-gang/chartjs-plugin-streaming';
+import colors from '@/scss/custom.scss'
 
-const MAINCOLOR = 'rgb(61,61,61)'
+const MAINCOLOR = colors.darkColor
 const SECONDARYCOLOR = MAINCOLOR
 export default {
   name: 'DummyChart',
@@ -59,7 +60,8 @@ export default {
                 },
                 ticks: {
                     //suggestedMin: 0,
-                    maxTicksLimit: 4
+                    maxTicksLimit: 4,
+                    fontColor:MAINCOLOR
                 }
             }]
         }
