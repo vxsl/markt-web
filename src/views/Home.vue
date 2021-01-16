@@ -120,7 +120,7 @@ export default {
       if (!this.mobile) {
         this.$set(this.modals, 'Welcome to markt!', 
           {
-            message:"Try buying and selling some stocks.\n\nMarket data is retrieved using <a href=https://github.com/vxsl/bnnbloomberg-markets-api>my wrapper for BNN Bloomberg's market data API</a>.\n\nIf you find the real stock market boring, you can disable boring mode and give insane mode a try...",
+            message:"Try buying and selling some stocks.\n\nMarket data is retrieved using <a href=https://github.com/vxsl/bnnbloomberg-markets-api>my unofficial Javascript wrapper for BNN Bloomberg's market data API</a>.\n\nIf you find the real stock market boring, you can disable boring mode and give insane mode a try...",
             closeable:true
           })
         this.toast('Warning', 'Please note that this project is still a WIP, and many features are still missing.')
