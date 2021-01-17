@@ -51,8 +51,9 @@
               </div>
             </b-navbar>
           </div>
-          <div class="stocksGrid">
-            <StockCard v-for="(stock, ticker) in stocks" class="rounded-card" :ref="ticker.replace(':', '')+'Chart'" :key="ticker" :ticker="ticker" :stock="stock" :insane="insane" :bank="bank" @buy="buyPosition" @sell="sellPosition" @toast="toast"/>
+          <div class="stocks-grid">
+            <StockCard v-for="(stock, ticker) in stocks" class="stock-card" :ref="ticker.replace(':', '')+'Chart'" :key="ticker" :ticker="ticker" :stock="stock" :insane="insane" :bank="bank" @buy="buyPosition" @sell="sellPosition" @toast="toast"/>
+            <DummyCard id="dummy" ref="dummy" class="bg-light text-dark invert-on-insane" :prompt="dummyPrompt" @clicked="dummyPrompt = false" @newStock="newStock"/>            
           </div>
         </div>
       </div>
@@ -94,7 +95,8 @@ export default {
         positions:0.00,
         totalDeposited:1000.00,
       },
-      modals: {}
+      modals: {},
+      dummyPrompt: false
     }
   },
   computed: {
@@ -159,6 +161,10 @@ export default {
             this.toast("Market closed", message, true)
           }, 1000)
         }
+
+        setTimeout(() => {
+          this.dummyPrompt = true
+        }, 3000)
       }
     },
     toast(title, message, noAutoHide = false) {

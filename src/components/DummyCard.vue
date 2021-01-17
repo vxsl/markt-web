@@ -1,7 +1,8 @@
 <template>
   <div class="chart-outer-container">
-    <div ref="overlay" id="dummy-overlay" @click="initStock">
-      <p ref="plus" v-show="!selecting">+</p>
+    <div ref="overlay" id="dummy-overlay" @click="handleClick">
+      <p ref="plus" id="plus" v-if="!selecting && !prompt">+</p>
+      <p id="prompt" v-if="prompt && !selecting">Click here to select your first stock.</p>
       <div class="autocomplete-container">
         <AutocompleteWrapper
           v-if="selecting"
@@ -42,7 +43,8 @@ export default {
       }
   },
   props: {
-    ticker: String,    
+    ticker: String,   
+    prompt: Boolean
   },
   components: {
       DummyChart,
@@ -57,24 +59,21 @@ export default {
           this.$emit('newStock', newStock)
           this.selecting = false
         }
-        catch {
-          // handle error (get message?)
-          alert('There was an error creating that position.')
+        catch (e) {
+          alert('There was an error initializing ' + input + '.\n\n' + e)
         }
       },
-      initStock() {
+      handleClick() {
+        this.$emit('clicked')
         this.selecting = true;
-
       },
       startLoading() {
         this.$refs.overlay.style.cursor = 'wait'
         this.$refs.loading.style.display = 'block'
-        this.$refs.plus.style.opacity = '0'
       },
       stopLoading() {
         this.$refs.overlay.style.cursor = 'pointer'
         this.$refs.loading.style.display = 'none'
-        this.$refs.plus.style.opacity = '1'
       },
   }
 }
@@ -139,8 +138,7 @@ export default {
   z-index: 2;
   border:solid;
   border-width:1px;
-
-  border-radius: 1em;
+  border-radius: 0.5em;
   /* border:solid;
   border-width:1px; */
   width: 100%;
@@ -150,13 +148,20 @@ export default {
   align-items: center;
   cursor: pointer;
 
-  p {
+  #plus {
     user-select: none;
     display: block !important;
     color: $dark-color;
     position: absolute;
     font-size: 5em;
     margin-bottom:0 !important;
+  }
+
+  #prompt {
+    position:absolute;
+    margin:1em;
+    text-align:center;
+    font-weight:700;
   }
 
 
