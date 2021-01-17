@@ -1,11 +1,29 @@
 @import '@/scss/custom.scss';
 
+@keyframes negative-pulse-animation {
+    0% {
+        box-shadow: 0 0 0 0em $light-color;
+    }
+    100% {
+        box-shadow: 0 0 0 0.2em $danger-color;
+    }
+}
+
+@keyframes positive-pulse-animation {
+    0% {
+        box-shadow: 0 0 0 0em $light-color;
+    }
+    100% {
+        box-shadow: 0 0 0 0.2em $positive-color;
+    }
+}
+
 @keyframes pulse-animation {
     0% {
         box-shadow: 0 0 0 0em $light-color;
     }
     100% {
-        box-shadow: 0 0 0 0.4em $dark-color;
+        box-shadow: 0 0 0 0.2em $dark-color;
     }
 }
 
