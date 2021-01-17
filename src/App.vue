@@ -1,5 +1,5 @@
-<template>
-  <div id="app" ref="app" :class="insaneClass" class="bg-light min-vh-100">
+<template :class="insaneClass">
+  <div id="app" ref="app" :class="insaneClass">
     <router-view @insane="toggleInsaneClass"/>
   </div>
 </template>
@@ -13,6 +13,7 @@ export default {
   },
   methods: {
     toggleInsaneClass(insane) {
+      insane? document.body.classList.add('insane') : document.body.classList.remove('insane')
       insane? this.insaneClass = 'insane' : this.insaneClass = 'normal'
       this.toggleInsaneClassOnChildren(insane)
     },
@@ -68,15 +69,23 @@ export default {
 <style lang="scss">
 @import '@/scss/custom.scss';
 
+body {
+  width:100%;
+  min-height:100vh;
+  transition: background 1s;
+  background:$light-color;
+  &.insane {
+    background:$dark-color;
+  }
+}
+
 #app {
   font-family: Inconsolata, Courier, monospace;
   min-width:100vw;
   letter-spacing:0.001em;
-  transition: background 1s;
-}
+  min-height:100vh;
+  background:transparent !important;
 
-#app.insane {
-  background:$dark-color !important;
 }
 
 .hide-on-insane {
@@ -86,7 +95,7 @@ export default {
   transition: color 1s
 }
 .invert-on-insane {
-  transition: filter 2s
+  transition: filter 1.5s
 }
 .alter-on-insane.insane {
   animation: colorchange 0.5s ease 0.5s infinite; 
