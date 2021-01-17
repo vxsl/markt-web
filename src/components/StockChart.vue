@@ -17,16 +17,8 @@ export default {
     active: Boolean,
     insane: Boolean,
     stock: {
-
     },
-    quantity: Number,
-    plugins: [{
-        /* Adjust label font size according to chart size */
-            beforeDraw: function(c) {
-              c.options.legend.labels.fontSize = c.chart.height * 0.07;
-            },
-            //streaming: 30
-        }],
+    quantity: Number
   },
   computed: {
     status() {
@@ -49,12 +41,12 @@ export default {
         case 2:
           return colors.positiveColor
         case 1:
-          return this.insane? colors.lightColor : colors.darkColor
+          return this.insane? colors.lightGreyColor : colors.darkGreyColor
         case 0:
           return colors.dangerColor
         case -1:
         default:
-          return colors.darkColor
+          return colors.darkGreyColor
       }
     }
   },
@@ -77,6 +69,11 @@ export default {
     }
   },
   methods: {
+    async updateInfinitely() {
+      for (;;) {
+        await this.updateEvaluate()
+      }
+    },
     async updateEvaluate() {
       let p = this.stock
       
@@ -122,7 +119,6 @@ export default {
       p.lock = 0
     },
     draw() {
-      const updateEvaluate = this.updateEvaluate
       const p = this.stock
       
       this.renderChart(
@@ -130,13 +126,19 @@ export default {
         {
           datasets: [{
               fill:false,
-              borderColor: this.color,
-              lineTension:0,
+              borderColor: this.insane? colors.lightColor : colors.darkColor,
+              borderWidth: 1,
+              lineTension:0.4,
               data: []
           }]
         },  
         // options:  
         {
+          plugins: {
+            streaming: {            
+              refresh:150
+            }
+          },
           events: [],        
           elements: {
               point: {
@@ -167,13 +169,10 @@ export default {
                   type: 'realtime',
                   realtime: {
                       onRefresh: async function(chart) {
-                          await updateEvaluate()
-                          
                           chart.data.datasets[0].data.push({
                               x:Date.now(),
                               y:p.price.current
                           })
-                          chart.data.datasets[0].data = chart.data.datasets[0].data.slice(-10)
 
                           // adjust min/max of the chart if necessary
                           chart.options.scales.yAxes[0].ticks.min = Math.max(0, 0.995*p.price.min);
@@ -199,7 +198,8 @@ export default {
   },
   mounted () {
     this.draw()
-  }
+    this.updateInfinitely()
+  },
 }
 </script>
 
