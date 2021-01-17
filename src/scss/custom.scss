@@ -8,6 +8,7 @@ $light-color: #f3f3f3;
 $dark-color:#353232;
 $grey-color:#afafaf;
 $light-grey-color:rgb(238, 238, 238);
+$dark-grey-color:rgb(136, 136, 136);
 $info-color:#3F88C5;
 $positive-color:#a8ff6e;
 $insane-color:#2E282A;
@@ -32,6 +33,8 @@ $theme-colors: (
     lightColor: $light-color;
     darkColor: $dark-color;
     greyColor: $grey-color;
+    lightGreyColor: $light-grey-color;
+    darkGreyColor: $dark-grey-color;
     infoColor: $info-color;
     positiveColor: $positive-color;
     insaneColor: $insane-color;
