@@ -56,17 +56,15 @@ export default {
       this.$data._chart.options.scales.yAxes[0].gridLines.color = newColor
       this.$data._chart.options.scales.yAxes[0].ticks.fontColor = newColor
       this.$data._chart.options.legend.labels.fontColor = newColor
-      this.$data._chart.update({preservation:true})
       this.$emit('redraw', this.status)
     },
     insane(insaneVal) {
-      if (insaneVal && this.active) {
-        this.$data._chart.config.data.datasets[0].borderColor = colors.lightColor
-      }
-      else {
-        this.$data._chart.config.data.datasets[0].borderColor = colors.darkColor
-      } 
+      this.$data._chart.config.data.datasets[0].borderColor = insaneVal ? colors.lightColor : colors.darkColor
     }
+  },
+  mounted () {
+    this.draw()
+    this.updateInfinitely()
   },
   methods: {
     async updateInfinitely() {
@@ -195,10 +193,6 @@ export default {
       );
       
     },
-  },
-  mounted () {
-    this.draw()
-    this.updateInfinitely()
   },
 }
 </script>

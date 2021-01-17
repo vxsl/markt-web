@@ -61,17 +61,13 @@ export default {
     insane(insaneVal) {
       if (insaneVal) {
         this.$refs.outerContainer.classList.add('insane')
-        if (!this.active) {
-          this.$refs.chart.$el.classList.add('insane-invert')
-          this.$refs.overlay.classList.add('insane-invert')
-        }
+        this.$refs.footerTable.classList.add('text-light')
+        this.$refs.buySellLabel.classList.add('text-light')
       }
       else {
         this.$refs.outerContainer.classList.remove('insane')
-        if (!this.active) {
-          this.$refs.chart.$el.classList.remove('insane-invert')
-          this.$refs.overlay.classList.remove('insane-invert')
-        }
+        this.$refs.footerTable.classList.remove('text-light')
+        this.$refs.buySellLabel.classList.remove('text-light')
       }
     }
   },
@@ -81,8 +77,8 @@ export default {
   mounted() {
     if (this.insane) {
       this.$refs.outerContainer.classList.add('insane')
-      this.$refs.chart.$el.classList.add('insane-invert')
-      this.$refs.overlay.classList.add('insane-invert')
+      this.$refs.footerTable.classList.add('text-light')
+      this.$refs.buySellLabel.classList.add('text-light')
     }
   },
   methods: {
@@ -109,6 +105,7 @@ export default {
         this.$refs.outerContainer.classList.remove('inactive')
         this.$refs.outerContainer.classList.add('active')
         this.$refs.outerContainer.classList.add('neutral')
+        this.insane? this.$refs.footerTable.classList.add('text-light') : null
       }
       else {
         this.$emit('toast', 'Not enough cash', "Sorry, you don't have enough cash to purchase " + this.quantity + " shares of " + this.stock.ticker + ".")
@@ -119,10 +116,6 @@ export default {
       this.active = false
     },
     redraw(newStatus) {
-      if (newStatus != -1) {
-        this.$refs.chart.$el.classList.remove('insane-invert')
-        this.$refs.overlay.classList.remove('insane-invert')
-      }
       this.$refs.outerContainer.classList = 'chart-outer-container '
       switch (newStatus) {
         case 2:
@@ -148,10 +141,6 @@ export default {
 @import "@/scss/custom.scss";
 @import "@/scss/animations.scss";
 
-.insane-invert {
-  filter:invert(100%) !important;
-}
-
 canvas {
     -moz-user-select: none;
     -webkit-user-select: none;
@@ -161,6 +150,14 @@ canvas {
   border-radius:0.5em;
   animation: none !important;
   -webkit-animation: none !important;
+  &.insane, &.inactive.insane, &.active.insane.neutral{
+    .chart-container {
+      border-color:$light-color;
+      .padded > .chart-extlabel {
+        color:$light-color;
+      }
+    } 
+  }
   &.inactive {
     animation: none !important;
     -webkit-animation: none !important;
@@ -170,14 +167,6 @@ canvas {
       border-color:$dark-color;
       .chart-extlabel {
         color:$dark-color;
-      }
-    }
-  }
-  &.inactive.insane {
-    .chart-container{
-      border-color:$light-color;
-      .chart-extlabel {
-        color:$light-color;
       }
     }
   }
@@ -196,9 +185,7 @@ canvas {
       animation: pulse-animation 1s infinite !important; 
       -webkit-animation: pulse-animation 1s infinite alternate !important;
       .chart-container{
-        border-color:$dark-color;
-        .chart-extlabel {
-          color:$dark-color;
+          color:$light-color;
         }
       }
     }
@@ -281,7 +268,7 @@ canvas {
     opacity:1
   }
   &:hover + .chart-container {
-    filter:blur(0.1em) !important;
+    filter:blur(0.2em) !important;
   }  
   .quantity-input-container {
     display:none;
