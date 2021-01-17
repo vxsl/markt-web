@@ -8,10 +8,30 @@
       </form>
     </div>
     <div ref="chartContainer" class="chart-container">
+      <div class="padded">
       <div class="chart-extlabel">
-      <h2>{{ ticker }}</h2>
+        <h2 ref="title">{{ ticker }}</h2>
       </div>
       <StockChart ref='chart' :stock="stock" :initPrice="initPrice" :active="active" :quantity="parseInt(quantity)" @redraw="redraw" :insane="insane" />
+    </div>
+      <div class="chart-footer">
+        <table class="table w-100" ref="footerTable">
+            <tbody>
+                <tr>
+                    <th>VAL.</th>
+                    <td>${{parseFloat(stock.price.current).toFixed(2)}}</td>
+                </tr>
+                <tr v-if="active">
+                    <th>INIT.</th>
+                    <td>${{initPrice}}</td>
+                </tr>
+                <tr v-if="active">
+                    <th>NET</th>
+                    <td :class="statusClass">{{net}}</td>
+                </tr>
+            </tbody>
+        </table>
+  </div>
     </div>
   </div>
 </template>
@@ -24,6 +44,7 @@ export default {
     return {
       active: false,
       quantity: 1,
+      initPrice: Number,
       statusClass: String,
       insaneClass: String
     };
@@ -38,6 +59,18 @@ export default {
     bank: Object
   },
   computed: {
+    net() {
+      let diff = this.stock.price.current - this.initPrice
+      let result = ''
+      if (diff >= 0) {
+        result = "+ $"  
+      }
+      else {
+        result = "- $"
+        diff = -diff
+      }
+      return result += parseFloat(diff * this.quantity).toFixed(2)
+    },
     quantityMessage() {
       let result = 'BUY ' + this.quantity + ' SHARE'
       this.quantity > 1? result += 'S' : null
@@ -94,7 +127,7 @@ export default {
     buy() {
       let tentativePrice = this.stock.price.current * this.quantity
       if (this.bank.cash >= tentativePrice) {
-        this.initPrice = this.stock.price.current
+        this.initPrice = parseFloat(this.stock.price.current).toFixed(2)
         this.$refs.chart.initPrice = this.initPrice
         this.$emit('buy', this.ticker, this.quantity)
         this.active = true
@@ -113,22 +146,22 @@ export default {
     sell() {
       this.$emit('sell', this.ticker)
       this.active = false
+      this.statusClass = 'inactive'
     },
     redraw(newStatus) {
-      this.$refs.outerContainer.classList = 'chart-outer-container '
       switch (newStatus) {
         case 2:
-          this.$refs.outerContainer.classList += 'active positive'
+          this.statusClass = 'active positive'
           break
         case 1:
-          this.$refs.outerContainer.classList += 'active neutral'
+          this.statusClass = 'active neutral'
           break
         case 0:
-          this.$refs.outerContainer.classList += 'active negative'
+          this.statusClass = 'active negative'
           break
         case -1:
         default:
-          this.$refs.outerContainer.classList += 'inactive'
+          this.statusClass = 'inactive'
       }
     }
   }
@@ -164,7 +197,7 @@ canvas {
       border:solid;
       border-width:1px;
       border-color:$dark-color;
-      .chart-extlabel {
+      .padded > .chart-extlabel {
         color:$dark-color;
       }
     }
@@ -174,17 +207,13 @@ canvas {
     -webkit-animation: pulse-animation 1s infinite alternate !important;
     .chart-container{
         border:none;
-        .chart-extlabel {
-          h2 {
-            font-weight:700;
           }
-        }
-      }
     &.neutral {
       animation: pulse-animation 1s infinite !important; 
       -webkit-animation: pulse-animation 1s infinite alternate !important;
       .chart-container{
-          color:$light-color;
+        .padded > .chart-extlabel {
+          color:$dark-color;
         }
       }
     }
@@ -193,7 +222,7 @@ canvas {
       -webkit-animation: negative-pulse-animation 1s infinite alternate !important;
       .chart-container{
         border-color:$danger-color;
-        .chart-extlabel {
+        .padded > .chart-extlabel {
           color:$danger-color;
         }
       }
@@ -203,7 +232,7 @@ canvas {
       -webkit-animation: positive-pulse-animation 1s infinite alternate !important;
       .chart-container{
         border-color:$positive-color;
-        .chart-extlabel {
+        .padded > .chart-extlabel {
           color:$positive-color;
         }
       }
@@ -219,12 +248,9 @@ canvas {
     border-radius:0.5em;
     overflow:hidden;
     height:100%;
+    .padded {
     padding:1em;
     padding-top:0.5em;
-    padding-bottom:0.5em;
-    border:solid;
-    border-color:$dark-color;
-    border-width:1px;
     .chart-extlabel {
       width:100%;
       color:$dark-color;
@@ -237,6 +263,27 @@ canvas {
           font-size:1.3vw;
           vertical-align:middle;
           margin:0;
+      }
+    }
+  }
+    border:solid;
+    border-color:$dark-color;
+    border-width:1px;
+    .chart-footer {
+      table {
+        td.active.positive {
+          color:$positive-color
+}
+        td.active.negative {
+          color:$danger-color
+        }
+        th {
+          font-weight:400;
+        }
+        td {
+          font-weight:700;
+        }
+        margin-bottom:0 !important;
       }
     }
   }
