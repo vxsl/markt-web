@@ -9,11 +9,11 @@
     </div>
     <div ref="chartContainer" class="chart-container">
       <div class="padded">
-      <div class="chart-extlabel">
+        <div class="chart-extlabel">
         <h2 ref="title">{{ ticker }}</h2>
+        </div>
+        <StockChart ref='chart' :stock="stock" :initPrice="initPrice" :active="active" :quantity="parseInt(quantity)" @redraw="redraw" :insane="insane" />
       </div>
-      <StockChart ref='chart' :stock="stock" :initPrice="initPrice" :active="active" :quantity="parseInt(quantity)" @redraw="redraw" :insane="insane" />
-    </div>
       <div class="chart-footer">
         <table class="table w-100" ref="footerTable">
             <tbody>
@@ -31,7 +31,7 @@
                 </tr>
             </tbody>
         </table>
-  </div>
+      </div>
     </div>
   </div>
 </template>
@@ -85,7 +85,6 @@ export default {
       if (activeVal) {
         this.$refs.outerContainer.classList.remove('inactive')
         this.$refs.outerContainer.classList.add('active')
-
       }
       else {
         this.$refs.outerContainer.classList.remove('active')
@@ -94,26 +93,35 @@ export default {
     },
     insane(insaneVal) {
       this.toggleInsaneStyling(insaneVal)
-      }
+    }
   },
   created() {
     this.$emit("newStockCard", this);
   },
   mounted() {
     this.toggleInsaneStyling(this.insane)
+    setTimeout(() => {
+      this.$refs.buySellLabel.style.opacity = 1
+      this.$refs.chartContainer.style.filter = 'blur(0.3em)'
+      setTimeout(() => {
+        this.$refs.buySellLabel.style.opacity = 0
+        this.$refs.chartContainer.style.filter = 'none'
+      }, 1000)
+    }, 1000)
+  },
   methods: {
     toggleInsaneStyling(insaneVal) {
       if (insaneVal) {
         this.insaneClass = 'insane'
-      this.$refs.footerTable.classList.add('text-light')
-      this.$refs.buySellLabel.classList.add('text-light')
-    }
+        this.$refs.footerTable.classList.add('text-light')
+        this.$refs.buySellLabel.classList.add('text-light')
+      }
       else {
         this.insaneClass = ''
         this.$refs.footerTable.classList.remove('text-light')
         this.$refs.buySellLabel.classList.remove('text-light')
       }
-  },
+    },
     buyOrSell() {
       if (this.active) {
         this.sell()
@@ -132,6 +140,7 @@ export default {
         this.$emit('buy', this.ticker, this.quantity)
         this.active = true
         this.$refs.buySellLabel.style.display = "block"
+        this.$refs.buySellLabel.style.opacity = 0
         this.$refs.quantityInputContainer.style.display = "none"
         this.$refs.chartContainer.style.filter = 'none'
         this.$refs.outerContainer.classList.remove('inactive')
@@ -206,8 +215,8 @@ canvas {
     animation: pulse-animation 1s infinite !important; 
     -webkit-animation: pulse-animation 1s infinite alternate !important;
     .chart-container{
-        border:none;
-          }
+      border:none;
+    }
     &.neutral {
       animation: pulse-animation 1s infinite !important; 
       -webkit-animation: pulse-animation 1s infinite alternate !important;
@@ -249,23 +258,23 @@ canvas {
     overflow:hidden;
     height:100%;
     .padded {
-    padding:1em;
-    padding-top:0.5em;
-    .chart-extlabel {
-      width:100%;
-      color:$dark-color;
-      padding-bottom:1%;
-      margin-bottom:0.6em;
-      text-align:right;
-      border-bottom:solid;
-      border-bottom-width:1px;
-      h2 {
-          font-size:1.3vw;
-          vertical-align:middle;
-          margin:0;
+      padding:1em;
+      padding-top:0.5em;
+      .chart-extlabel {
+        width:100%;
+        color:$dark-color;
+        padding-bottom:1%;
+        margin-bottom:0.6em;
+        text-align:right;
+        border-bottom:solid;
+        border-bottom-width:1px;
+        h2 {
+            font-size:1.3vw;
+            vertical-align:middle;
+            margin:0;
+        }
       }
     }
-  }
     border:solid;
     border-color:$dark-color;
     border-width:1px;
@@ -273,7 +282,7 @@ canvas {
       table {
         td.active.positive {
           color:$positive-color
-}
+        }
         td.active.negative {
           color:$danger-color
         }
@@ -309,9 +318,10 @@ canvas {
   .buy-sell-label {
     display:block;
     opacity:0;
+    transition: opacity 0.5s;
   }
   &:hover > .buy-sell-label {
-    opacity:1
+    opacity:1 !important;
   }
   &:hover + .chart-container {
     filter:blur(0.2em) !important;
