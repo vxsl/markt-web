@@ -52,8 +52,7 @@
             </b-navbar>
           </div>
           <div class="stocksGrid">
-            <StockCard v-for="(stock, ticker) in stocks" class="rounded-card" :ref="ticker.replace(':', '')+'Chart'" :key="ticker" :ticker="ticker" :stock="stock" :insane="insane" :bank="bank" @buy="buyPosition" @sell="sellPosition" @toast="childToast"/>
-            <DummyCard id="dummy" ref="dummy" class="rounded-card bg-light text-dark invert-on-insane" @newStock="newStock"/>            
+            <StockCard v-for="(stock, ticker) in stocks" class="rounded-card" :ref="ticker.replace(':', '')+'Chart'" :key="ticker" :ticker="ticker" :stock="stock" :insane="insane" :bank="bank" @buy="buyPosition" @sell="sellPosition" @toast="toast"/>
           </div>
         </div>
       </div>
@@ -134,7 +133,6 @@ export default {
             message:"Try buying and selling some stocks. If you find the real stock market boring, you can disable boring mode and give insane mode a try...\n\nMarket data is retrieved using <a href=https://github.com/vxsl/bnnbloomberg-markets-api>my unofficial Javascript wrapper for BNN Bloomberg's market data API</a>.\nNote that although they advertise their quote data as realtime, in practice it is unfortunately not always reliable.\n\nAt this time, mostly Canadian stocks are available.",
             closeable:true
           })
-        this.toast('Warning', 'Please note that this project is still a WIP, and many features are still missing.')
       }
       else {
         this.$set(this.modals, 'Welcome to markt!', 
@@ -148,17 +146,27 @@ export default {
   methods: {
     destroyModal(title) {
       this.$delete(this.modals, title)
+      if (title == 'Welcome to markt!') {
+        this.toast('Warning', 'Please note that this project is still a work in progress. Features are still missing, and you may encounter bugs.')
+
+        // TODO implement holiday check from https://www.marketbeat.com/stock-market-holidays/canada/
+        let day = new Date().getDay() 
+        if (day == 0 || day == 6) {
+          let message = "Today is "
+          message += (day == 0? 'Sunday' : 'Saturday')
+          message += ", so not much is going to happen until you turn off boring mode..."
+          setTimeout(() => {
+            this.toast("Market closed", message, true)
+          }, 1000)
+        }
+      }
     },
-    toast(title, message, append = false) {
+    toast(title, message, noAutoHide = false) {
       this.$bvToast.toast(message, {
         title: title,
         toaster: 'b-toaster-bottom-right',
-        solid: true,
-        appendToast: append
+        noAutoHide: noAutoHide
       })
-    },
-    childToast(title, message) {
-      this.toast(title, message)
     },
     newStock(stock) {
       if (this.stocks[stock.ticker]) {
