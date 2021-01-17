@@ -1,5 +1,5 @@
 <template>
-  <div ref="outerContainer" class="chart-outer-container">
+  <div ref="outerContainer" class="chart-outer-container" :class="statusClass + ' ' + insaneClass">
     <div ref="overlay" class="stock-overlay" @click="buyOrSell">
       <p ref="buySellLabel" class="buy-sell-label lead">{{ active ? "SELL" : "BUY" }}</p>
       <form ref="quantityInputContainer" class="quantity-input-container" @submit.prevent="buy">
@@ -24,7 +24,8 @@ export default {
     return {
       active: false,
       quantity: 1,
-      initPrice: Number
+      statusClass: String,
+      insaneClass: String
     };
   },
   components: {
@@ -59,29 +60,27 @@ export default {
       }
     },
     insane(insaneVal) {
-      if (insaneVal) {
-        this.$refs.outerContainer.classList.add('insane')
-        this.$refs.footerTable.classList.add('text-light')
-        this.$refs.buySellLabel.classList.add('text-light')
+      this.toggleInsaneStyling(insaneVal)
       }
-      else {
-        this.$refs.outerContainer.classList.remove('insane')
-        this.$refs.footerTable.classList.remove('text-light')
-        this.$refs.buySellLabel.classList.remove('text-light')
-      }
-    }
   },
   created() {
     this.$emit("newStockCard", this);
   },
   mounted() {
-    if (this.insane) {
-      this.$refs.outerContainer.classList.add('insane')
+    this.toggleInsaneStyling(this.insane)
+  methods: {
+    toggleInsaneStyling(insaneVal) {
+      if (insaneVal) {
+        this.insaneClass = 'insane'
       this.$refs.footerTable.classList.add('text-light')
       this.$refs.buySellLabel.classList.add('text-light')
     }
+      else {
+        this.insaneClass = ''
+        this.$refs.footerTable.classList.remove('text-light')
+        this.$refs.buySellLabel.classList.remove('text-light')
+      }
   },
-  methods: {
     buyOrSell() {
       if (this.active) {
         this.sell()
@@ -105,7 +104,7 @@ export default {
         this.$refs.outerContainer.classList.remove('inactive')
         this.$refs.outerContainer.classList.add('active')
         this.$refs.outerContainer.classList.add('neutral')
-        this.insane? this.$refs.footerTable.classList.add('text-light') : null
+        this.toggleInsaneStyling(this.insane)
       }
       else {
         this.$emit('toast', 'Not enough cash', "Sorry, you don't have enough cash to purchase " + this.quantity + " shares of " + this.stock.ticker + ".")
