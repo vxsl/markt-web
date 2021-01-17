@@ -1,5 +1,5 @@
 <template>
-  <div ref="outerContainer" class="chart-outer-container inactive">
+  <div ref="outerContainer" class="chart-outer-container">
     <div ref="overlay" class="stock-overlay" @click="buyOrSell">
       <p ref="buySellLabel" class="buy-sell-label lead">{{ active ? "SELL" : "BUY" }}</p>
       <form ref="quantityInputContainer" class="quantity-input-container" @submit.prevent="buy">
@@ -50,8 +50,11 @@ export default {
     active(activeVal) {
       if (activeVal) {
         this.$refs.outerContainer.classList.remove('inactive')
+        this.$refs.outerContainer.classList.add('active')
+
       }
       else {
+        this.$refs.outerContainer.classList.remove('active')
         this.$refs.outerContainer.classList.add('inactive')
       }
     },
@@ -156,9 +159,11 @@ canvas {
 }
 .chart-outer-container {
   border-radius:0.5em;
+  animation: none !important;
+  -webkit-animation: none !important;
   &.inactive {
-    animation: none;
-    -webkit-animation: none;
+    animation: none !important;
+    -webkit-animation: none !important;
     .chart-container{
       border:solid;
       border-width:1px;
@@ -188,6 +193,8 @@ canvas {
         }
       }
     &.neutral {
+      animation: pulse-animation 1s infinite !important; 
+      -webkit-animation: pulse-animation 1s infinite alternate !important;
       .chart-container{
         border-color:$dark-color;
         .chart-extlabel {
@@ -196,6 +203,8 @@ canvas {
       }
     }
     &.negative {
+      animation: negative-pulse-animation 1s infinite !important; 
+      -webkit-animation: negative-pulse-animation 1s infinite alternate !important;
       .chart-container{
         border-color:$danger-color;
         .chart-extlabel {
@@ -204,6 +213,8 @@ canvas {
       }
     }
     &.positive {
+      animation: positive-pulse-animation 1s infinite !important; 
+      -webkit-animation: positive-pulse-animation 1s infinite alternate !important;
       .chart-container{
         border-color:$positive-color;
         .chart-extlabel {
