@@ -126,6 +126,11 @@ export default {
       }
     },
   },
+  watch: {
+    dummyPromptDismissed() {
+      this.dummyPrompt = false
+    }
+  },
   mounted() {
     window.addEventListener('load', () => {
       this.loading = false
@@ -163,7 +168,9 @@ export default {
         }
 
         setTimeout(() => {
+          if (!this.dummyPromptDismissed) {
           this.dummyPrompt = true
+          }
         }, 3000)
       }
     },

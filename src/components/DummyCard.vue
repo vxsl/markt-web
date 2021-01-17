@@ -1,18 +1,18 @@
 <template>
   <div class="chart-outer-container">
     <div ref="overlay" id="dummy-overlay" @click="handleClick">
-      <p ref="plus" id="plus" v-if="!selecting && !prompt">+</p>
+      <p ref="plus" id="plus" v-if="!selecting && !prompt && !loading">+</p>
       <p id="prompt" v-if="prompt && !selecting">Click here to select your first stock.</p>
       <div class="autocomplete-container">
         <AutocompleteWrapper
-          v-if="selecting"
-          @submit="createPosition"
+          v-if="selecting && !loading"
+          @submit="handleSubmit"
           @quit="selecting = false"
           @loading="startLoading"
         >
         </AutocompleteWrapper>
         <div class="loading" ref="loading">
-          <p>Contacting BNN server...</p>
+          <p>Contacting BNN Bloomberg server...</p>
           <div 
             class="spinner-border" 
             role="status"
@@ -24,7 +24,7 @@
       <div class="chart-extlabel">
         <h2>&#10240; &#x2800;</h2>
       </div>
-      <DummyChart />
+      <DummyChart/>
     </div>
   </div>
 </template>
@@ -37,9 +37,9 @@ const appLink = require('@/js/app/appLink.js')
 export default {
   data() {
       return {
-          link: appLink,
           selecting: false,
-          selected: false
+          selected: false,
+          loading: false
       }
   },
   props: {
@@ -64,7 +64,7 @@ export default {
         }
       },
       handleClick() {
-        this.$emit('clicked')
+      this.$emit('promptDismissed')
         this.selecting = true;
       },
       startLoading() {
@@ -94,6 +94,7 @@ export default {
   }
   p {
     font-size:1em !important;
+    margin-bottom:0;
   }
   div {
     margin-top:20%;
