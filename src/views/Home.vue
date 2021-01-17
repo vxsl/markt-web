@@ -171,6 +171,7 @@ export default {
     newStock(stock) {
       if (this.stocks[stock.ticker]) {
         this.toast('Error', 'Sorry, you may not add duplicate stocks.')
+        this.$refs.dummy.stopLoading()
         return
       }
       else if (Object.keys(this.stocks).length == 0) {
