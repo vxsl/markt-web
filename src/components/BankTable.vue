@@ -13,8 +13,8 @@
                     <td>{{'$' + parseFloat(stats.return.dollar).toFixed(2) + ' (' + parseFloat(stats.return.percent).toFixed(2) + '%)'}}</td>
                 </tr>
                 <tr>
-                    <th>Activity</th>
-                    <td>xxxxxx</td>
+                    <th>Trades</th>
+                    <td>{{bank.trades}}</td>
                 </tr>
             </tbody>
         </table>
