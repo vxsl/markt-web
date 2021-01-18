@@ -6,14 +6,14 @@
                         <th></th>
                         <th>Qty</th>
                         <th>Value</th>
-                        <th>Margin</th>
+                        <th>Net</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr v-for="(position, ticker) in positions" :key="ticker">
                         <td>{{ticker}}</td>
                         <td>{{position.quantity}}</td>
-                        <td>{{parseFloat(stocks[ticker].price.current).toFixed(2)}}</td>
+                        <td>${{parseFloat(position.quantity * stocks[ticker].price.current).toFixed(2)}}</td>
                         <td>{{parseFloat(stocks[ticker].price.max).toFixed(2)}}</td>
                     </tr>
                     </tbody>
