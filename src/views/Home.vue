@@ -9,7 +9,14 @@
         </div>
       </div>
     </transition>
-    <Modal v-for="(dialog, title) in modals" :key="title" :closeable="dialog.closeable" :title="title" :message="dialog.message" @done="destroyModal"/>
+    <Modal 
+      v-for="(dialog, title) in modals" 
+      :key="title" 
+      :closeable="dialog.closeable" 
+      :title="title" 
+      :message="dialog.message" 
+      @done="destroyModal"
+    />
     <transition name="fade">
       <div v-if="!loading && screenSize != 'mobile'" id="content" :class="screenSize">
         <div class="sidebar">          
@@ -32,8 +39,15 @@
           <div id="nav-container" ref="navContainer" fixed="top">
             <b-navbar id="nav" class="d-flex align-items-start">
               <div id="options" ref="options" class="col-2 bg-dark text-light">
-                <p ref="optionsTitle" class="light-text-on-insane">OPTIONS</p>
-                <ToggleButton action="this.$emit('toggled', this.$refs.toggle.checked)" @toggled="toggleInsane" ref="toggleInsane" class="option-button alter-on-insane" onText="Insane mode" offText="Boring mode" />
+                <p ref="optionsTitle">OPTIONS</p>
+                <ToggleButton
+                  @toggled="toggleInsane"
+                  ref="toggleInsane"
+                  class="option-button"
+                  :class="insaneClass"
+                  onText="Insane mode"
+                  offText="Boring mode"
+                />
               </div>
               <div class="col-8 terminal d-flex align-items-center">
                 <div id="log-container" class="bg-dark text-light">
@@ -41,18 +55,30 @@
                 </div>
               </div>
               <div id="title-box" class="col-2">
-                <div id="main-title" ref="main-title" class="alter-on-insane">MARKT</div>
+                <div id="main-title" ref="main-title" :class="insaneClass">MARKT</div>
                 <span class="break-here"></span>
-                <div id="markt-subtitle" ref="main-subtitle" class="lead hide-on-insane">by <a href="https://kylegrimsrudma.nz">Kyle</a></div>
+                <div id="markt-subtitle" ref="main-subtitle" class="lead" v-show="!insane">by <a href="https://kylegrimsrudma.nz">Kyle</a></div>
                 <div class="clock-container d-flex align-items-end">
-                  <Clock id="clock" ref="clock" class="light-text-on-insane"/>
+                  <Clock 
+                    id="clock" 
+                    ref="clock" 
+                    :class="insaneClass"
+                  />
                 </div>
               </div>
             </b-navbar>
           </div>
           <div class="stocks-grid">
-            <StockCard v-for="(stock, ticker) in stocks" class="stock-card" :ref="ticker.replace(':', '')+'Chart'" :key="ticker" :ticker="ticker" :stock="stock" :insane="insane" :bank="bank" @buy="buyPosition" @sell="sellPosition" @toast="toast"/>
-            <DummyCard id="dummy" ref="dummy" class="bg-light text-dark invert-on-insane" :key="dummyRedrawFlag" :prompt="dummyPrompt" @promptDismissed="dummyPromptDismissed = true" @submitted="createStock"/>            
+            <DummyCard 
+              id="dummy" 
+              ref="dummy" 
+              class="bg-light text-dark" 
+              :class="insaneClass" 
+              :key="dummyRedrawFlag" 
+              :prompt="dummyPrompt" 
+              @promptDismissed="dummyPromptDismissed = true"
+              @submitted="createStock"
+            />            
           </div>
         </div>
       </div>
@@ -104,6 +130,9 @@ export default {
     }
   },
   computed: {
+    insaneClass() {
+      return this.insane? 'insane' : ''
+    },
     screenSize() {
       if (screen.width > 2400) {
         return 'xl'
@@ -239,9 +268,9 @@ export default {
         this.toast('Ouch...', messagePrefix + " for a net loss of -$" + parseFloat((initPrice - soldPrice) * quantity).toFixed(2) + ".")
       }
     },
-    toggleInsane(insane) {
+    toggleInsane() {
       this.$bvToast.hide('Market closed')
-      this.insane = insane;
+      this.insane = !this.insane;
       this.$emit('insane', this.insane)
     }
   }
@@ -251,6 +280,15 @@ export default {
 <style lang="scss">
 @import '@/scss/custom.scss';
 @import '@/scss/animations.scss';
+
+#main-title {
+  animation: none; 
+  -webkit-animation: none;
+  &.insane {
+    animation: colorchange 0.5s ease 0.5s infinite; 
+    -webkit-animation: colorchange 0.5s ease 0s infinite alternate;
+  }
+}
 
 #content {
   &.xl {
@@ -366,6 +404,12 @@ export default {
   .stock-card {
     width:20%;
   }
+  #dummy {
+    transition: filter 1.5s;
+    &.insane {
+      filter:invert(100%)
+    }
+  }
 }
 
 .content {
@@ -378,9 +422,6 @@ export default {
   position:relative;
   z-index:4;
   float:right;
-  /* padding-top:1.2em;
-  padding-bottom:1.2em;
-  padding-right:2%; */
   user-select:none;
   margin-bottom:1em;
   #title-box {
@@ -403,8 +444,12 @@ export default {
       top:0;
       height:100%;
       #clock {
+        transition:color 0.5s;
         user-select:none;
         margin-bottom:0;
+        &.insane {
+          color:$light-color
+        }
       }
     }
   }
@@ -434,6 +479,8 @@ export default {
         animation-duration: 1s;
         -webkit-animation-fill-mode: both;
         animation-fill-mode: both;
+        -webkit-animation-iteration-count: infinite;
+        animation-iteration-count: infinite;
       }
     }
     &.insane {
