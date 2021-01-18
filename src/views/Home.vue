@@ -246,10 +246,16 @@ export default {
       }
     },
     buyPosition(ticker, quantity) {
-      let amount = this.stocks[ticker].price.current * quantity
+      let salePrice = this.stocks[ticker].price.current
+      let amount = salePrice * quantity
       this.toast(ticker, 'Purchased ' + quantity + " " + ticker + " stock" + (quantity > 1? "s" : '') + " for $" + parseFloat(amount).toFixed(2) + " total.")
-      this.$set(this.positions, ticker, {'quantity':quantity, 'sold':false})
-      let ref = ticker.replace(':', '') + 'Chart'
+      this.$set(this.positions, ticker, 
+        {
+          'quantity':quantity,
+          'initPrice':salePrice,
+          'sold':false
+        }
+      )
       this.bank.cash -= amount
       this.bank.invested += amount
       this.bank.trades += 1
@@ -260,7 +266,7 @@ export default {
       let quantity = this.positions[ticker].quantity
       let amount = soldPrice * quantity
       this.bank.cash += amount
-      this.bank.invested -= (this.stocks[ticker].price.average * quantity)
+      this.bank.invested -= (this.positions[ticker].initPrice * quantity)
       this.$delete(this.positions, ticker)
       this.bank.trades += 1
       let messagePrefix = 'You just sold ' + quantity + " " + ticker + " stock" + (quantity > 1? "s" : '')
