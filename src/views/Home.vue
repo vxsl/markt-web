@@ -168,22 +168,21 @@ export default {
     window.addEventListener('load', () => {
       this.loading = false
       if (this.screenSize != 'mobile') {
-        this.$set(this.modals, 'WELCOME', 
-          {
-            message:"Try your hand at day trading risk-free.\n\nMarket data is retrieved using <a href=https://github.com/vxsl/bnnbloomberg-markets-api>my unofficial Javascript wrapper for BNN Bloomberg's market data API</a>. If you find the real stock market boring, you can try disabling boring mode...\n\nAt this time, mostly Canadian stocks are available.\n\n\n<span style='float:right'><span style='font-style:italic'>Have fun!</span> 📈</span>",
-            closeable:true
-          })
+        this.createModal('WELCOME', "Try your hand at day trading risk-free.\n\nMarket data is retrieved using <a href=https://github.com/vxsl/bnnbloomberg-markets-api>my unofficial Javascript wrapper for BNN Bloomberg's market data API</a>. If you find the real stock market boring, you can try disabling boring mode...\n\nAt this time, mostly Canadian stocks are available.\n\n\n<span style='float:right'><span style='font-style:italic'>Have fun!</span> 📈</span>")
       }
       else {
-        this.$set(this.modals, 'WELCOME', 
-          {
-            message:"Unfortunately this webapp has not yet been optimized for mobile use. Please visit again on a larger display.",
-            closeable:false
-          })
+        this.createModal('WELCOME', "Unfortunately this webapp has not yet been optimized for mobile use. Please visit again on a larger display.", false)
       }
     })
   },
   methods: {
+    createModal(title, message, closeable=true) {
+      this.$set(this.modals, title, 
+        {
+          message:message,
+          closeable:closeable
+        })
+    },
     destroyModal(title) {
       this.$delete(this.modals, title)
       if (title == 'WELCOME') {
