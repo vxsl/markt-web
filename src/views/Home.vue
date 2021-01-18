@@ -99,7 +99,7 @@ export default {
       },
       modals: {},
       dummyPrompt: false,
-      dummyPromptDismissed: true,
+      dummyPromptDismissed: false,
       dummyRedrawFlag: false
     }
   },

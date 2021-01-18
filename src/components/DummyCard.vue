@@ -1,7 +1,7 @@
 <template>
   <div class="chart-outer-container">
     <div ref="overlay" id="dummy-overlay" :style="loading? 'cursor:wait' : 'cursor:pointer'" @click="handleClick">
-      <p ref="plus" id="plus" v-if="waiting">+</p>
+      <p ref="plus" id="plus" v-if="waiting && !prompt">+</p>
       <p id="prompt" v-if="prompt">Click here to select your first stock.</p>
       <div v-else class="autocomplete-container">
         <AutocompleteWrapper
@@ -26,6 +26,16 @@
       </div>
       <DummyChart/>
     </div>
+    <div class="chart-footer">
+        <table class="table w-100" ref="footerTable">
+            <tbody>
+                <tr>
+                    <th></th>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+      </div>
   </div>
 </template>
 
@@ -102,12 +112,13 @@ export default {
 }
 
 .chart-outer-container {
-  
   position:relative;
   width:20%;
   margin:1em;
   user-select:none;
   .chart-container{
+      padding:1em;
+
     filter: blur(0.2em);    
     border:none !important;
     overflow:hidden;
@@ -133,15 +144,14 @@ export default {
   }
 }
 
+.chart-footer {
+  visibility: hidden;
+}
+
 #dummy-overlay {
   user-select:none;
   position: absolute;
   z-index: 2;
-  border:solid;
-  border-width:1px;
-  border-radius: 0.5em;
-  /* border:solid;
-  border-width:1px; */
   width: 100%;
   height: 100%;
   display: flex;
