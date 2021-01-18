@@ -154,8 +154,6 @@ export default {
     destroyModal(title) {
       this.$delete(this.modals, title)
       if (title == 'Welcome to markt!') {
-        this.toast('Warning', 'Please note that this project is still a work in progress. Features are still missing, and you may encounter bugs.')
-
         // TODO implement holiday check from https://www.marketbeat.com/stock-market-holidays/canada/
         let day = new Date().getDay() 
         if (day == 0 || day == 6) {
@@ -163,7 +161,7 @@ export default {
           message += (day == 0? 'Sunday' : 'Saturday')
           message += ", so not much is going to happen until you turn off boring mode..."
           setTimeout(() => {
-            this.toast("Market closed", message, true)
+            this.toast("Market closed", message, false)
           }, 1000)
         }
 
@@ -174,12 +172,14 @@ export default {
         }, 3000)
       }
     },
-    toast(title, message, noAutoHide = false) {
-      this.$bvToast.toast(message, {
+    toast(title, message, autohide = true) {
+      let options = {
         title: title,
         toaster: 'b-toaster-bottom-right',
-        noAutoHide: noAutoHide
-      })
+          noAutoHide: !autohide
+        }
+      autohide? null : options.id = title
+      this.$bvToast.toast(message, options)
     },
     newStock(stock) {
       if (this.stocks[stock.ticker]) {
@@ -202,6 +202,7 @@ export default {
       this.$set(this.positions, ticker, {'quantity':0, 'sold':true})
     },
     toggleInsane(insane) {
+      this.$bvToast.hide('Market closed')
       this.insane = insane;
       this.$emit('insane', this.insane)
     }
