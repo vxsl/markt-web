@@ -6,18 +6,20 @@
         <br>
         <span :class="balanceStyle" class="balance-sub">${{parseFloat(bank.positions).toFixed(2)}} tied up</span>
         
-        <table class="table table-dark table-striped ">
-            <tbody>
-                <tr>
-                    <th>Return</th>
-                    <td>{{'$' + parseFloat(stats.return.dollar).toFixed(2) + ' (' + parseFloat(stats.return.percent).toFixed(2) + '%)'}}</td>
-                </tr>
-                <tr>
-                    <th>Trades</th>
-                    <td>{{bank.trades}}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-dark">
+                <tbody>
+                    <tr>
+                        <th>Return</th>
+                        <td>{{'$' + parseFloat(stats.return.dollar).toFixed(2) + ' (' + parseFloat(stats.return.percent).toFixed(2) + '%)'}}</td>
+                    </tr>
+                    <tr>
+                        <th>Trades</th>
+                        <td>{{bank.trades}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>
 
@@ -67,6 +69,9 @@ export default {
         border-radius:1em;
         td, th {
             border:none;
+        }
+        td {
+            float:right;
         }
         th {
             font-weight:100;

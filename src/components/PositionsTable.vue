@@ -1,6 +1,6 @@
 <template>
         <div class="table-responsive">
-            <table id="positionsData" v-if="Object.keys(positions).length > 0" class="table table-dark table-striped table-responsive">
+            <table id="positionsData" v-if="Object.keys(positions).length > 0" class="table table-dark">
                 <thead>
                     <tr>
                         <th></th>
