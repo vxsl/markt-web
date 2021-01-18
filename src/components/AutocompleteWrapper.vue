@@ -1,13 +1,12 @@
 <template>
     <div class="d-flex justify-content-center align-items-center">
       <autocomplete
-          v-show="!done"
           class="ticker-input"
           ref="tickerInput"
           placeholder="Search..."
           :search="search"
           @submit="passInput"
-          @blur="done? $emit('loading') : $emit('quit')"
+          @blur="$emit('blur')"
       ></autocomplete>
     </div>
 </template>
@@ -20,7 +19,6 @@ export default {
   data() {
       return {
         symbols: [],
-        done:false
       }
   },
   props: {
@@ -42,11 +40,14 @@ export default {
       },
       async passInput(input) {
         if (input === undefined) {
-          return
+          if (this.$refs.tickerInput.value === undefined) {
+            return
+          }
+          else {
+            input = this.$refs.tickerInput.value
+          }
         }
-        this.done = true
-        //this.$refs.spinner.style.display = 'block'
-        this.$emit('submit', input)
+        this.$emit('submit', input.toUpperCase())
       },
   }
 }

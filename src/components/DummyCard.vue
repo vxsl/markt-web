@@ -8,8 +8,7 @@
           v-if="selecting"
           ref="autocomplete"
           @submit="handleSubmit"
-          @quit="handleAutocompleteQuit"
-          @loading="handleSubmit"
+          @blur="handleAutocompleteBlur"
         >
         </AutocompleteWrapper>
         <div v-else-if="loading" class="loading" ref="loading">
@@ -37,9 +36,10 @@ import AutocompleteWrapper from '@/components/AutocompleteWrapper.vue'
 export default {
   data() {
       return {
-        waiting:true,
-        selecting:false,
-        loading:false
+        waiting:Boolean,
+        selecting:Boolean,
+        loading:Boolean,
+        noBlur:Boolean
       }
   },
   props: {
@@ -54,18 +54,22 @@ export default {
     this.waiting = true
     this.selecting = false
     this.loading = false
+    this.noBlur = false
   },
   methods: {
-    handleAutocompleteQuit() {
-      this.waiting = true
-      this.selecting = false
-      this.loading = false
+    handleAutocompleteBlur() {
+      if (!this.noBlur) {
+        this.waiting = true
+        this.selecting = false
+        this.loading = false
+      }
     },
-    async handleSubmit(input) {
-      this.$emit('submitted', input)
+    handleSubmit(input) {
+      this.noBlur = true
       this.waiting = false
       this.selecting = false
       this.loading = true
+      this.$emit('submitted', input)
     },
     handleClick() {
       this.$emit('promptDismissed')
