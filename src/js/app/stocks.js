@@ -1,7 +1,7 @@
 const	{ EventEmitter } = require("events"),
         { QuoteHarvester } = require("./bnnbloomberg-markets-api/QuoteHarvester")
 
-const logEmitter = new EventEmitter()
+const messageEmitter = new EventEmitter()
 
 class Stock {
 	constructor (quoteHarvester, price) {
@@ -12,24 +12,18 @@ class Stock {
 	}
 	
 	static async build (ticker) {
-		try {
-			let p = await QuoteHarvester.build(ticker)
-			let q = await p.quote()
-			console.dir(q)
-			let initPrice = q.data.stocks[0].price
-			let price = {
-				current:initPrice,
-				history:[{value: initPrice, timestamp: Date.parse(q.generatedTimestamp).toString()}],				
-				min:initPrice,
-				max: initPrice,
-				average:initPrice  
-			}   
-			return new Position(p, price)
-		}
-		catch (error) {
-			console.log(error)
-			throw "...unable to instantiate a Position object for " + ticker + ".\n"
-		}		
+        let p = await QuoteHarvester.build(ticker)
+        let q = await p.quote()
+        console.dir(q)
+        let initPrice = q.data.stocks[0].price
+        let price = {
+            current:initPrice,
+            history:[{value: initPrice, timestamp: Date.parse(q.generatedTimestamp).toString()}],				
+            min:initPrice,
+            max: initPrice,
+            average:initPrice  
+        }   
+        return new Stock(p, price)
 	}
 
 	async newQuote () {
@@ -45,5 +39,5 @@ const createStock = async (ticker) => {
 
 module.exports = {
 	createStock,
-	logEmitter
+	messageEmitter
 }

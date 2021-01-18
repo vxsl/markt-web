@@ -1,12 +1,12 @@
 const { EventEmitter } = require("events")
 
-const logEmitter = new EventEmitter()
+const messageEmitter = new EventEmitter()
 
 const log = (message) => {
-    logEmitter.emit('new', message)
+    messageEmitter.emit('new', message)
 }
 
 module.exports = {
     log,
-    logEmitter
+    messageEmitter
 }
