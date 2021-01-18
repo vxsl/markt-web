@@ -39,15 +39,15 @@
               <div class="col-8 terminal d-flex align-items-center">
                 <div id="log-container" class="bg-dark text-light">
                     <Log id="log" ref="log" class="text-light"/>
-                    <div class="clock-container d-flex align-items-end">
-                      <Clock id="clock"/>
                     </div>
                 </div>
-              </div>
               <div id="title-box" class="col-2">
                 <div ref="main-title" class="display-4 alter-on-insane">MARKT</div>
                 <span class="break-here"></span>
                 <div id="markt-subtitle" ref="main-subtitle" class="lead hide-on-insane">by <a href="https://kylegrimsrudma.nz">Kyle</a></div>
+                <div class="clock-container d-flex align-items-end">
+                  <Clock id="clock"/>
+              </div>
               </div>
             </b-navbar>
           </div>
@@ -253,17 +253,6 @@ export default {
   #log-container {
     width:100%;
     height:20vh;
-    .clock-container {
-      float:right;
-      height:100%;
-      padding-bottom:0.5em;
-      padding-right:0.75em;
-      #clock {
-        user-select:none;
-        float:right;
-        margin-bottom:0;
-      }
-    }
     #log {
       padding-left:1vw;
       padding-right:1vw;
@@ -357,6 +346,7 @@ export default {
   user-select:none;
   margin-bottom:1em;
   #title-box {
+    height:20vh;
     text-align:right;
     padding-right:2vw;
     #markt-title {
@@ -367,6 +357,15 @@ export default {
     }
     #markt-subtitle {
       display:block;
+    }
+    .clock-container {
+      position:absolute;
+      top:0;
+      height:100%;
+      #clock {
+        user-select:none;
+        margin-bottom:0;
+      }
     }
   }
   nav {
