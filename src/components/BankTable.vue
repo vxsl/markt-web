@@ -4,7 +4,7 @@
         <br>
         <span :class="balanceStyle" class="balance-sub">${{parseFloat(bank.cash).toFixed(2)}} cash</span>
         <br>
-        <span :class="balanceStyle" class="balance-sub">${{parseFloat(bank.positions).toFixed(2)}} tied up</span>
+        <span :class="balanceStyle" class="balance-sub">${{parseFloat(bank.invested).toFixed(2)}} tied up</span>
         
         <div class="table-responsive">
             <table class="table table-dark">

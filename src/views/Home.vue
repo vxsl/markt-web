@@ -131,7 +131,7 @@ export default {
       insane: false,
       bank: {            
         cash:1000.00,
-        positions:0.00,
+        invested:0.00,
         totalDeposited:1000.00,
         trades:0
       },
@@ -160,7 +160,7 @@ export default {
       }
     },
     bankStats() {
-      let balance = this.bank.cash + this.bank.positions
+      let balance = this.bank.cash + this.bank.invested
       let diff = balance - this.bank.totalDeposited
       return {
         balance: balance,
@@ -251,7 +251,7 @@ export default {
       this.$set(this.positions, ticker, {'quantity':quantity, 'sold':false})
       let ref = ticker.replace(':', '') + 'Chart'
       this.bank.cash -= amount
-      this.bank.positions += amount
+      this.bank.invested += amount
       this.bank.trades += 1
     },
     sellPosition(ticker) {
@@ -260,7 +260,7 @@ export default {
       let quantity = this.positions[ticker].quantity
       let amount = soldPrice * quantity
       this.bank.cash += amount
-      this.bank.positions -= (this.stocks[ticker].price.average * quantity)
+      this.bank.invested -= (this.stocks[ticker].price.average * quantity)
       this.$delete(this.positions, ticker)
       this.bank.trades += 1
       let messagePrefix = 'You just sold ' + quantity + " " + ticker + " stock" + (quantity > 1? "s" : '')
