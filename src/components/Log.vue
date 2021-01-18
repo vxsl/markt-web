@@ -10,7 +10,7 @@
 
 <script>
 const { messageEmitter } = require('@/js/log.js')
-const { harvesterMessageEmitter } = require('@/js/app/bnnbloomberg-markets-api/QuoteHarvester.js') 
+const { harvesterMessageEmitter } = require('@/js/bnnbloomberg-markets-api/QuoteHarvester.js') 
 
 export default {
   data() {

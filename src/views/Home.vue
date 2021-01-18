@@ -70,7 +70,7 @@ import StockCard from '@/components/StockCard.vue'
 import DummyCard from '@/components/DummyCard.vue'
 import PositionsTable from '@/components/PositionsTable.vue'
 import BankTable from '@/components/BankTable.vue'
-const { createStock } = require('@/js/app/stocks.js')
+const { createStock } = require('@/js/stocks.js')
 const { log } = require('@/js/log.js')
 
 export default {

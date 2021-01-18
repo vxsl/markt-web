@@ -13,7 +13,7 @@
 
 <script>
 import Autocomplete from '@trevoreyre/autocomplete-vue'
-import knownSymbols from '@/js/data/knownSymbols.json'
+import knownSymbols from '@/js/knownSymbols.json'
 
 export default {
   data() {
