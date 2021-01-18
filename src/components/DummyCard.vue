@@ -1,17 +1,18 @@
 <template>
   <div class="chart-outer-container">
-    <div ref="overlay" id="dummy-overlay" @click="handleClick">
-      <p ref="plus" id="plus" v-if="!selecting && !prompt && !loading">+</p>
-      <p id="prompt" v-if="prompt && !selecting">Click here to select your first stock.</p>
-      <div class="autocomplete-container">
+    <div ref="overlay" id="dummy-overlay" :style="loading? 'cursor:wait' : 'cursor:pointer'" @click="handleClick">
+      <p ref="plus" id="plus" v-if="waiting">+</p>
+      <p id="prompt" v-if="prompt">Click here to select your first stock.</p>
+      <div v-else class="autocomplete-container">
         <AutocompleteWrapper
-          v-if="selecting && !loading"
+          v-if="selecting"
+          ref="autocomplete"
           @submit="handleSubmit"
-          @quit="selecting = false"
-          @loading="startLoading"
+          @quit="handleAutocompleteQuit"
+          @loading="handleSubmit"
         >
         </AutocompleteWrapper>
-        <div class="loading" ref="loading">
+        <div v-else-if="loading" class="loading" ref="loading">
           <p>Contacting BNN Bloomberg server...</p>
           <div 
             class="spinner-border" 
@@ -32,14 +33,13 @@
 <script>
 import DummyChart from '@/components/DummyChart.vue'
 import AutocompleteWrapper from '@/components/AutocompleteWrapper.vue'
-const appLink = require('@/js/app/appLink.js')
 
 export default {
   data() {
       return {
-          selecting: false,
-          selected: false,
-          loading: false
+        waiting:true,
+        selecting:false,
+        loading:false
       }
   },
   props: {
@@ -51,30 +51,26 @@ export default {
       AutocompleteWrapper
   },
   mounted() {
+    this.waiting = true
+    this.selecting = false
+    this.loading = false
   },
   methods: {
-    async createPosition(input) {
-      try {
-          let newStock = await appLink.createPosition(input)
-          this.$emit('newStock', newStock)
-          this.selecting = false
-        }
-        catch (e) {
-          alert('There was an error initializing ' + input + '.\n\n' + e)
-        }
-      },
-      handleClick() {
+    handleAutocompleteQuit() {
+      this.waiting = true
+      this.selecting = false
+      this.loading = false
+    },
+    async handleSubmit(input) {
+      this.$emit('submitted', input)
+      this.waiting = false
+      this.selecting = false
+      this.loading = true
+    },
+    handleClick() {
       this.$emit('promptDismissed')
-        this.selecting = true;
-      },
-      startLoading() {
-        this.$refs.overlay.style.cursor = 'wait'
-        this.$refs.loading.style.display = 'block'
-      },
-      stopLoading() {
-        this.$refs.overlay.style.cursor = 'pointer'
-        this.$refs.loading.style.display = 'none'
-      },
+      this.loading? null : this.selecting = true
+    },
   }
 }
 </script>
@@ -85,7 +81,7 @@ export default {
 @import "../scss/autocomplete-custom.css";
 
 .loading {
-  display:none;
+  display:block;
   text-align:center;
   max-width:100%;
   overflow:hidden;

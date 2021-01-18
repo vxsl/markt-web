@@ -53,7 +53,7 @@
           </div>
           <div class="stocks-grid">
             <StockCard v-for="(stock, ticker) in stocks" class="stock-card" :ref="ticker.replace(':', '')+'Chart'" :key="ticker" :ticker="ticker" :stock="stock" :insane="insane" :bank="bank" @buy="buyPosition" @sell="sellPosition" @toast="toast"/>
-            <DummyCard id="dummy" ref="dummy" class="bg-light text-dark invert-on-insane" :prompt="dummyPrompt" @clicked="dummyPrompt = false" @newStock="newStock"/>            
+            <DummyCard id="dummy" ref="dummy" class="bg-light text-dark invert-on-insane" :key="dummyRedrawFlag" :prompt="dummyPrompt" @promptDismissed="dummyPromptDismissed = true" @submitted="createStock"/>            
           </div>
         </div>
       </div>
@@ -96,7 +96,7 @@ export default {
         totalDeposited:1000.00,
       },
       modals: {},
-      dummyPrompt: false
+      dummyRedrawFlag: false
     }
   },
   computed: {
@@ -184,14 +184,8 @@ export default {
     newStock(stock) {
       if (this.stocks[stock.ticker]) {
         this.toast('Error', 'Sorry, you may not add duplicate stocks.')
-        this.$refs.dummy.stopLoading()
-        return
       }
-      else if (Object.keys(this.stocks).length == 0) {
-        this.toast('Nice!', 'Click on a stock to buy some shares.')
-      }
-      this.$set(this.stocks, stock.ticker, stock)
-      this.$refs.dummy.stopLoading()
+      this.dummyRedrawFlag = !this.dummyRedrawFlag
     },
     buyPosition(ticker, quantity) {
       this.$set(this.positions, ticker, {'quantity':quantity, 'sold':false})
