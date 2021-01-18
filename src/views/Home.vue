@@ -39,15 +39,15 @@
               <div class="col-8 terminal d-flex align-items-center">
                 <div id="log-container" class="bg-dark text-light">
                     <Log id="log" ref="log" class="text-light"/>
-                    </div>
                 </div>
+              </div>
               <div id="title-box" class="col-2">
                 <div ref="main-title" class="display-4 alter-on-insane">MARKT</div>
                 <span class="break-here"></span>
                 <div id="markt-subtitle" ref="main-subtitle" class="lead hide-on-insane">by <a href="https://kylegrimsrudma.nz">Kyle</a></div>
                 <div class="clock-container d-flex align-items-end">
                   <Clock id="clock"/>
-              </div>
+                </div>
               </div>
             </b-navbar>
           </div>
@@ -96,6 +96,7 @@ export default {
         cash:1000.00,
         positions:0.00,
         totalDeposited:1000.00,
+        trades:0
       },
       modals: {},
       dummyPrompt: false,
@@ -171,39 +172,56 @@ export default {
 
         setTimeout(() => {
           if (!this.dummyPromptDismissed) {
-          this.dummyPrompt = true
+            this.dummyPrompt = true
           }
         }, 3000)
       }
     },
     toast(title, message, autohide = true) {
       let options = {
-        title: title,
-        toaster: 'b-toaster-bottom-right',
+          title: title,
+          toaster: 'b-toaster-bottom-right',
           noAutoHide: !autohide
         }
       autohide? null : options.id = title
       this.$bvToast.toast(message, options)
     },
-    newStock(stock) {
-      if (this.stocks[stock.ticker]) {
+    async createStock(input) {
+      if (!this.stocks[input]) {
+        try {
+          let newStock = await createStock(input)
+          this.$set(this.stocks, newStock.ticker, newStock)
+          log('Successfully initialized ' + newStock.ticker + ' at $' + newStock.price.current + '.') 
+        }
+        catch (e) {
+          this.toast('Error', 'Unable to add ' + input + '.\n\n' + e)
+        }
+      }
+      else {
         this.toast('Error', 'Sorry, you may not add duplicate stocks.')
       }
       this.dummyRedrawFlag = !this.dummyRedrawFlag
+      if (Object.keys(this.stocks).length == 1) {
+        this.toast('Nice!', 'Click on a stock to buy some shares.')
+      }
     },
     buyPosition(ticker, quantity) {
+      let amount = this.stocks[ticker].price.current * quantity
+      this.toast(ticker, 'Purchased ' + quantity + "x " + ticker + " for $" + parseFloat(amount).toFixed(2) + " total.")
       this.$set(this.positions, ticker, {'quantity':quantity, 'sold':false})
       let ref = ticker.replace(':', '') + 'Chart'
-      let amount = this.stocks[ticker].price.current * quantity
       this.bank.cash -= amount
       this.bank.positions += amount
+      this.bank.trades += 1
     },
     sellPosition(ticker) {
-      console.log('sell ' + this.stocks[ticker].price.current + " * " + this.positions[ticker].quantity)
       let amount = this.stocks[ticker].price.current * this.positions[ticker].quantity
+      this.toast(ticker, 'Sold ' + this.positions[ticker].quantity + "x " + ticker + " for $" + parseFloat(amount).toFixed(2) + " total.")
       this.bank.cash += amount
-      this.bank.positions -= amount
+      console.log(parseFloat(this.positions[ticker].initPrice) * parseFloat(this.positions[ticker].quantity))
+      this.bank.positions -= parseFloat(this.positions[ticker].initPrice) * parseFloat(this.positions[ticker].quantity)
       this.$set(this.positions, ticker, {'quantity':0, 'sold':true})
+      this.bank.trades += 1
     },
     toggleInsane(insane) {
       this.$bvToast.hide('Market closed')
@@ -389,10 +407,10 @@ export default {
     border-color:$dark-color;
     color:$dark-color;
     .option-button {
-    .tgl-btn {
+      .tgl-btn {
         width:100%;
         border-color:$dark-color;
-    }
+      }
       &.insane{
         -webkit-animation-name: shake;
         animation-name: shake;
