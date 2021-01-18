@@ -214,13 +214,23 @@ export default {
       this.bank.trades += 1
     },
     sellPosition(ticker) {
-      let amount = this.stocks[ticker].price.current * this.positions[ticker].quantity
-      this.toast(ticker, 'Sold ' + this.positions[ticker].quantity + "x " + ticker + " for $" + parseFloat(amount).toFixed(2) + " total.")
+      let soldPrice = this.stocks[ticker].price.current
+      let initPrice = this.stocks[ticker].price.average
+      let quantity = this.positions[ticker].quantity
+      let amount = soldPrice * quantity
       this.bank.cash += amount
-      console.log(parseFloat(this.positions[ticker].initPrice) * parseFloat(this.positions[ticker].quantity))
-      this.bank.positions -= parseFloat(this.positions[ticker].initPrice) * parseFloat(this.positions[ticker].quantity)
-      this.$set(this.positions, ticker, {'quantity':0, 'sold':true})
+      this.bank.positions -= (this.stocks[ticker].price.average * quantity)
+      this.$delete(this.positions, ticker)
       this.bank.trades += 1
+      if (soldPrice > initPrice) {
+        this.toast('Nice trade!', 'You just sold ' + quantity + " shares of " + ticker + " for a net profit of $" + parseFloat((soldPrice - initPrice) * quantity).toFixed(2) + ".")
+      }
+      else if (soldPrice == initPrice) {
+        this.toast(ticker, 'You just sold ' + quantity + " shares of " + ticker + " for the same price at which they were purchased.")
+      }
+      else if (soldPrice < initPrice) {
+        this.toast('Ouch...', 'You just sold ' + quantity + " shares of " + ticker + " for a net loss of -$" + parseFloat((initPrice - soldPrice) * quantity).toFixed(2) + ".")
+      }
     },
     toggleInsane(insane) {
       this.$bvToast.hide('Market closed')
