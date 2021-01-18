@@ -1,5 +1,21 @@
 @import '@/scss/custom.scss';
 
+// colorchange animation
+
+@keyframes colorchange
+{
+  0%    {color: $light-color;}
+  100%  {color: $dark-color;}
+}
+
+@-webkit-keyframes colorchange 
+{
+  0%    {color: $light-color;}
+  100%  {color: $dark-color;}
+}
+
+// ripple pulse animation
+
 @keyframes negative-pulse-animation {
     0% {
         box-shadow: 0 0 0 0em $light-color;
@@ -55,4 +71,4 @@
     -webkit-transform: translate3d(0.1em, 0, 0);
     transform: translate3d(0.1em, 0, 0);
     }
-    } 
+} 
