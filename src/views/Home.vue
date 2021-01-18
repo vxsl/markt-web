@@ -69,6 +69,18 @@
             </b-navbar>
           </div>
           <div class="stocks-grid">
+            <StockCard 
+              v-for="(stock, ticker) in stocks" 
+              class="stock-card" 
+              :key="ticker" 
+              :bank="bank"
+              :ticker="ticker" 
+              :stock="stock" 
+              :insane="insane" 
+              @buy="buyPosition" 
+              @sell="sellPosition" 
+              @toast="toast"
+            />
             <DummyCard 
               id="dummy" 
               ref="dummy" 
