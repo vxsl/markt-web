@@ -1,0 +1,3 @@
+[submodule "src/js/app/bnnbloomberg-markets-api"]
+	path = src/js/app/bnnbloomberg-markets-api
+	url = https://github.com/vxsl/bnnbloomberg-markets-api
