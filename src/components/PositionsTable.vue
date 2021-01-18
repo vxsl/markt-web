@@ -21,7 +21,7 @@
             <table id="positionsData" v-else class="table table-dark">
                 <tbody>
                 <tr>
-                    <td>No positions yet.</td>
+                    <td>No current positions.</td>
                 </tr>
                 </tbody>
             </table>

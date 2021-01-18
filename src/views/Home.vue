@@ -280,6 +280,7 @@ export default {
 .terminal {
   min-width:50%;
   #log-container {
+    user-select:none;
     width:100%;
     height:20vh;
     #log {
@@ -288,7 +289,6 @@ export default {
     }
     overflow:hidden;
     position:relative;
-    user-select:text;
     border:solid;
     border-top:none;
     border-bottom-left-radius:1em;

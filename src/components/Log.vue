@@ -39,8 +39,10 @@ export default {
 
   position: absolute;
   top: calc(20vh - 1em);
-  width: 100%;
+  width: calc(100% - 2em);
   height:0;
+  left:1em;
+  user-select:none;
   .log-lines {
     font-size:0.9em;
     word-wrap:break-word !important;
