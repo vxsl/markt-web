@@ -141,7 +141,7 @@ export default {
       if (this.screenSize != 'mobile') {
         this.$set(this.modals, 'WELCOME', 
           {
-            message:"Try buying and selling some stocks. If you find the real stock market boring, you can try disabling boring mode...\n\nMarket data is retrieved using <a href=https://github.com/vxsl/bnnbloomberg-markets-api>my unofficial Javascript wrapper for BNN Bloomberg's market data API</a>.\nNote that although they advertise their quote data as realtime, in practice it is unfortunately not always reliable.\n\nAt this time, mostly Canadian stocks are available.\n\n\n<span style='float:right'><span style='font-style:italic'>Have fun!</span> 📈</span>",
+            message:"Try your hand at day trading risk-free.\n\nMarket data is retrieved using <a href=https://github.com/vxsl/bnnbloomberg-markets-api>my unofficial Javascript wrapper for BNN Bloomberg's market data API</a>. If you find the real stock market boring, you can try disabling boring mode...\n\nAt this time, mostly Canadian stocks are available.\n\n\n<span style='float:right'><span style='font-style:italic'>Have fun!</span> 📈</span>",
             closeable:true
           })
       }
