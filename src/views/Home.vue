@@ -139,14 +139,14 @@ export default {
     window.addEventListener('load', () => {
       this.loading = false
       if (this.screenSize != 'mobile') {
-        this.$set(this.modals, 'Welcome to markt!', 
+        this.$set(this.modals, 'WELCOME', 
           {
-            message:"Try buying and selling some stocks. If you find the real stock market boring, you can disable boring mode and give insane mode a try...\n\nMarket data is retrieved using <a href=https://github.com/vxsl/bnnbloomberg-markets-api>my unofficial Javascript wrapper for BNN Bloomberg's market data API</a>.\nNote that although they advertise their quote data as realtime, in practice it is unfortunately not always reliable.\n\nAt this time, mostly Canadian stocks are available.",
+            message:"Try buying and selling some stocks. If you find the real stock market boring, you can try disabling boring mode...\n\nMarket data is retrieved using <a href=https://github.com/vxsl/bnnbloomberg-markets-api>my unofficial Javascript wrapper for BNN Bloomberg's market data API</a>.\nNote that although they advertise their quote data as realtime, in practice it is unfortunately not always reliable.\n\nAt this time, mostly Canadian stocks are available.\n\n\n<span style='float:right'><span style='font-style:italic'>Have fun!</span> 📈</span>",
             closeable:true
           })
       }
       else {
-        this.$set(this.modals, 'Welcome to markt!', 
+        this.$set(this.modals, 'WELCOME', 
           {
             message:"Unfortunately this webapp has not yet been optimized for mobile use. Please visit again on a larger display.",
             closeable:false
@@ -157,7 +157,7 @@ export default {
   methods: {
     destroyModal(title) {
       this.$delete(this.modals, title)
-      if (title == 'Welcome to markt!') {
+      if (title == 'WELCOME') {
         // TODO implement holiday check from https://www.marketbeat.com/stock-market-holidays/canada/
         let day = new Date().getDay() 
         if (day == 0 || day == 6) {
