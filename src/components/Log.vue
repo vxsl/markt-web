@@ -39,15 +39,17 @@ export default {
 
   position: absolute;
   top: calc(20vh - 1em);
-  width: calc(100% - 5vh);
+  width: 100%;
   height:0;
   .log-lines {
     word-wrap:break-word !important;
-  display:inline-block !important;
-
+    display:inline-block !important;
     width:100%;
     position: absolute;
     bottom:0;
+    p {
+      margin-bottom:0;
+    }
   }
 }
 
