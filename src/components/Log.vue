@@ -42,6 +42,7 @@ export default {
   width: 100%;
   height:0;
   .log-lines {
+    font-size:0.9em;
     word-wrap:break-word !important;
     display:inline-block !important;
     width:100%;
