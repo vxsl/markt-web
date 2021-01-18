@@ -96,6 +96,8 @@ export default {
         totalDeposited:1000.00,
       },
       modals: {},
+      dummyPrompt: false,
+      dummyPromptDismissed: true,
       dummyRedrawFlag: false
     }
   },
