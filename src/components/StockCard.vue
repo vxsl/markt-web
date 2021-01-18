@@ -72,7 +72,7 @@ export default {
       return result += parseFloat(diff * this.quantity).toFixed(2)
     },
     quantityMessage() {
-      let result = 'BUY ' + this.quantity + ' SHARE'
+      let result = 'BUY ' + this.quantity + ' STOCK'
       this.quantity > 1? result += 'S' : null
       result += ' ' + this.ticker + ' [$' 
       result += parseFloat(this.quantity * this.stock.price.current).toFixed(2)
@@ -149,7 +149,7 @@ export default {
         this.toggleInsaneStyling(this.insane)
       }
       else {
-        this.$emit('toast', 'Not enough cash', "Sorry, you don't have enough cash to purchase " + this.quantity + " shares of " + this.stock.ticker + ".")
+        this.$emit('toast', 'Not enough cash', "Sorry, you don't have enough cash to purchase " + this.quantity + " " + this.stock.ticker + " stocks.")
       }
     },
     sell() {

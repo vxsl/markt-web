@@ -41,7 +41,7 @@
                 </div>
               </div>
               <div id="title-box" class="col-2">
-                <div ref="main-title" class="display-4 alter-on-insane">MARKT</div>
+                <div id="main-title" ref="main-title" class="alter-on-insane">MARKT</div>
                 <span class="break-here"></span>
                 <div id="markt-subtitle" ref="main-subtitle" class="lead hide-on-insane">by <a href="https://kylegrimsrudma.nz">Kyle</a></div>
                 <div class="clock-container d-flex align-items-end">
@@ -158,6 +158,7 @@ export default {
     destroyModal(title) {
       this.$delete(this.modals, title)
       if (title == 'WELCOME') {
+        window.scrollTo(0,0)
         // TODO implement holiday check from https://www.marketbeat.com/stock-market-holidays/canada/
         let day = new Date().getDay() 
         if (day == 0 || day == 6) {
@@ -201,12 +202,12 @@ export default {
       }
       this.dummyRedrawFlag = !this.dummyRedrawFlag
       if (Object.keys(this.stocks).length == 1) {
-        this.toast('Nice!', 'Click on a stock to buy some shares.')
+        this.toast('Nice!', 'Click on a stock to initiate a position.')
       }
     },
     buyPosition(ticker, quantity) {
       let amount = this.stocks[ticker].price.current * quantity
-      this.toast(ticker, 'Purchased ' + quantity + "x " + ticker + " for $" + parseFloat(amount).toFixed(2) + " total.")
+      this.toast(ticker, 'Purchased ' + quantity + " " + ticker + " stock" + (quantity > 1? "s" : '') + " for $" + parseFloat(amount).toFixed(2) + " total.")
       this.$set(this.positions, ticker, {'quantity':quantity, 'sold':false})
       let ref = ticker.replace(':', '') + 'Chart'
       this.bank.cash -= amount
@@ -222,14 +223,20 @@ export default {
       this.bank.positions -= (this.stocks[ticker].price.average * quantity)
       this.$delete(this.positions, ticker)
       this.bank.trades += 1
+      let messagePrefix = 'You just sold ' + quantity + " " + ticker + " stock" + (quantity > 1? "s" : '')
       if (soldPrice > initPrice) {
-        this.toast('Nice trade!', 'You just sold ' + quantity + " shares of " + ticker + " for a net profit of $" + parseFloat((soldPrice - initPrice) * quantity).toFixed(2) + ".")
+        this.toast('Nice trade!', messagePrefix + " for a net profit of $" + parseFloat((soldPrice - initPrice) * quantity).toFixed(2) + ".")
       }
       else if (soldPrice == initPrice) {
-        this.toast(ticker, 'You just sold ' + quantity + " shares of " + ticker + " for the same price at which they were purchased.")
+        if (quantity > 1) {
+          this.toast(ticker, messagePrefix + " for the same price at which they were purchased.")
+        }
+        else {
+          this.toast(ticker, messagePrefix + " for the same price at which it was purchased.")
+        }
       }
       else if (soldPrice < initPrice) {
-        this.toast('Ouch...', 'You just sold ' + quantity + " shares of " + ticker + " for a net loss of -$" + parseFloat((initPrice - soldPrice) * quantity).toFixed(2) + ".")
+        this.toast('Ouch...', messagePrefix + " for a net loss of -$" + parseFloat((initPrice - soldPrice) * quantity).toFixed(2) + ".")
       }
     },
     toggleInsane(insane) {
@@ -379,15 +386,17 @@ export default {
   #title-box {
     height:20vh;
     text-align:right;
-    padding-right:2vw;
-    #markt-title {
-      width:100% !important;
-      display:block !important;
+    padding-top:1%;
+    padding-right:3%;
+    #main-title {
+      direction: rtl;
+      font-size:2em;
       font-family:Rubik;
       font-weight:100;
     }
     #markt-subtitle {
       display:block;
+      padding-right:5%;
     }
     .clock-container {
       position:absolute;
