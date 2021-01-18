@@ -31,10 +31,9 @@
         <div class="content">
           <div id="nav-container" ref="navContainer" fixed="top">
             <b-navbar id="nav" class="d-flex align-items-start">
-              <div id="options" ref="options" class="col-2 alter-on-insane">
+              <div id="options" ref="options" class="col-2 bg-dark text-light">
                 <p ref="optionsTitle" class="light-text-on-insane">OPTIONS</p>
                 <ToggleButton action="this.$emit('toggled', this.$refs.toggle.checked)" @toggled="toggleInsane" ref="toggleInsane" class="option-button alter-on-insane" onText="Insane mode" offText="Boring mode" />
-
               </div>
               <div class="col-8 terminal d-flex align-items-center">
                 <div id="log-container" class="bg-dark text-light">
@@ -46,7 +45,7 @@
                 <span class="break-here"></span>
                 <div id="markt-subtitle" ref="main-subtitle" class="lead hide-on-insane">by <a href="https://kylegrimsrudma.nz">Kyle</a></div>
                 <div class="clock-container d-flex align-items-end">
-                  <Clock id="clock"/>
+                  <Clock id="clock" ref="clock" class="light-text-on-insane"/>
                 </div>
               </div>
             </b-navbar>
@@ -395,7 +394,6 @@ export default {
   }
   
   #options {
-    transition:border-color 1s;
     padding:1em;
     text-align:center;
     border:solid;
@@ -404,12 +402,11 @@ export default {
     border-bottom-right-radius:1em;
     border-bottom-left-radius:1em;
     border-top:none;
-    border-color:$dark-color;
-    color:$dark-color;
+    border-color:$light-color;
     .option-button {
       .tgl-btn {
         width:100%;
-        border-color:$dark-color;
+        border-color:$light-color;
       }
       &.insane{
         -webkit-animation-name: shake;
