@@ -9,47 +9,31 @@
 </template>
 
 <script>
-const { logEmitter } = require('@/js/log.js')
+const { messageEmitter } = require('@/js/log.js')
+const { harvesterMessageEmitter } = require('@/js/app/bnnbloomberg-markets-api/QuoteHarvester.js') 
+
 export default {
   data() {
     return {
       messages: []
     };
   },
-  async created() { 
-    /* var i = 0;
-    logEmitter.on('new', (message) => {
-      this.messages.unshift(message)
-      if (this.messages.length > 50) {
-        this.messages.pop()
-      }
-    }) */
-
-    var i = 0;
-    logEmitter.on('new', (message) => {
+  created() { 
+    messageEmitter.on('new', this.addMessage)
+    harvesterMessageEmitter.on('new', this.addMessage)
+  },
+  methods: {
+    addMessage(message) {
       this.messages.push(message)
       if (this.messages.length > 50) {
         this.messages.shift()
       }
-    })
-  },
+    }
+  }
 };
 </script>
 
 <style lang="scss">
-
-/* .log-container {
-  padding:1em;
-  overflow:hidden;
-  user-select:text;
-  position:absolute;
-  bottom:55vh;
-  margin:0;
-  .log-line {
-    white-space:pre-wrap;
-    margin:0 !important;
-  }
-} */
 
 .log-container {
 
