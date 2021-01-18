@@ -10,11 +10,10 @@ export default {
     props: {
         onText: String,
         offText: String,
-        action: String
     },
     methods: {
         toggle() {
-          eval(this.action)
+          this.$emit('toggled')
         }
     }
 }
