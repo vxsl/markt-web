@@ -31,7 +31,7 @@
         <div class="content">
           <div id="nav-container" ref="navContainer" fixed="top">
             <b-navbar id="nav" class="d-flex align-items-start">
-              <div id="options" class="col-2">
+              <div id="options" ref="options" class="col-2 alter-on-insane">
                 <p ref="optionsTitle" class="light-text-on-insane">OPTIONS</p>
                 <ToggleButton action="this.$emit('toggled', this.$refs.toggle.checked)" @toggled="toggleInsane" ref="toggleInsane" class="option-button alter-on-insane" onText="Insane mode" offText="Boring mode" />
 
@@ -70,6 +70,8 @@ import StockCard from '@/components/StockCard.vue'
 import DummyCard from '@/components/DummyCard.vue'
 import PositionsTable from '@/components/PositionsTable.vue'
 import BankTable from '@/components/BankTable.vue'
+const { createStock } = require('@/js/app/stocks.js')
+const { log } = require('@/js/log.js')
 
 export default {
 
@@ -218,7 +220,7 @@ export default {
 
 #content {
   &.xl {
-    font-size:1.15em;
+    font-size:1.3em;
   }
 }
 
@@ -315,18 +317,20 @@ export default {
 }
 
 
-.stocksGrid {
+.stocks-grid {
   float:right;
   display: flex;
   width:100%;
+  padding-right:3em;
   flex-direction: row;
   flex-wrap: wrap;
   position:relative;
   border-right:none !important;
   border-top-right-radius:0 !important;
   border-bottom-right-radius:0 !important;
-  .rounded-card {
-    border-radius:1em
+
+  .stock-card {
+    width:20%;
   }
 }
 
@@ -373,21 +377,23 @@ export default {
   }
   
   #options {
-    padding-top:1em;
-    float:right;
+    transition:border-color 1s;
+    padding:1em;
+    text-align:center;
     border:solid;
     min-height:20vh;
     border-width:1px;
     border-bottom-right-radius:1em;
     border-bottom-left-radius:1em;
     border-top:none;
-    border-color:$grey-color;
-    color:$grey-color;
+    border-color:$dark-color;
+    color:$dark-color;
     .option-button {
     .tgl-btn {
-      border-color:$grey-color;
+        width:100%;
+        border-color:$dark-color;
     }
-      &.insane {
+      &.insane{
         -webkit-animation-name: shake;
         animation-name: shake;
         -webkit-animation-duration: 1s;
@@ -395,6 +401,9 @@ export default {
         -webkit-animation-fill-mode: both;
         animation-fill-mode: both;
       }
+    }
+    &.insane {
+      border-color:$light-color;
     }
   }
 }
