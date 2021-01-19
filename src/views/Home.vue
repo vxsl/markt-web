@@ -74,8 +74,8 @@
               class="stock-card" 
               :key="ticker" 
               :bank="bank"
-              :ticker="ticker" 
               :stock="stock" 
+              :position="positions[ticker]" 
               :insane="insane" 
               @buy="buyPosition" 
               @sell="sellPosition" 
@@ -143,6 +143,30 @@ export default {
       dummyRedrawFlag: false
     }
   },
+  watch: {
+    stocks: {
+      deep: true,
+      handler() {
+        for (let ticker in this.positions) {
+          let p = this.positions[ticker]
+          let diff = this.stocks[ticker].price.current - p.initPrice
+          p.net = diff * p.quantity
+          let prefix = ''
+          if (diff >= 0) {
+            prefix = "+ $"  
+          }
+          else {
+            prefix = "- $"
+            diff = -diff
+          }
+          p.netString = prefix + parseFloat(diff).toFixed(2)
+        }
+      }
+    },
+    dummyPromptDismissed() {
+      this.dummyPrompt = false
+    }
+  },
   computed: {
     insaneClass() {
       return this.insane? 'insane' : ''
@@ -173,11 +197,7 @@ export default {
       }
     },
   },
-  watch: {
-    dummyPromptDismissed() {
-      this.dummyPrompt = false
-    }
-  },
+  
   mounted() {
     window.addEventListener('load', () => {
       this.loading = false
@@ -255,6 +275,8 @@ export default {
         {
           'quantity':quantity,
           'initPrice':salePrice,
+          'net':0,
+          'netString':'+ $0.00',
           'sold':false
         }
       )

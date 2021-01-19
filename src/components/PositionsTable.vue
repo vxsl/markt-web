@@ -14,7 +14,7 @@
                         <td>{{ticker}}</td>
                         <td>{{position.quantity}}</td>
                         <td>${{parseFloat(position.quantity * stocks[ticker].price.current).toFixed(2)}}</td>
-                        <td>{{parseFloat(stocks[ticker].price.max).toFixed(2)}}</td>
+                        <td>{{position.netString}}</td>
                     </tr>
                     </tbody>
             </table>

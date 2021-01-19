@@ -12,7 +12,7 @@
         <div class="chart-extlabel">
         <h2 ref="title">{{ ticker }}</h2>
         </div>
-        <StockChart ref='chart' :stock="stock" :initPrice="initPrice" :active="active" :quantity="parseInt(quantity)" @redraw="redraw" :insane="insane" />
+        <StockChart ref='chart' :stock="stock" :position="position" :active="active" :quantity="parseInt(quantity)" @redraw="redraw" :insane="insane" />
       </div>
       <div class="chart-footer">
         <table class="table w-100" ref="footerTable">
@@ -23,11 +23,11 @@
                 </tr>
                 <tr v-if="active">
                     <th>INIT.</th>
-                    <td>${{initPrice}}</td>
+                    <td>${{parseFloat(position.initPrice).toFixed(2)}}</td>
                 </tr>
                 <tr v-if="active">
                     <th>NET</th>
-                    <td :class="positionStatusClass">{{net}}</td>
+                    <td :class="positionStatusClass">{{position.netString}}</td>
                 </tr>
             </tbody>
         </table>
@@ -44,7 +44,6 @@ export default {
     return {
       active: false,
       quantity: 1,
-      initPrice: Number,
       positionStatusClass: String,
       userInput: false,
       userInputClass:String,
@@ -56,22 +55,12 @@ export default {
   props: {
     ticker: String,
     stock: {},
+    stock: Object,
+    position: Object,
     insane: Boolean,
     bank: Object
   },
   computed: {
-    net() {
-      let diff = this.stock.price.current - this.initPrice
-      let result = ''
-      if (diff >= 0) {
-        result = "+ $"  
-      }
-      else {
-        result = "- $"
-        diff = -diff
-      }
-      return result += parseFloat(diff * this.quantity).toFixed(2)
-    },
     quantityMessage() {
       let result = 'BUY ' + this.quantity + ' STOCK'
       this.quantity > 1? result += 'S' : null

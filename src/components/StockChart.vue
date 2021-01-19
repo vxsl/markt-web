@@ -6,24 +6,19 @@ const { log } = require('@/js/log.js')
 import colors from '@/scss/custom.scss'
 
 export default {
-  data() {
-    return {
-      initPrice: Number
-    }
-  },
   name: 'StockChart',
   extends: Line,
   props: {
     active: Boolean,
     insane: Boolean,
-    stock: {
-    },
+    stock: Object,
+    position: Object,
     quantity: Number
   },
   computed: {
     status() {
       if (this.active) {
-        let diff = this.stock.price.current - this.initPrice
+        let diff = this.stock.price.current - this.position.initPrice
         if (diff > 0) {
           return 2
         }
