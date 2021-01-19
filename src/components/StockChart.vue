@@ -24,7 +24,7 @@ export default {
           return colors.dangerColor
         }
       }
-      return this.insane? colors.lightGreyColor : colors.darkGreyColor
+      return this.insane? colors.darkGreyColor : colors.lightGreyColor
     }
   },
   watch: {
