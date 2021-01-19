@@ -1,8 +1,8 @@
 <template>
-  <div ref="outerContainer" class="chart-outer-container" :class="statusClass + ' ' + insaneClass">
+  <div ref="outerContainer" class="chart-outer-container" :class="positionStatusClass + ' ' + insaneClass + ' ' + userInputClass">
     <div ref="overlay" class="stock-overlay" @click="buyOrSell">
       <p ref="buySellLabel" class="buy-sell-label lead">{{ active ? "SELL" : "BUY" }}</p>
-      <form ref="quantityInputContainer" class="quantity-input-container" @submit.prevent="buy">
+      <form class="quantity-input-container" @submit.prevent="buy">
         <input required v-model="quantity" type="number" name="quantity-input" value="1" min="1" max="9999">
         <input type="submit" :value="quantityMessage" ref="quantitySubmit">
       </form>
@@ -27,7 +27,7 @@
                 </tr>
                 <tr v-if="active">
                     <th>NET</th>
-                    <td :class="statusClass">{{net}}</td>
+                    <td :class="positionStatusClass">{{net}}</td>
                 </tr>
             </tbody>
         </table>
@@ -45,8 +45,10 @@ export default {
       active: false,
       quantity: 1,
       initPrice: Number,
-      statusClass: String,
-      insaneClass: String
+      positionStatusClass: String,
+      insaneClass: String,
+      userInput: false,
+      userInputClass:String,
     };
   },
   components: {
@@ -81,6 +83,9 @@ export default {
     }
   },
   watch: {
+    userInput(val) {
+      val? this.userInputClass = 'user-input' : this.userInputClass = ''
+    },
     active(activeVal) {
       if (activeVal) {
         this.$refs.outerContainer.classList.remove('inactive')
@@ -123,14 +128,7 @@ export default {
       }
     },
     buyOrSell() {
-      if (this.active) {
-        this.sell()
-      }
-      else {
-        this.$refs.buySellLabel.style.display = "none"
-        this.$refs.quantityInputContainer.style.display = "block"
-        this.$refs.chartContainer.style.filter = 'blur(0.3em)'
-      }
+      this.active? this.sell() : this.userInput = true
     },
     buy() {
       let tentativePrice = this.stock.price.current * this.quantity
@@ -139,10 +137,7 @@ export default {
         this.$refs.chart.initPrice = this.initPrice
         this.$emit('buy', this.ticker, this.quantity)
         this.active = true
-        this.$refs.buySellLabel.style.display = "block"
-        this.$refs.buySellLabel.style.opacity = 0
-        this.$refs.quantityInputContainer.style.display = "none"
-        this.$refs.chartContainer.style.filter = 'none'
+        this.userInput = false
         this.$refs.outerContainer.classList.remove('inactive')
         this.$refs.outerContainer.classList.add('active')
         this.$refs.outerContainer.classList.add('neutral')
@@ -155,22 +150,22 @@ export default {
     sell() {
       this.$emit('sell', this.ticker)
       this.active = false
-      this.statusClass = 'inactive'
+      this.positionStatusClass = 'inactive'
     },
     redraw(newStatus) {
       switch (newStatus) {
         case 2:
-          this.statusClass = 'active positive'
+          this.positionStatusClass = 'active positive'
           break
         case 1:
-          this.statusClass = 'active neutral'
+          this.positionStatusClass = 'active neutral'
           break
         case 0:
-          this.statusClass = 'active negative'
+          this.positionStatusClass = 'active negative'
           break
         case -1:
         default:
-          this.statusClass = 'inactive'
+          this.positionStatusClass = 'inactive'
       }
     }
   }
@@ -248,11 +243,24 @@ canvas {
     }
   }
 
+  &.user-input {
+    .buy-sell-label {
+      display:none
+    }
+    .quantity-input-container {
+      display:block
+    }
+    .chart-container {
+      filter:blur(0.3em)
+    }
+  }
+
   position:relative;
   width:20%;
   margin:1em;
   user-select:none;
   .chart-container{
+    filter:none;
     transition: filter 0.5s;
     border-radius:0.5em;
     overflow:hidden;
