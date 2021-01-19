@@ -3,7 +3,7 @@
     <div ref="overlay" class="stock-overlay" @click="buyOrSell">
       <p ref="buySellLabel" class="buy-sell-label lead">{{ active ? "SELL" : "BUY" }}</p>
       <form ref="quantityInputContainer" class="quantity-input-container" @submit.prevent="buy">
-        <input required v-model="quantity" type="number" name="quantity-input" value="1" min="1" max="1000">
+        <input required v-model="quantity" type="number" name="quantity-input" value="1" min="1" max="9999">
         <input type="submit" :value="quantityMessage" ref="quantitySubmit">
       </form>
     </div>
