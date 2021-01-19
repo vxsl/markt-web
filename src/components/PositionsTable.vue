@@ -4,17 +4,17 @@
                 <thead>
                     <tr>
                         <th></th>
-                        <th>Qty</th>
-                        <th>Value</th>
-                        <th>Net</th>
+                        <th>QTY</th>
+                        <th>VAL</th>
+                        <th >NET</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr v-for="(position, ticker) in positions" :key="ticker">
-                        <td>{{ticker}}</td>
+                        <td class="ticker">{{ticker}}</td>
                         <td>{{position.quantity}}</td>
                         <td>${{parseFloat(position.quantity * stocks[ticker].price.current).toFixed(2)}}</td>
-                        <td>{{position.netString}}</td>
+                        <td style="display:min-width:1000px;">{{position.netString}}</td>
                     </tr>
                     </tbody>
             </table>
@@ -41,8 +41,12 @@ export default {
 #positionsData {
     border-radius:1em;
     th {
-        width:100%;
         font-weight:100;
+    }
+    td {
+        &.ticker {
+            font-weight:700
+        }
     }
     td, th {
         border:none !important;
