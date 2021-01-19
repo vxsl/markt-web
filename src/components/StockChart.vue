@@ -13,7 +13,6 @@ export default {
     insane: Boolean,
     stock: Object,
     position: Object,
-    quantity: Number
   },
   computed: {
     color() {
