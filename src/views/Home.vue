@@ -25,14 +25,22 @@
               <p class="lead table-title">BANK</p>
               <p class="table-sub">A summary of your finances is shown here.</p>
               <hr class="bg-light">
-              <BankTable :positions='positions' :stocks='stocks' :bank="bank" :bankComputed="bankComputed"/>
+              <BankTable 
+                :positions='positions' 
+                :stocks='stocks' 
+                :bank="bank" 
+                :bankComputed="bankComputed"
+              />
             </div>
             <div id="positions">
               <p class="lead table-title">POSITIONS</p>
               <p class="table-sub">A summary of your positions is shown here.</p>
               <hr class="bg-light">
             </div>
-            <PositionsTable :positions='positions' :stocks='stocks'/>
+            <PositionsTable 
+              :positions='positions' 
+              :stocks='stocks'
+            />
           </div>
         </div>
         <div class="content">
