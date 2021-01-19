@@ -10,7 +10,7 @@
     <div ref="chartContainer" class="chart-container">
       <div class="padded">
         <div class="chart-extlabel">
-        <h2 ref="title">{{ ticker }}</h2>
+        <h2 ref="title">{{ stock.ticker }}</h2>
         </div>
         <StockChart ref='chart' :stock="stock" :position="position" :active="active" :quantity="parseInt(quantity)" @redraw="redraw" :insane="insane" />
       </div>
@@ -53,8 +53,7 @@ export default {
     StockChart,
   },
   props: {
-    ticker: String,
-    stock: {},
+    ticker:String,
     stock: Object,
     position: Object,
     insane: Boolean,
@@ -64,7 +63,7 @@ export default {
     quantityMessage() {
       let result = 'BUY ' + this.quantity + ' STOCK'
       this.quantity > 1? result += 'S' : null
-      result += ' ' + this.ticker + ' [$' 
+      result += ' ' + this.stock.ticker + ' [$' 
       result += parseFloat(this.quantity * this.stock.price.current).toFixed(2)
       result += ']'
       return result
@@ -76,16 +75,6 @@ export default {
   watch: {
     userInput(val) {
       val? this.userInputClass = 'user-input' : this.userInputClass = ''
-    },
-    active(activeVal) {
-      if (activeVal) {
-        this.$refs.outerContainer.classList.remove('inactive')
-        this.$refs.outerContainer.classList.add('active')
-      }
-      else {
-        this.$refs.outerContainer.classList.remove('active')
-        this.$refs.outerContainer.classList.add('inactive')
-      }
     },
   },
   created() {
@@ -108,21 +97,17 @@ export default {
     buy() {
       let tentativePrice = this.stock.price.current * this.quantity
       if (this.bank.cash >= tentativePrice) {
-        this.initPrice = parseFloat(this.stock.price.current).toFixed(2)
-        this.$refs.chart.initPrice = this.initPrice
-        this.$emit('buy', this.ticker, this.quantity)
+        this.$emit('buy', this.stock.ticker, this.quantity)
         this.active = true
         this.userInput = false
-        this.$refs.outerContainer.classList.remove('inactive')
-        this.$refs.outerContainer.classList.add('active')
-        this.$refs.outerContainer.classList.add('neutral')
+        this.positionStatusClass = 'active neutral'
       }
       else {
         this.$emit('toast', 'Not enough cash', "Sorry, you don't have enough cash to purchase " + this.quantity + " " + this.stock.ticker + " stocks.")
       }
     },
     sell() {
-      this.$emit('sell', this.ticker)
+      this.$emit('sell', this.stock.ticker)
       this.active = false
       this.positionStatusClass = 'inactive'
     },
