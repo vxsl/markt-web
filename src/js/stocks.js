@@ -1,8 +1,6 @@
 const	{ EventEmitter } = require("events"),
         { QuoteHarvester } = require("./bnnbloomberg-markets-api/QuoteHarvester")
 
-const messageEmitter = new EventEmitter()
-
 class Stock {
 	constructor (quoteHarvester, price) {
 		this.ticker = quoteHarvester.ticker
@@ -31,13 +29,12 @@ class Stock {
 	}
 }
 
-const createStock = async (ticker) => {
+const initializeStock = async (ticker) => {
 
 	let result = await Stock.build(ticker)
 	return result
 }
 
 module.exports = {
-	createStock,
-	messageEmitter
+	initializeStock,
 }

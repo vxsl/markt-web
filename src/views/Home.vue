@@ -89,7 +89,7 @@
               :key="dummyRedrawFlag" 
               :prompt="dummyPrompt" 
               @promptDismissed="dummyPromptDismissed = true"
-              @submitted="createStock"
+              @submitted="createStockCard"
             />            
           </div>
         </div>
@@ -107,7 +107,7 @@ import StockCard from '@/components/StockCard.vue'
 import DummyCard from '@/components/DummyCard.vue'
 import PositionsTable from '@/components/PositionsTable.vue'
 import BankTable from '@/components/BankTable.vue'
-const { createStock } = require('@/js/stocks.js')
+const { initializeStock } = require('@/js/stocks.js')
 const { log } = require('@/js/log.js')
 
 export default {
@@ -226,10 +226,10 @@ export default {
       autohide? null : options.id = title
       this.$bvToast.toast(message, options)
     },
-    async createStock(input) {
+    async createStockCard(input) {
       if (!this.stocks[input]) {
         try {
-          let newStock = await createStock(input)
+          let newStock = await initializeStock(input)
           this.$set(this.stocks, newStock.ticker, newStock)
           log('Successfully initialized ' + newStock.ticker + ' at $' + newStock.price.current + '.') 
         }
