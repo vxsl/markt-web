@@ -18,11 +18,11 @@
         <table class="table w-100" ref="footerTable">
             <tbody>
                 <tr>
-                    <th>VAL.</th>
+                    <th>VAL</th>
                     <td>${{parseFloat(stock.price.current).toFixed(2)}}</td>
                 </tr>
                 <tr v-if="active">
-                    <th>INIT.</th>
+                    <th>INIT</th>
                     <td>${{parseFloat(position.initPrice).toFixed(2)}}</td>
                 </tr>
                 <tr v-if="active">

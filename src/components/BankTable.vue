@@ -10,11 +10,11 @@
             <table class="table table-dark">
                 <tbody>
                     <tr>
-                        <th>Return</th>
+                        <th>RETURN</th>
                         <td>{{'$' + parseFloat(bankComputed.return.dollar).toFixed(2) + ' (' + parseFloat(bankComputed.return.percent).toFixed(2) + '%)'}}</td>
                     </tr>
                     <tr>
-                        <th>Trades</th>
+                        <th>TRADES</th>
                         <td>{{bank.trades}}</td>
                     </tr>
                 </tbody>
