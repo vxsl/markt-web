@@ -3,7 +3,7 @@
     <div ref="overlay" class="stock-overlay" @click="buyOrSell">
       <p ref="buySellLabel" class="buy-sell-label lead">{{ active ? "SELL" : "BUY" }}</p>
       <form class="quantity-input-container" @submit.prevent="buy">
-        <input required v-model="quantity" type="number" name="quantity-input" value="1" min="1" max="9999">
+        <input required v-model="purchaseQuantity" type="number" name="quantity-input" value="1" min="1" max="9999">
         <input type="submit" :value="quantityMessage" ref="quantitySubmit">
       </form>
     </div>
@@ -12,7 +12,7 @@
         <div class="chart-extlabel">
         <h2 ref="title">{{ stock.ticker }}</h2>
         </div>
-        <StockChart ref='chart' :stock="stock" :position="position" :active="active" :quantity="parseInt(quantity)" :insane="insane" />
+        <StockChart ref='chart' :stock="stock" :position="position" :active="active" :insane="insane" />
       </div>
       <div class="chart-footer">
         <table class="table w-100" ref="footerTable">
@@ -42,9 +42,8 @@ import StockChart from "@/components/StockChart.vue";
 export default {
   data() {
     return {
-      active: false,
-      quantity: 1,
       userInput: false,
+      purchaseQuantity:1
     };
   },
   components: {
@@ -58,11 +57,17 @@ export default {
     bank: Object
   },
   computed: {
+    active() {
+      if (this.position) {
+        return !this.position.sold
+      }
+      return false
+    },
     quantityMessage() {
-      let result = 'BUY ' + this.quantity + ' STOCK'
-      this.quantity > 1? result += 'S' : null
+      let result = 'BUY ' + this.purchaseQuantity + ' STOCK'
+      this.purchaseQuantity > 1? result += 'S' : null
       result += ' ' + this.stock.ticker + ' [$' 
-      result += parseFloat(this.quantity * this.stock.price.current).toFixed(2)
+      result += parseFloat(this.purchaseQuantity * this.stock.price.current).toFixed(2)
       result += ']'
       return result
     },
@@ -105,21 +110,17 @@ export default {
       this.active? this.sell() : this.userInput = true
     },
     buy() {
-      let tentativePrice = this.stock.price.current * this.quantity
+      let tentativePrice = this.stock.price.current * this.purchaseQuantity
       if (this.bank.cash >= tentativePrice) {
-        this.$emit('buy', this.stock.ticker, this.quantity)
-        this.active = true
+        this.$emit('buy', this.stock.ticker, this.purchaseQuantity)
         this.userInput = false
-        this.positionStatusClass = 'active neutral'
       }
       else {
-        this.$emit('toast', 'Not enough cash', "Sorry, you don't have enough cash to purchase " + this.quantity + " " + this.stock.ticker + " stocks.")
+        this.$emit('toast', 'Not enough cash', "Sorry, you don't have enough cash to purchase " + this.purchaseQuantity + " " + this.stock.ticker + " stocks.")
       }
     },
     sell() {
       this.$emit('sell', this.stock.ticker)
-      this.active = false
-      this.positionStatusClass = 'inactive'
     }
   }
 };
