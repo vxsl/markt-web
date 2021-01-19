@@ -20,14 +20,11 @@ export default {
         if (this.position.net > 0) {
           return colors.positiveColor
         }
-        else if (this.position.net == 0) {
-          return this.insane? colors.lightGreyColor : colors.darkGreyColor
-        }
-        else {
+        else if (this.position.net < 0) {
           return colors.dangerColor
         }
       }
-      return colors.darkColor
+      return this.insane? colors.lightGreyColor : colors.darkGreyColor
     }
   },
   watch: {
