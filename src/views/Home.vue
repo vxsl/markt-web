@@ -25,7 +25,7 @@
               <p class="lead table-title">BANK</p>
               <p class="table-sub">A summary of your finances is shown here.</p>
               <hr class="bg-light">
-              <BankTable :positions='positions' :stocks='stocks' :bank="bank" :stats="bankStats"/>
+              <BankTable :positions='positions' :stocks='stocks' :bank="bank" :bankComputed="bankComputed"/>
             </div>
             <div id="positions">
               <p class="lead table-title">POSITIONS</p>
@@ -161,7 +161,7 @@ export default {
         return 'mobile'
       }
     },
-    bankStats() {
+    bankComputed() {
       let balance = this.bank.cash + this.bank.invested
       let diff = balance - this.bank.totalDeposited
       return {
