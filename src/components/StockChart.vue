@@ -16,33 +16,19 @@ export default {
     quantity: Number
   },
   computed: {
-    status() {
-      if (this.active) {
-        let diff = this.stock.price.current - this.position.initPrice
-        if (diff > 0) {
-          return 2
-        }
-        else if (diff == 0) {
-          return 1
-        }
-        else if (diff < 0) {
-          return 0
-        }
-      }
-      return -1
-    },
     color() {
-      switch (this.status) {
-        case 2:
+      if (this.active) {
+        if (this.position.net > 0) {
           return colors.positiveColor
-        case 1:
+        }
+        else if (this.position.net == 0) {
           return this.insane? colors.lightGreyColor : colors.darkGreyColor
-        case 0:
+        }
+        else {
           return colors.dangerColor
-        case -1:
-        default:
-          return colors.darkGreyColor
+        }
       }
+      return colors.darkColor
     }
   },
   watch: {
@@ -51,7 +37,6 @@ export default {
       this.$data._chart.options.scales.yAxes[0].gridLines.color = newColor
       this.$data._chart.options.scales.yAxes[0].ticks.fontColor = newColor
       this.$data._chart.options.legend.labels.fontColor = newColor
-      this.$emit('redraw', this.status)
     },
     insane(insaneVal) {
       this.$data._chart.config.data.datasets[0].borderColor = insaneVal ? colors.lightColor : colors.darkColor

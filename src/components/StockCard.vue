@@ -12,7 +12,7 @@
         <div class="chart-extlabel">
         <h2 ref="title">{{ stock.ticker }}</h2>
         </div>
-        <StockChart ref='chart' :stock="stock" :position="position" :active="active" :quantity="parseInt(quantity)" @redraw="redraw" :insane="insane" />
+        <StockChart ref='chart' :stock="stock" :position="position" :active="active" :quantity="parseInt(quantity)" :insane="insane" />
       </div>
       <div class="chart-footer">
         <table class="table w-100" ref="footerTable">
@@ -44,9 +44,7 @@ export default {
     return {
       active: false,
       quantity: 1,
-      positionStatusClass: String,
       userInput: false,
-      userInputClass:String,
     };
   },
   components: {
@@ -70,12 +68,24 @@ export default {
     },
     insaneClass() {
       return this.insane? 'insane' : ''
-    }
-  },
-  watch: {
-    userInput(val) {
-      val? this.userInputClass = 'user-input' : this.userInputClass = ''
     },
+    userInputClass() {
+      return this.userInput? 'user-input' : ''
+    },
+    positionStatusClass() {
+      if (this.active) {
+        if (this.position.net > 0) {
+          return 'active positive'
+        }
+        else if (this.position.net == 0) {
+          return 'active neutral'
+        }
+        else {
+          return 'active negative'
+        }
+      }
+      return 'inactive'
+    }
   },
   created() {
     this.$emit("newStockCard", this);
@@ -110,22 +120,6 @@ export default {
       this.$emit('sell', this.stock.ticker)
       this.active = false
       this.positionStatusClass = 'inactive'
-    },
-    redraw(newStatus) {
-      switch (newStatus) {
-        case 2:
-          this.positionStatusClass = 'active positive'
-          break
-        case 1:
-          this.positionStatusClass = 'active neutral'
-          break
-        case 0:
-          this.positionStatusClass = 'active negative'
-          break
-        case -1:
-        default:
-          this.positionStatusClass = 'inactive'
-      }
     }
   }
 };
