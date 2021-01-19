@@ -1,5 +1,5 @@
 <template>
-  <div ref="outerContainer" class="chart-outer-container" :class="positionStatusClass + ' ' + insaneClass + ' ' + userInputClass">
+  <div ref="outerContainer" class="chart-outer-container" :class="[positionStatusClass, insaneClass, userInputClass]">
     <div ref="overlay" class="stock-overlay" @click="buyOrSell">
       <p ref="buySellLabel" class="buy-sell-label lead">{{ active ? "SELL" : "BUY" }}</p>
       <form class="quantity-input-container" @submit.prevent="buy">
@@ -46,7 +46,6 @@ export default {
       quantity: 1,
       initPrice: Number,
       positionStatusClass: String,
-      insaneClass: String,
       userInput: false,
       userInputClass:String,
     };
@@ -80,6 +79,9 @@ export default {
       result += parseFloat(this.quantity * this.stock.price.current).toFixed(2)
       result += ']'
       return result
+    },
+    insaneClass() {
+      return this.insane? 'insane' : ''
     }
   },
   watch: {
@@ -96,15 +98,11 @@ export default {
         this.$refs.outerContainer.classList.add('inactive')
       }
     },
-    insane(insaneVal) {
-      this.toggleInsaneStyling(insaneVal)
-    }
   },
   created() {
     this.$emit("newStockCard", this);
   },
   mounted() {
-    this.toggleInsaneStyling(this.insane)
     setTimeout(() => {
       this.$refs.buySellLabel.style.opacity = 1
       this.$refs.chartContainer.style.filter = 'blur(0.3em)'
@@ -115,18 +113,6 @@ export default {
     }, 1000)
   },
   methods: {
-    toggleInsaneStyling(insaneVal) {
-      if (insaneVal) {
-        this.insaneClass = 'insane'
-        this.$refs.footerTable.classList.add('text-light')
-        this.$refs.buySellLabel.classList.add('text-light')
-      }
-      else {
-        this.insaneClass = ''
-        this.$refs.footerTable.classList.remove('text-light')
-        this.$refs.buySellLabel.classList.remove('text-light')
-      }
-    },
     buyOrSell() {
       this.active? this.sell() : this.userInput = true
     },
@@ -141,7 +127,6 @@ export default {
         this.$refs.outerContainer.classList.remove('inactive')
         this.$refs.outerContainer.classList.add('active')
         this.$refs.outerContainer.classList.add('neutral')
-        this.toggleInsaneStyling(this.insane)
       }
       else {
         this.$emit('toast', 'Not enough cash', "Sorry, you don't have enough cash to purchase " + this.quantity + " " + this.stock.ticker + " stocks.")
@@ -187,10 +172,20 @@ canvas {
   animation: none !important;
   -webkit-animation: none !important;
   &.insane, &.inactive.insane, &.active.insane.neutral{
+    .stock-overlay {
+      .buy-sell-label {
+        color:$light-color;
+      }
+    }
     .chart-container {
       border-color:$light-color;
       .padded > .chart-extlabel {
         color:$light-color;
+      }
+      .chart-footer {
+        table {
+          color:$light-color;
+        }
       }
     } 
   }
@@ -288,6 +283,8 @@ canvas {
     border-width:1px;
     .chart-footer {
       table {
+        transition:color 0.5s;
+        color:$dark-color;
         td.active.positive {
           color:$positive-color
         }
@@ -324,6 +321,7 @@ canvas {
     margin-bottom: 0 !important;
   }
   .buy-sell-label {
+    color:$dark-color;
     display:block;
     opacity:0;
     transition: opacity 0.5s;
