@@ -110,6 +110,8 @@ import BankTable from '@/components/BankTable.vue'
 const { initializeStock } = require('@/js/stocks.js')
 const { log } = require('@/js/log.js')
 
+const DEFAULT_INITIAL_CASH = 5000
+
 export default {
 
   name: 'Home',
@@ -130,9 +132,9 @@ export default {
       stocks: {},
       insane: false,
       bank: {            
-        cash:1000.00,
-        invested:0.00,
-        totalDeposited:1000.00,
+        cash:DEFAULT_INITIAL_CASH,
+        invested:0,
+        totalDeposited:DEFAULT_INITIAL_CASH,
         trades:0
       },
       modals: {},
@@ -414,9 +416,6 @@ export default {
   flex-direction: row;
   flex-wrap: wrap;
   position:relative;
-  border-right:none !important;
-  border-top-right-radius:0 !important;
-  border-bottom-right-radius:0 !important;
 
   .stock-card {
     width:20%;
