@@ -159,7 +159,7 @@ export default {
             prefix = "- $"
             diff = -diff
           }
-          p.netString = prefix + parseFloat(diff).toFixed(2)
+          p.netString = prefix + parseFloat(p.net).toFixed(2)
         }
       }
     },
