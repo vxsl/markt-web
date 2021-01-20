@@ -181,6 +181,13 @@ canvas {
     .chart-container{
       border:none;
     }
+    &.insane.neutral {
+      .chart-container{
+        .chart-header * {
+          color:$light-color;
+        }
+      }
+    }
     &.neutral {
       animation: pulse-animation 1s infinite !important; 
       -webkit-animation: pulse-animation 1s infinite alternate !important;
