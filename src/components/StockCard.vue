@@ -8,24 +8,24 @@
       </form>
     </div>
     <div ref="chartContainer" class="chart-container">
-      <div class="padded">
-        <div class="chart-extlabel">
-        <h2 ref="title">{{ stock.ticker }}</h2>
+      <div class="chart-header">
+        <div class="chart-label">
+          <span class="chart-title">{{ stock.ticker }}</span>
+          <marquee class="chart-subtitle" scrollamount="2">{{ stock.name }}</marquee>
         </div>
-        <StockChart ref='chart' :stock="stock" :position="position" :active="active" :insane="insane" />
+        <div class="value">
+          <span>${{parseFloat(stock.price.current).toFixed(2)}}</span>
+        </div>
       </div>
-      <div class="chart-footer">
-        <table class="table w-100" ref="footerTable">
+      <StockChart ref='chart' :stock="stock" :position="position" :active="active" :insane="insane" />
+      <div v-if="active" class="chart-footer">
+        <table class="table" ref="footerTable">
             <tbody>
                 <tr>
-                    <th>VAL</th>
-                    <td>${{parseFloat(stock.price.current).toFixed(2)}}</td>
-                </tr>
-                <tr v-if="active">
                     <th>INIT</th>
                     <td>${{parseFloat(position.initPrice).toFixed(2)}}</td>
                 </tr>
-                <tr v-if="active">
+                <tr>
                     <th>NET</th>
                     <td :class="positionStatusClass">{{position.netString}}</td>
                 </tr>
@@ -148,7 +148,12 @@ canvas {
     }
     .chart-container {
       border-color:$light-color;
-      .padded > .chart-extlabel {
+      .chart-header {
+        .value {
+          color:$light-color
+        }
+      }
+      .chart-label {
         color:$light-color;
       }
       .chart-footer {
@@ -165,7 +170,7 @@ canvas {
       border:solid;
       border-width:1px;
       border-color:$dark-color;
-      .padded > .chart-extlabel {
+      .chart-label {
         color:$dark-color;
       }
     }
@@ -180,7 +185,7 @@ canvas {
       animation: pulse-animation 1s infinite !important; 
       -webkit-animation: pulse-animation 1s infinite alternate !important;
       .chart-container{
-        .padded > .chart-extlabel {
+        .chart-header * {
           color:$dark-color;
         }
       }
@@ -190,7 +195,7 @@ canvas {
       -webkit-animation: negative-pulse-animation 1s infinite alternate !important;
       .chart-container{
         border-color:$danger-color;
-        .padded > .chart-extlabel {
+        .chart-header * {
           color:$danger-color;
         }
       }
@@ -200,7 +205,7 @@ canvas {
       -webkit-animation: positive-pulse-animation 1s infinite alternate !important;
       .chart-container{
         border-color:$positive-color;
-        .padded > .chart-extlabel {
+        .chart-header * {
           color:$positive-color;
         }
       }
@@ -229,29 +234,12 @@ canvas {
     border-radius:0.5em;
     overflow:hidden;
     height:100%;
-    .padded {
-      padding:1em;
-      padding-top:0.5em;
-      .chart-extlabel {
-        width:100%;
-        color:$dark-color;
-        padding-bottom:1%;
-        margin-bottom:0.6em;
-        text-align:right;
-        border-bottom:solid;
-        border-bottom-width:1px;
-        h2 {
-            font-size:1.3vw;
-            vertical-align:middle;
-            margin:0;
-        }
-      }
-    }
-    border:solid;
-    border-color:$dark-color;
-    border-width:1px;
+    padding:0.6em;
+    padding-top:0.5em;
     .chart-footer {
+      margin-top:1em;
       table {
+        font-size:0.8em;
         transition:color 0.5s;
         color:$dark-color;
         td.active.positive {
@@ -269,6 +257,35 @@ canvas {
         margin-bottom:0 !important;
       }
     }
+    .chart-header {
+      .chart-label {
+        display:flex;
+        float:left;
+        width:100%;
+        color:$dark-color;
+        text-align:left;
+        line-height:1em;
+        .chart-title {
+          margin-right:0.6em;
+        }
+        .chart-subtitle {
+          font-style:italic;
+          flex-grow:1;
+          float:right;
+          text-align:right;
+          color:$light-grey-color;
+          font-size:0.8em;
+        }
+      }
+      .value {
+        padding-top:0.5em;
+        padding-bottom:0.75em;
+        display:block;
+      }
+    }
+    border:solid;
+    border-color:$dark-color;
+    border-width:1px;
   }
 }
 
