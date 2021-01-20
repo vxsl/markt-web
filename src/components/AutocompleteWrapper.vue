@@ -7,7 +7,19 @@
           :search="search"
           @submit="passInput"
           @blur="$emit('blur')"
-      ></autocomplete>
+      >
+      <template #result="{ result, props }">
+        <li
+          v-bind="props"
+          class="autocomplete-result"
+        >
+          <div class="result">
+            {{ result.symbol }}
+          </div>
+          <div class="result-details" v-html="result.name" />
+        </li>
+      </template>
+      </autocomplete>
     </div>
 </template>
 
@@ -35,9 +47,15 @@ export default {
   },
   methods: {
       search(input) {
-        return this.symbols.filter(symbol => {
-            return symbol.label.startsWith(input.toUpperCase())
-        }).map(a => a.label)
+        if (this.market.length) {
+          return this.market.filter(stock => {
+            input = input.toUpperCase()
+            return stock.symbol.startsWith(input) || stock.name.startsWith(input)
+          })
+        }
+        else {
+          return ['Retrieving market data from BNN Bloomberg...']
+        }
       },
       async passInput(input) {
         if (input === undefined) {
@@ -48,7 +66,10 @@ export default {
             input = this.$refs.tickerInput.value
           }
         }
-        this.$emit('submit', input.toUpperCase())
+        if (input.symbol) {
+          input = input.symbol
+        }
+        this.$emit('submit', input)
       },
   }
 }
@@ -56,6 +77,11 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+@import '@/scss/custom.scss';
+  .result-details {
+    font-size:0.8em;
+    color:$light-grey-color
+  }
   .ticker-input {
     position:absolute;
     width:80%;
