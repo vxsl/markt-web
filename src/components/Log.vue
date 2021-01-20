@@ -21,6 +21,7 @@ export default {
   created() { 
     messageEmitter.on('new', this.addMessage)
     harvesterMessageEmitter.on('new', this.addMessage)
+    this.$emit('ready')
   },
   methods: {
     addMessage(message) {
