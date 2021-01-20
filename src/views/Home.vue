@@ -212,7 +212,7 @@ export default {
     },
   },
   created() {
-    this.getMarketData()
+    this.getMarketSnapshot()
   },
   mounted() {
     window.addEventListener('load', () => {
@@ -235,14 +235,16 @@ export default {
     preLog(message) {
       this.logReady? log(message) : this.preMountMessages.push(message)
     },
-    async getMarketData() {
-      this.preLog('Obtaining stock list...')
+    async getMarketSnapshot() {
+      this.preLog('Retrieving stock list')
+      this.preLog('...')
       await new Promise(r => setTimeout(r, 1000));
       this.market = await fetch('https://kylegrimsrudma.nz:8081/https://markt.kylegrimsrudma.nz/static/freshest', {method: 'get'}).then(async (res) => {
         if (res.status != 200) throw Error
         let obj = await res.json()
-        this.preLog('Stock list obtained successfully', obj.length + ' total stocks from Canadian and US exchanges')
-        return obj
+        this.preLog('Stock list retrieved successfully.')
+        this.preLog(obj.stocks.length + ' stocks listed on ' + obj.exchanges + ' as of ' + new Date(parseInt(obj.timestamp)).toString())
+        return obj.stocks
       }).catch(async (err) => {
         this.preLog('Error obtaining stock list', 'Trying to generate from scratch.')
         try {
