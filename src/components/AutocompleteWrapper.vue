@@ -54,7 +54,7 @@ export default {
           })
         }
         else {
-          return ['Retrieving market data from BNN Bloomberg...']
+          return ' '
         }
       },
       async passInput(input) {
