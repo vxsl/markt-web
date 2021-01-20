@@ -171,15 +171,14 @@ export default {
           let p = this.positions[ticker]
           let diff = this.stocks[ticker].price.current - p.initPrice
           p.net = diff * p.quantity
-          let prefix = ''
+          let result
           if (diff >= 0) {
-            prefix = "+ $"  
+            result = "+ $" + parseFloat(p.net).toFixed(2)
           }
           else {
-            prefix = "- $"
-            diff = -diff
+            result = "- $" + parseFloat(-1 * p.net).toFixed(2)
           }
-          p.netString = prefix + parseFloat(p.net).toFixed(2)
+          p.netString = result
         }
       }
     },
