@@ -90,7 +90,6 @@ export default {
       else {
         /* tools.refreshLog(i, newTimestamp, p.ticker + ": Nothing to report...") */
       }
-      p.lock = 0
     },
     draw() {
       const p = this.stock
