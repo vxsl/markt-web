@@ -218,7 +218,7 @@ export default {
     window.addEventListener('load', () => {
       this.loading = false
       if (this.screenSize != 'mobile') {
-        this.createModal('WELCOME', "Try your hand at day trading risk-free.\n\nMarket data is retrieved using <a href=https://github.com/vxsl/bnnbloomberg-markets-api>my unofficial Javascript wrapper for BNN Bloomberg's market data API</a>. If you find the real stock market boring, you can try disabling boring mode...\n\nAt this time, mostly Canadian stocks are available.\n\n\n<span style='float:right'><span style='font-style:italic'>Have fun!</span> 📈</span>")
+        this.createModal('WELCOME', "Try your hand at day trading risk-free.\n\nMarket data is retrieved using <a href=https://github.com/vxsl/bnnbloomberg-markets-api>my unofficial Javascript wrapper for BNN Bloomberg's market data API</a>. If you find the real stock market boring, you can try disabling boring mode...\n\n<span style='float:right'><span style='font-style:italic'>Have fun!</span> 📈</span>")
       }
       else {
         this.createModal('WELCOME', "Unfortunately this webapp has not yet been optimized for mobile use. Please visit again on a larger display.", false)
