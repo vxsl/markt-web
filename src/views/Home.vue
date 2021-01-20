@@ -1,6 +1,5 @@
 <template>
   <div>
-    <transition name="fade">
       <div v-if="loading" class="spinner-splash min-vh-100 d-flex justify-content-center align-items-center">
         <div class="spinner-inner-container text-light">
           <b-spinner/>
@@ -8,7 +7,6 @@
           <p class="lead">LOADING</p>
         </div>
       </div>
-    </transition>
     <Modal 
       v-for="(dialog, title) in modals" 
       :key="title" 
@@ -17,7 +15,6 @@
       :message="dialog.message" 
       @done="destroyModal"
     />
-    <transition name="fade">
       <div v-if="!loading && screenSize != 'mobile'" id="content" :class="screenSize">
         <div class="sidebar">          
           <div class="inner-sidebar bg-dark text-light">
@@ -102,7 +99,6 @@
           </div>
         </div>
       </div>
-    </transition>
   </div>
 </template>
 
