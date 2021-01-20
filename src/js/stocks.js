@@ -21,15 +21,14 @@ const generateStockList = async(pathToWrite=null) => {
 class Stock {
 	constructor (quoteHarvester, price) {
 		this.ticker = quoteHarvester.ticker
+		this.name = quoteHarvester.name
 		this.quoter = quoteHarvester
 		this.price = price
-		this.lock = 0
 	}
 	
 	static async build (ticker) {
         let p = await QuoteHarvester.build(ticker)
         let q = await p.quote()
-        console.dir(q)
         let initPrice = q.data.stocks[0].price
         let price = {
             current:initPrice,
