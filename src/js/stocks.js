@@ -1,6 +1,23 @@
 const	{ EventEmitter } = require("events"),
         { QuoteHarvester } = require("./bnnbloomberg-markets-api/QuoteHarvester")
 
+const generateStockList = async(pathToWrite=null) => {
+	let q = await QuoteHarvester.build('ca')
+	let ca = (await q.quote()).data.stocks
+	q = await QuoteHarvester.build('us')
+	let us = (await q.quote()).data.stocks
+	
+	if (pathToWrite) {
+		var fs = require('fs')
+		fs.writeFile(pathToWrite, ca.concat(us), (err) => {
+			if (err) {
+				console.log(err)
+			}
+		})
+	}
+	return ca.concat(us)
+}
+
 class Stock {
 	constructor (quoteHarvester, price) {
 		this.ticker = quoteHarvester.ticker
@@ -37,4 +54,5 @@ const initializeStock = async (ticker) => {
 
 module.exports = {
 	initializeStock,
+	generateStockList
 }
