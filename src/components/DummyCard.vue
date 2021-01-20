@@ -7,6 +7,7 @@
         <AutocompleteWrapper
           v-if="selecting"
           ref="autocomplete"
+          :market="market"
           @submit="handleSubmit"
           @blur="handleAutocompleteBlur"
         >
@@ -53,6 +54,7 @@ export default {
       }
   },
   props: {
+    market: Array,
     ticker: String,   
     prompt: Boolean
   },

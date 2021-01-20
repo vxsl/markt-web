@@ -22,6 +22,7 @@ export default {
       }
   },
   props: {
+    market:Array
   },
   components: {
       Autocomplete
