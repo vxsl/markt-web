@@ -1,12 +1,12 @@
 <template>
   <div>
-      <div v-if="loading" class="spinner-splash min-vh-100 d-flex justify-content-center align-items-center">
-        <div class="spinner-inner-container text-light">
-          <b-spinner/>
-          <span class="break-here"></span>
-          <p class="lead">LOADING</p>
-        </div>
+    <div v-if="loading" class="spinner-splash min-vh-100 d-flex justify-content-center align-items-center">
+      <div class="spinner-inner-container text-light">
+        <b-spinner/>
+        <span class="break-here"></span>
+        <p class="lead">LOADING</p>
       </div>
+    </div>
     <Modal 
       v-for="(dialog, title) in modals" 
       :key="title" 
@@ -15,95 +15,96 @@
       :message="dialog.message" 
       @done="destroyModal"
     />
-      <div v-if="!loading && screenSize != 'mobile'" id="content" :class="screenSize">
-        <div class="sidebar">          
-          <div class="inner-sidebar bg-dark text-light">
-            <div id="bank">
-              <p class="lead table-title">BANK</p>
-              <p class="table-sub">A summary of your finances is shown here.</p>
-              <hr class="bg-light">
-              <BankTable 
-                :positions='positions' 
-                :stocks='stocks' 
-                :bank="bank" 
-                :bankComputed="bankComputed"
-              />
-            </div>
-            <div id="positions">
-              <p class="lead table-title">POSITIONS</p>
-              <p class="table-sub">A summary of your positions is shown here.</p>
-              <hr class="bg-light">
-            </div>
-            <PositionsTable 
+    <div v-if="!loading && screenSize != 'mobile'" id="content" :class="screenSize">
+      <div class="sidebar">          
+        <div class="inner-sidebar bg-dark text-light">
+          <div id="bank">
+            <p class="lead table-title">BANK</p>
+            <p class="table-sub">A summary of your finances is shown here.</p>
+            <hr class="bg-light">
+            <BankTable 
               :positions='positions' 
-              :stocks='stocks'
+              :stocks='stocks' 
+              :bank="bank" 
+              :bankComputed="bankComputed"
             />
           </div>
+          <div id="positions">
+            <p class="lead table-title">POSITIONS</p>
+            <p class="table-sub">A summary of your positions is shown here.</p>
+            <hr class="bg-light">
+          </div>
+          <PositionsTable 
+            :positions='positions' 
+            :stocks='stocks'
+          />
         </div>
-        <div class="content">
-          <div id="nav-container" ref="navContainer" fixed="top">
-            <b-navbar id="nav" class="d-flex align-items-start">
-              <div id="options" ref="options" class="col-2 bg-dark text-light">
-                <p ref="optionsTitle">OPTIONS</p>
-                <ToggleButton
-                  @toggled="toggleInsane"
-                  ref="toggleInsane"
-                  class="option-button"
-                  :class="insaneClass"
-                  onText="Insane mode"
-                  offText="Boring mode"
-                />
-              </div>
-              <div class="col-8 terminal d-flex align-items-center">
-                <div id="log-container" class="bg-dark text-light">
+      </div>
+      <div class="content">
+        <div id="nav-container" ref="navContainer" fixed="top">
+          <b-navbar id="nav" class="d-flex align-items-start">
+            <div id="options" ref="options" class="col-2 bg-dark text-light">
+              <p ref="optionsTitle">OPTIONS</p>
+              <ToggleButton
+                @toggled="toggleInsane"
+                ref="toggleInsane"
+                class="option-button"
+                :class="insaneClass"
+                onText="Insane mode"
+                offText="Boring mode"
+              />
+            </div>
+            <div class="col-8 terminal d-flex align-items-center">
+              <div id="log-container" class="bg-dark text-light">
                   <Log 
                     id="log" 
                     ref="log" 
                     class="text-light"
                     @ready="handleLogReady"
                   />
-                </div>
               </div>
-              <div id="title-box" class="col-2">
-                <div id="main-title" ref="main-title" :class="insaneClass">MARKT</div>
-                <span class="break-here"></span>
-                <div id="markt-subtitle" ref="main-subtitle" class="lead" v-show="!insane">by <a href="https://kylegrimsrudma.nz">Kyle</a></div>
-                <div class="clock-container d-flex align-items-end">
-                  <Clock 
-                    id="clock" 
-                    ref="clock" 
-                    :class="insaneClass"
-                  />
-                </div>
+            </div>
+            <div id="title-box" class="col-2">
+              <div id="main-title" ref="main-title" :class="insaneClass">MARKT</div>
+              <span class="break-here"></span>
+              <div id="markt-subtitle" ref="main-subtitle" class="lead" v-show="!insane">by <a href="https://kylegrimsrudma.nz">Kyle</a></div>
+              <div class="clock-container d-flex align-items-end">
+                <Clock 
+                  id="clock" 
+                  ref="clock" 
+                  :class="insaneClass"
+                />
               </div>
-            </b-navbar>
-          </div>
-          <div class="stocks-grid">
-            <StockCard 
-              v-for="(stock, ticker) in stocks" 
-              class="stock-card" 
-              :key="ticker" 
-              :bank="bank"
-              :stock="stock" 
-              :position="positions[ticker]" 
-              :insane="insane" 
-              @buy="buyPosition" 
-              @sell="sellPosition" 
-              @toast="toast"
-            />
-            <DummyCard 
-              id="dummy" 
-              ref="dummy" 
-              class="bg-light text-dark" 
-              :class="insaneClass" 
-              :key="dummyRedrawFlag" 
-              :prompt="dummyPrompt" 
-              @promptDismissed="dummyPromptDismissed = true"
-              @submitted="createStockCard"
-            />            
-          </div>
+            </div>
+          </b-navbar>
+        </div>
+        <div class="stocks-grid">
+          <StockCard 
+            v-for="(stock, ticker) in stocks" 
+            class="stock-card" 
+            :key="ticker" 
+            :bank="bank"
+            :stock="stock" 
+            :position="positions[ticker]" 
+            :insane="insane" 
+            @buy="buyPosition" 
+            @sell="sellPosition" 
+            @toast="toast"
+          />
+          <DummyCard 
+            id="dummy" 
+            ref="dummy" 
+            class="bg-light text-dark" 
+            :class="insaneClass" 
+            :key="dummyRedrawFlag" 
+            :prompt="dummyPrompt" 
+            :market="market"
+            @promptDismissed="dummyPromptDismissed = true"
+            @submitted="createStockCard"
+          />            
         </div>
       </div>
+    </div>
   </div>
 </template>
 
@@ -116,6 +117,7 @@ import StockCard from '@/components/StockCard.vue'
 import DummyCard from '@/components/DummyCard.vue'
 import PositionsTable from '@/components/PositionsTable.vue'
 import BankTable from '@/components/BankTable.vue'
+import { generateStockList } from '../js/stocks'
 const { initializeStock } = require('@/js/stocks.js')
 const { log } = require('@/js/log.js')
 
@@ -138,6 +140,7 @@ export default {
     return {
       logReady:false,
       preMountMessages: [],
+      market:[],
       loading: true,
       positions: {},
       stocks: {},
@@ -208,7 +211,9 @@ export default {
       }
     },
   },
-  
+  created() {
+    this.getMarketData()
+  },
   mounted() {
     window.addEventListener('load', () => {
       this.loading = false
@@ -226,6 +231,30 @@ export default {
       for (let message of this.preMountMessages) {
         log(message)
       }
+    },
+    preLog(message) {
+      this.logReady? log(message) : this.preMountMessages.push(message)
+    },
+    async getMarketData() {
+      this.preLog('Obtaining stock list...')
+      await new Promise(r => setTimeout(r, 1000));
+      this.market = await fetch('https://kylegrimsrudma.nz:8081/https://markt.kylegrimsrudma.nz/static/freshest', {method: 'get'}).then(async (res) => {
+        if (res.status != 200) throw Error
+        let obj = await res.json()
+        this.preLog('Stock list obtained successfully', obj.length + ' total stocks from Canadian and US exchanges')
+        return obj
+      }).catch(async (err) => {
+        this.preLog('Error obtaining stock list', 'Trying to generate from scratch.')
+        try {
+          this.preLog('Success', 'Stock list successfully generated.')
+          return await generateStockList()
+        }
+        catch (e) {
+          this.preLog('Error generating stock list - ' + e)
+          this.toast('Error generating stock list', e, false)
+          return []
+        }
+      });
     },
     createModal(title, message, closeable=true) {
       this.$set(this.modals, title, 
