@@ -56,7 +56,12 @@
               </div>
               <div class="col-8 terminal d-flex align-items-center">
                 <div id="log-container" class="bg-dark text-light">
-                    <Log id="log" ref="log" class="text-light"/>
+                  <Log 
+                    id="log" 
+                    ref="log" 
+                    class="text-light"
+                    @ready="handleLogReady"
+                  />
                 </div>
               </div>
               <div id="title-box" class="col-2">
@@ -131,6 +136,8 @@ export default {
   },
   data() {
     return {
+      logReady:false,
+      preMountMessages: [],
       loading: true,
       positions: {},
       stocks: {},
@@ -214,6 +221,12 @@ export default {
     })
   },
   methods: {
+    handleLogReady() {
+      this.logReady = true
+      for (let message of this.preMountMessages) {
+        log(message)
+      }
+    },
     createModal(title, message, closeable=true) {
       this.$set(this.modals, title, 
         {
