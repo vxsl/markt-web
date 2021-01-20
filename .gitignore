@@ -3,3 +3,4 @@ dist
 deploy.sh
 .gitignore
 .vscode
+demo/demo1.gif
