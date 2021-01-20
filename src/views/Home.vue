@@ -38,6 +38,11 @@
             :positions='positions' 
             :stocks='stocks'
           />
+          <PositionsTable 
+            v-if='pastPositions.length > 0'
+            :pastPositions='pastPositions' 
+            :past='true'
+          />
         </div>
       </div>
       <div class="content">
@@ -143,6 +148,7 @@ export default {
       market:[],
       loading: true,
       positions: {},
+      pastPositions: [],
       stocks: {},
       insane: false,
       bank: {            
@@ -325,7 +331,8 @@ export default {
           'initPrice':salePrice,
           'net':0,
           'netString':'+ $0.00',
-          'sold':false
+          'timestamp':Date.now(),
+          'ticker':ticker
         }
       )
       this.bank.cash -= amount
@@ -339,6 +346,7 @@ export default {
       let amount = soldPrice * quantity
       this.bank.cash += amount
       this.bank.invested -= (this.positions[ticker].initPrice * quantity)
+      this.pastPositions.unshift(this.positions[ticker])
       this.$delete(this.positions, ticker)
       this.bank.trades += 1
       let messagePrefix = 'You just sold ' + quantity + " " + ticker + " stock" + (quantity > 1? "s" : '')
@@ -440,6 +448,7 @@ export default {
   height:100vh !important;
   padding-bottom:2vh;
   .inner-sidebar {
+    overflow:hidden;
     position:relative;
     height:100%;
     border-bottom-right-radius:1em;
